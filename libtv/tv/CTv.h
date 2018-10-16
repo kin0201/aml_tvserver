@@ -66,6 +66,8 @@ static const char *TV_CONFIG_EDID20_FILE_PATH = "/vendor/etc/tvconfig/hdmi/port_
 #define LCD_ENABLE "/sys/class/lcd/enable"
 #define BL_LOCAL_DIMING_FUNC_ENABLE "/sys/class/aml_ldim/func_en"
 #define DEVICE_CLASS_TSYNC_AV_THRESHOLD_MIN "/sys/class/tsync/av_threshold_min"
+#define IWATT_SHELL_PATH    "/system/bin/get_iwatt_regs.sh"
+
 #define AV_THRESHOLD_MIN_MS "540000" //6S = 6*90000
 
 #define DTV_DTMB_MODE        "dtmb"
@@ -256,6 +258,7 @@ public:
     virtual int Tv_SSMRestoreDefaultSetting();
     int handleGPIO(const char *port_name, bool is_out, int edge);
     int setLcdEnable(bool enable);
+    int Tv_GetIwattRegs();
     int GetSourceConnectStatus(tv_source_input_t source_input);
     int IsDVISignal();
     int isVgaFmtInHdmi();

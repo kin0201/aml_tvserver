@@ -2513,6 +2513,30 @@ int CTv::setLcdEnable(bool enable)
     return ret;
 }
 
+int CTv::Tv_GetIwattRegs()
+{
+    int ret = -1;
+    time_t timer;
+    struct tm *tp;
+    char path[100] = {0};
+
+    time(&timer);
+    tp = localtime(&timer);
+
+    sprintf(path, "%s /data/log/%s-%d-%d-%d-%d%d%d",
+            IWATT_SHELL_PATH,
+            "iwatt-7019", tp->tm_year + 1900, tp->tm_mon+1,
+            tp->tm_mday, tp->tm_hour, tp->tm_min, tp->tm_sec);
+    LOGD("save iwatt regs to %s", path);
+
+    ret = system(path);
+    if (ret < 0) {
+        LOGE("%s: system commond error\n", __FUNCTION__);
+    }
+
+    return ret;
+}
+
 /*********************** SSM  start **********************/
 int CTv::Tv_SSMRestoreDefaultSetting()
 {

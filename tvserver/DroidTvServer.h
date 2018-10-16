@@ -148,6 +148,8 @@ public:
     Return<int32_t> setLcdEnable(int32_t enable) override;
     Return<void> readMacAddress(readMacAddress_cb _hidl_cb) override;
     Return<int32_t> saveMacAddress(const hidl_array<int32_t, 6>& data_buf) override;
+    Return<int32_t> getIwattRegs() override;
+
     Return<void> setCallback(const sp<ITvServerCallback>& callback, ConnectType type) override;
 
     virtual void onEvent(const TvHidlParcel &hidlParcel);

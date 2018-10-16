@@ -500,6 +500,10 @@ Return<int32_t> DroidTvServer::saveMacAddress(const hidl_array<int32_t, 6>& data
     return mTvServiceIntf->saveMacAddress(tempBuf);
 }
 
+Return<int32_t> DroidTvServer::getIwattRegs() {
+    return mTvServiceIntf->getIwattRegs();
+}
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {

@@ -131,6 +131,8 @@ public:
     int setLcdEnable(int enable);
     int readMacAddress(unsigned char *dataBuf);
     int saveMacAddress(unsigned char *dataBuf);
+    int getIwattRegs();
+
     virtual status_t dump(int fd, const Vector<String16>& args);
 
     //wp<Client> mpScannerClient;
