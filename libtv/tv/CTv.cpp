@@ -700,7 +700,7 @@ int CTv::atvAutoScan(int videoStd __unused, int audioStd __unused, int searchTyp
     if ( !mATVDisplaySnow ) {
         mpTvin->Tvin_StopDecoder();
     } else {
-        mpTvin->SwitchSnow( true );
+        SetSnowShowEnable( true );
     }
 
     vStd = CC_ATV_VIDEO_STD_PAL;
@@ -826,7 +826,7 @@ int CTv::stopScan()
     LOGD("%s, tv scanning , stop it\n", __FUNCTION__);
     if ((SOURCE_TV == m_source_input) && mATVDisplaySnow) {
         mpTvin->Tvin_StopDecoder();
-        mpTvin->SwitchSnow( false );
+        SetSnowShowEnable( false );
         mAv.DisableVideoWithBlackColor();
     } else {
         mAv.DisableVideoWithBlackColor();
@@ -1314,7 +1314,7 @@ int CTv::setFrontEnd ( const char *paras, bool force )
                 mTvAction &= ~TV_ACTION_IN_VDIN;
                 mpTvin->Tvin_StopDecoder();
                 if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-                    mpTvin->SwitchSnow( false );
+                    SetSnowShowEnable( false );
                 }
                 mpTvin->VDIN_ClosePort();
             }
@@ -1836,7 +1836,7 @@ int CTv::StopTvLock ( void )
     stopPlaying(false);
     mpTvin->Tvin_StopDecoder();
     if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-        mpTvin->SwitchSnow( false );
+        SetSnowShowEnable( false );
     }
     mpTvin->VDIN_ClosePort();
     mTvAction &= ~TV_ACTION_IN_VDIN;
@@ -2158,7 +2158,7 @@ void CTv::onSigStillStable()
         LOGD("still stable , to start decoder");
         if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
             mpTvin->Tvin_StopDecoder();
-            mpTvin->SwitchSnow( false );
+            SetSnowShowEnable( false );
         }
         int startdec_status = mpTvin->Tvin_StartDecoder ( m_cur_sig_info );
         if ( startdec_status == 0 ) { //showboz  codes from  start decode fun
@@ -2225,7 +2225,7 @@ void CTv::onSigToUnSupport()
 {
     LOGD ( "%s, signal to UnSupport\n", __FUNCTION__);
     if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-        mpTvin->SwitchSnow(true);
+        SetSnowShowEnable(true);
         mpTvin->Tvin_StartDecoder(m_cur_sig_info);
         mAv.EnableVideoNow(false);
     } else {
@@ -2252,7 +2252,7 @@ void CTv::onSigToNoSig()
 {
     LOGD ( "%s, signal to NoSignal\n", __FUNCTION__);
     if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-        mpTvin->SwitchSnow(true);
+        SetSnowShowEnable(true);
         mpTvin->Tvin_StartDecoder(m_cur_sig_info);
         mAv.EnableVideoNow(false);
     } else {
@@ -3328,3 +3328,13 @@ int CTv::GetAtvAutoScanMode()
      */
     return mode;
 }
+
+int CTv::SetSnowShowEnable(bool enable)
+{
+    if (enable) {
+        mAv.setVideoScreenMode(1);//while show snow,need show full screen
+    }
+
+    return mpTvin->SwitchSnow(enable);
+}
+
