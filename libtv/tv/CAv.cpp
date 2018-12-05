@@ -445,7 +445,7 @@ int CAv::seekTimeShift(int pos, bool start)
 
 int CAv::setTimeShiftSpeed(int speed)
 {
-    LOGD ( "%S: [%d]", __FUNCTION__, speed);
+    LOGD ( "%s: [%d]", __FUNCTION__, speed);
     int ret = 0;
 #ifdef SUPPORT_ADTV
     if (speed < 0)
@@ -458,7 +458,7 @@ int CAv::setTimeShiftSpeed(int speed)
 
 int CAv::switchTimeShiftAudio(int apid, int afmt)
 {
-    LOGD ( "%S: [pid:%d, fmt:%d]", __FUNCTION__, apid, afmt);
+    LOGD ( "%s: [pid:%d, fmt:%d]", __FUNCTION__, apid, afmt);
 #ifdef SUPPORT_ADTV
     return AM_AV_SwitchTimeshiftAudio (mTvPlayDevId, apid, afmt);
 #else
