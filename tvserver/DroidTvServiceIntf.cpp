@@ -788,8 +788,8 @@ int DroidTvServiceIntf::sendRecordingCmd(int32_t cmd, const std::string& id, con
     return mpTv->doRecordingCommand(cmd, id.c_str(), param.c_str());
 }
 
-rrt_select_info_t DroidTvServiceIntf::searchRrtInfo(int rating_region_id, int dimension_id, int value_id) {
-    return mpTv->Tv_RrtSearch(rating_region_id, dimension_id, value_id);
+rrt_select_info_t DroidTvServiceIntf::searchRrtInfo(int rating_region_id, int dimension_id, int value_id, int program_id) {
+    return mpTv->Tv_RrtSearch(rating_region_id, dimension_id, value_id, program_id);
 }
 
 int DroidTvServiceIntf::updateRRT(int freq, int moudle, int mode) {

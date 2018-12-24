@@ -3245,13 +3245,13 @@ int CTv::Tv_RrtUpdate(int freq, int modulation, int mode)
     return ret;
 }
 
-rrt_select_info_t CTv::Tv_RrtSearch(int rating_region_id, int dimension_id, int value_id)
+rrt_select_info_t CTv::Tv_RrtSearch(int rating_region_id, int dimension_id, int value_id, int program_id)
 {
     rrt_select_info_t tmp;
     memset(&tmp, 0, sizeof(rrt_select_info_t));
 #ifdef SUPPORT_ADTV
 
-    int ret = mTvRrt->GetRRTRating(rating_region_id, dimension_id, value_id, &tmp);
+    int ret = mTvRrt->GetRRTRating(rating_region_id, dimension_id, value_id, program_id, &tmp);
     if (ret < 0) {
         LOGD("Tv_RrtSearch error!\n");
     }

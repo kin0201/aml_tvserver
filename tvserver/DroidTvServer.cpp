@@ -391,12 +391,13 @@ Return<int32_t> DroidTvServer::sendRecordingCmd(int32_t cmd, const hidl_string& 
     return mTvServiceIntf->sendRecordingCmd(cmd, id, param);
 }
 
-Return<void> DroidTvServer::searchRrtInfo(int32_t rating_region_id, int32_t dimension_id, int32_t value_id, searchRrtInfo_cb _hidl_cb) {
+Return<void> DroidTvServer::searchRrtInfo(int32_t rating_region_id, int32_t dimension_id, int32_t value_id, int32_t program_id, searchRrtInfo_cb _hidl_cb) {
     RRTSearchInfo info;
-    rrt_select_info_t tempInfo = mTvServiceIntf->searchRrtInfo(rating_region_id, dimension_id, value_id);
+    rrt_select_info_t tempInfo = mTvServiceIntf->searchRrtInfo(rating_region_id, dimension_id, value_id, program_id);
     info.RatingRegionName = tempInfo.rating_region_name;
     info.DimensionsName = tempInfo.dimensions_name;
     info.RatingValueText = tempInfo.rating_value_text;
+    info.status = tempInfo.status;
     _hidl_cb(info);
     return Void();
 }

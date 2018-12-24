@@ -113,7 +113,7 @@ public:
     int DtvSwitchAudioTrack(int32_t audio_pid, int32_t audio_format, int32_t audio_param);
     int setWssStatus(int status);
     int sendRecordingCmd(int32_t cmd, const std::string& id, const std::string& param);
-    rrt_select_info_t searchRrtInfo(int rating_region_id, int dimension_id, int value_id);
+    rrt_select_info_t searchRrtInfo(int rating_region_id, int dimension_id, int value_id, int program_id);
     int updateRRT(int freq, int moudle, int mode);
     int updateEAS(int freq, int moudle, int mode);
     int setDeviceIdForCec(int DeviceId);
