@@ -414,6 +414,10 @@ Return<int32_t> DroidTvServer::setDeviceIdForCec(int32_t DeviceId) {
     return mTvServiceIntf->setDeviceIdForCec(DeviceId);
 }
 
+Return<int32_t> DroidTvServer::getTvRunStatus(void) {
+    return mTvServiceIntf->getTvRunStatus();
+}
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {

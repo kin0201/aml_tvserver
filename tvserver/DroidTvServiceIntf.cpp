@@ -804,6 +804,10 @@ int DroidTvServiceIntf::setDeviceIdForCec(int DeviceId) {
     return mpTv->Tv_SetDeviceIdForCec(DeviceId);
 }
 
+int DroidTvServiceIntf::getTvRunStatus(void) {
+    return mpTv->GetTvStatus();
+}
+
 int DroidTvServiceIntf::processCmd(const Parcel &p) {
     unsigned char dataBuf[512] = {0};
     int ret = -1;
