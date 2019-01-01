@@ -153,6 +153,9 @@ public:
         static const int EVENT_FE_HAS_SIG = 0x01;
         static const int EVENT_FE_NO_SIG = 0x02;
         static const int EVENT_FE_INIT = 0x03;
+        static const int EVENT_VLFE_HAS_SIG = 0x04;
+        static const int EVENT_VLFE_NO_SIG = 0x05;
+        static const int EVENT_VLFE_INIT = 0x06;
 
         FEEvent(): CTvEv(CTvEv::TV_EVENT_SIGLE_DETECT)
         {

@@ -592,11 +592,11 @@ void CFrontEnd::v4l2_fend_callback(long dev_no __unused, int event_type __unused
 
     LOGD("vlfend callback: status[0x%x]\n", evt->status);
     if (evt->status &  TV_FE_HAS_LOCK) {
-        pFront->mCurSigEv.mCurSigStaus = FEEvent::EVENT_FE_HAS_SIG;
+        pFront->mCurSigEv.mCurSigStaus = FEEvent::EVENT_VLFE_HAS_SIG;
         pFront->mCurSigEv.mCurFreq = evt->parameters.frequency;
         pFront->mpObserver->onEvent(pFront->mCurSigEv);
     } else if (evt->status & TV_FE_TIMEDOUT) {
-        pFront->mCurSigEv.mCurSigStaus = FEEvent::EVENT_FE_NO_SIG;
+        pFront->mCurSigEv.mCurSigStaus = FEEvent::EVENT_VLFE_NO_SIG;
         pFront->mCurSigEv.mCurFreq = evt->parameters.frequency;
         pFront->mpObserver->onEvent(pFront->mCurSigEv);
     }

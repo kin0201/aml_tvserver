@@ -253,6 +253,10 @@ void CTv::onEvent ( const CFrontEnd::FEEvent &ev )
             ev.mReserved = 0;
             sendTvEvent ( ev );
         }
+    } else if (ev.mCurSigStaus == CFrontEnd::FEEvent::EVENT_VLFE_HAS_SIG) {
+        LOGD("[source_switch_time]: %fs, vlfe lock", getUptimeSeconds());
+    } else if (ev.mCurSigStaus == CFrontEnd::FEEvent::EVENT_VLFE_NO_SIG) {
+        LOGD("[source_switch_time]: %fs, vlfe unlock", getUptimeSeconds());
     }
 }
 
@@ -1790,6 +1794,16 @@ int CTv::StartTvLock ()
     AutoMutex _l( mLock );
     //tvWriteSysfs("/sys/power/wake_lock", "tvserver.run");
 
+    if ( m_first_enter_tvinput ) {
+        if (mpTvin->Tvin_RemovePath (TV_PATH_TYPE_TVIN) > 0) {
+            mpTvin->VDIN_AddVideoPath(TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
+        }
+        if (mpTvin->Tvin_RemovePath (TV_PATH_TYPE_DEFAULT) > 0) {
+            mpTvin->VDIN_AddVideoPath(TV_PATH_DECODER_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
+        }
+        m_first_enter_tvinput = false;
+    }
+
     setDvbLogLevel();
     //mAv.ClearVideoBuffer();
     mAv.SetVideoLayerDisable(0);
@@ -1963,15 +1977,6 @@ int CTv::SetSourceSwitchInputLocked(tv_source_input_t virtual_input, tv_source_i
 {
     LOGD ( "[source_switch_time]: %fs, %s, virtual source input = %d source input = %d m_source_input = %d",
            getUptimeSeconds(), __FUNCTION__, virtual_input, source_input, m_source_input );
-    if ( m_first_enter_tvinput ) {
-        if (mpTvin->Tvin_RemovePath (TV_PATH_TYPE_TVIN) > 0) {
-            mpTvin->VDIN_AddVideoPath(TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
-        }
-        if (mpTvin->Tvin_RemovePath (TV_PATH_TYPE_DEFAULT) > 0) {
-            mpTvin->VDIN_AddVideoPath(TV_PATH_DECODER_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
-        }
-        m_first_enter_tvinput = false;
-    }
 
     tvin_port_t cur_port;
     m_source_input_virtual = virtual_input;
