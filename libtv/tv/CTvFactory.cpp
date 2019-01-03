@@ -16,8 +16,8 @@
 #include "../tvsetting/CTvSetting.h"
 
 CTvFactory::CTvFactory()
-    :mHdmiOutFbc(false),
-    mFbcObj(NULL)
+    :mHdmiOutFbc(false)
+    /*mFbcObj(NULL)*/
 {
 }
 
@@ -26,14 +26,14 @@ void CTvFactory::init()
     const char *value = config_get_str(CFG_SECTION_TV, CFG_FBC_USED, "true");
     if (strcmp(value, "true") == 0) {
         mHdmiOutFbc = true;
-        mFbcObj = GetSingletonFBC();
+        //mFbcObj = GetSingletonFBC();
     }
 }
 
 int CTvFactory::setGamma(tcon_gamma_table_t *gamma_r, tcon_gamma_table_t *gamma_g, tcon_gamma_table_t *gamma_b)
 {
     if (mHdmiOutFbc) {
-        return mFbcObj->fbcSetGammaPattern(COMM_DEV_SERIAL, gamma_r->data[0], gamma_g->data[0], gamma_b->data[0]);
+        return 0;//mFbcObj->fbcSetGammaPattern(COMM_DEV_SERIAL, gamma_r->data[0], gamma_g->data[0], gamma_b->data[0]);
     } else {
         return 0;
     }
@@ -110,88 +110,88 @@ int CTvFactory::setScreenColor ( int vdinBlendingMask, int y, int u, int v )
 
 int CTvFactory::fbcSetBrightness ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Brightness(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
 int CTvFactory::fbcGetBrightness ()
 {
     int value = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Brightness(COMM_DEV_SERIAL, &value);
         return value;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetContrast ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Contrast(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
 int CTvFactory::fbcGetContrast ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Contrast(COMM_DEV_SERIAL, &data);
         return data;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetSaturation ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Saturation(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
 int CTvFactory::fbcGetSaturation ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Saturation(COMM_DEV_SERIAL, &data);
         return data;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetHueColorTint ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_HueColorTint(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
 int CTvFactory::fbcGetHueColorTint ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_HueColorTint(COMM_DEV_SERIAL, &data);
         return data;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetBacklight ( int value )
 {
     int temp_value = value;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         temp_value = temp_value * 255 / 100;
         mFbcObj->cfbc_Set_Backlight(COMM_DEV_SERIAL, temp_value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
@@ -200,7 +200,7 @@ int CTvFactory::fbcGetBacklight ()
     int temp_value = 0;
     int data = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Backlight(COMM_DEV_SERIAL, &temp_value);
         if (temp_value * 100 % 255 == 0)
             temp_value = temp_value * 100 / 255;
@@ -208,16 +208,16 @@ int CTvFactory::fbcGetBacklight ()
             temp_value = temp_value * 100 / 255 + 1;
         data = temp_value;
         return data;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcSetAutoBacklightOnOff( unsigned char status)
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         return mFbcObj->cfbc_Set_Auto_Backlight_OnOff(COMM_DEV_SERIAL, status);
-    }
+    }*/
 
     return -1;
 }
@@ -226,20 +226,20 @@ int CTvFactory::fbcGetAutoBacklightOnOff( void )
 {
     int temp_status = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Auto_Backlight_OnOff(COMM_DEV_SERIAL, &temp_status);
         return temp_status;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetElecMode( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_AUTO_ELEC_MODE(COMM_DEV_SERIAL, value);
         SSMSaveFBCELECmodeVal(value);
         return 0;
-    }
+    }*/
     return -1;
 }
 
@@ -265,20 +265,20 @@ int CTvFactory::fbcGetBacklightN360( void )
 
 int CTvFactory::fbcSetThermalState( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Thermal_state(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
 
 int CTvFactory::fbcSetPictureMode ( int mode )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Picture_Mode(COMM_DEV_SERIAL, mode);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -287,19 +287,19 @@ int CTvFactory::fbcGetPictureMode ()
 {
     int mode = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Picture_Mode(COMM_DEV_SERIAL, &mode);
         return mode;
-    }
+    }*/
     return 0;
 }
 
 int CTvFactory::fbcSetTestPattern ( int mode )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Test_Pattern(COMM_DEV_SERIAL, mode);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -308,10 +308,10 @@ int CTvFactory::fbcGetTestPattern ()
 {
     int mode = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Test_Pattern(COMM_DEV_SERIAL, &mode);
         return mode;
-    }
+    }*/
 
     return 0;
 }
@@ -319,29 +319,29 @@ int CTvFactory::fbcGetTestPattern ()
 int CTvFactory::fbcSelectTestPattern(int value)
 {
     int ret = -1;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         LOGD("%s, value is %d\n", __FUNCTION__, value);
         ret = mFbcObj->cfbc_TestPattern_Select(COMM_DEV_SERIAL, value);
-    }
+    }*/
 
     return ret;
 }
 
 int CTvFactory::fbcSetGammaValue(vpp_gamma_curve_t gamma_curve, int is_save)
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->fbcSetGammaValue(COMM_DEV_SERIAL, (int)gamma_curve, is_save);
         return 0;
-    }
+    }*/
     return -1;
 }
 
 int CTvFactory::fbcSetGainRed( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Gain_Red(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -349,20 +349,20 @@ int CTvFactory::fbcSetGainRed( int value )
 int CTvFactory::fbcGetGainRed ()
 {
     int value = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Gain_Red(COMM_DEV_SERIAL, &value);
         return value;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcSetGainGreen( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Gain_Green(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -370,20 +370,20 @@ int CTvFactory::fbcSetGainGreen( int value )
 int CTvFactory::fbcGetGainGreen ()
 {
     int value = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Gain_Green(COMM_DEV_SERIAL, &value);
         //value 0 ~ 2047
         return value;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcGetVideoMute ()
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_VMute(COMM_DEV_SERIAL, 1);
-    }
+    }*/
 
     return 0;
 }
@@ -391,10 +391,10 @@ int CTvFactory::fbcGetVideoMute ()
 int CTvFactory::fbcSetGainBlue( int value )
 {
     //value 0 ~ 2047
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Gain_Blue(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -402,11 +402,11 @@ int CTvFactory::fbcSetGainBlue( int value )
 int CTvFactory::fbcGetGainBlue ()
 {
     int value = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Gain_Blue(COMM_DEV_SERIAL, &value);
         //value 0 ~ 2047
         return value;
-    }
+    }*/
 
     return 0;
 }
@@ -419,10 +419,10 @@ int CTvFactory::fbcSetOffsetRed( int value )
     //temp_value = (value+1024)*255/2047;
     temp_value = value;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Offset_Red(COMM_DEV_SERIAL, temp_value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -431,14 +431,14 @@ int CTvFactory::fbcGetOffsetRed ()
 {
     int temp_value = 0, value = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Offset_Red(COMM_DEV_SERIAL, &temp_value);
         //value -1024~+1023
         //value = (temp_value*2047)/255 - 1024;
         value = temp_value;
 
         return value;
-    }
+    }*/
 
     return 0;
 }
@@ -451,10 +451,10 @@ int CTvFactory::fbcSetOffsetGreen( int value )
     //temp_value = (value+1024)*255/2047;
     temp_value = value;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Offset_Green(COMM_DEV_SERIAL, temp_value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -463,14 +463,14 @@ int CTvFactory::fbcGetOffsetGreen ()
 {
     int temp_value = 0, value = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Offset_Green(COMM_DEV_SERIAL, &temp_value);
         //value -1024~+1023
         //value = (temp_value*2047)/255 - 1024;
         value = temp_value;
 
         return value;
-    }
+    }*/
 
     return 0;
 }
@@ -483,10 +483,10 @@ int CTvFactory::fbcSetOffsetBlue( int value )
     //temp_value = (value+1024)*255/2047;
     temp_value = value;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Offset_Blue(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -495,14 +495,14 @@ int CTvFactory::fbcGetOffsetBlue ()
 {
     int temp_value = 0, value = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_Offset_Blue(COMM_DEV_SERIAL, &temp_value);
         //value -1024~+1023
         //value = (temp_value*2047)/255 - 1024;
         value = temp_value;
 
         return value;
-    }
+    }*/
 
     return 0;
 }
@@ -835,36 +835,36 @@ int CTvFactory::fbcGrayPatternSet(int value)
     } else {
         grayValue = (unsigned char)(0xFF & value);
     }
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         ret = mFbcObj->cfbc_WhiteBalance_SetGrayPattern(COMM_DEV_SERIAL, grayValue);
-    }
+    }*/
     return ret;
 }
 
 int CTvFactory::fbcGrayPatternOpen()
 {
     int ret = -1;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         ret = mFbcObj->cfbc_WhiteBalance_GrayPattern_OnOff(COMM_DEV_SERIAL, 0);
-    }
+    }*/
     return ret;
 }
 
 int CTvFactory::fbcGrayPatternClose()
 {
     int ret = -1;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         ret = mFbcObj->cfbc_WhiteBalance_GrayPattern_OnOff(COMM_DEV_SERIAL, 1);
-    }
+    }*/
     return ret;
 }
 
 int CTvFactory::fbcColorTempModeSet( int mode )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_ColorTemp_Mode(COMM_DEV_SERIAL, mode);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -873,21 +873,21 @@ int CTvFactory::fbcColorTempModeGet ()
 {
     int temp_mode = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_ColorTemp_Mode(COMM_DEV_SERIAL, &temp_mode);
         return temp_mode;
-    }
+    }*/
 
     return -1;
 }
 
 int CTvFactory::fbcColorTempModeN360Set( int mode )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_ColorTemp_Mode(COMM_DEV_SERIAL, mode);
         SSMSaveFBCN360ColorTempVal(mode);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -901,10 +901,10 @@ int CTvFactory::fbcColorTempModeN360Get ()
 
 int CTvFactory::fbcWBInitialSet( int status )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_WB_Initial(COMM_DEV_SERIAL, status);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -913,21 +913,21 @@ int CTvFactory::fbcWBInitialGet ()
 {
     int temp_status = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_WB_Initial(COMM_DEV_SERIAL, &temp_status);
         return temp_status;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcBacklightOnOffSet(int value)
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         value = value ? 0 : 1;
         mFbcObj->cfbc_Set_backlight_onoff(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -936,32 +936,32 @@ int CTvFactory::fbcBacklightOnOffGet()
 {
     int temp_value = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_backlight_onoff(COMM_DEV_SERIAL, &temp_value);
         temp_value = temp_value ? 0 : 1;
         return temp_value;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcLvdsSsgSet( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_LVDS_SSG_Set(COMM_DEV_SERIAL, value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
 
 int CTvFactory::fbcLightSensorStatusN310Set ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_LightSensor_N310(COMM_DEV_SERIAL, value);
         SSMSaveFBCN310LightsensorVal(value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -969,21 +969,21 @@ int CTvFactory::fbcLightSensorStatusN310Set ( int value )
 int CTvFactory::fbcLightSensorStatusN310Get ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         SSMReadFBCN310LightsensorVal(&data);
         return data;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcDreamPanelStatusN310Set ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_Dream_Panel_N310(COMM_DEV_SERIAL, value);
         SSMSaveFBCN310Dream_PanelVal(value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -991,21 +991,21 @@ int CTvFactory::fbcDreamPanelStatusN310Set ( int value )
 int CTvFactory::fbcDreamPanelStatusN310Get ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         SSMReadFBCN310Dream_PanelVal(&data);
         return data;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcMultPQStatusN310Set ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_MULT_PQ_N310(COMM_DEV_SERIAL, value);
         SSMSaveFBCN310MULT_PQVal(value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -1014,21 +1014,21 @@ int CTvFactory::fbcMultPQStatusN310Get ()
 {
     int data = 0;
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         SSMReadFBCN310MULT_PQVal(&data);
         return data;
-    }
+    }*/
 
     return 0;
 }
 
 int CTvFactory::fbcMemcStatusN310Set ( int value )
 {
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_MEMC_N310(COMM_DEV_SERIAL, value);
         SSMSaveFBCN310MEMCVal(value);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -1036,10 +1036,10 @@ int CTvFactory::fbcMemcStatusN310Set ( int value )
 int CTvFactory::fbcMemcStatusN310Get ()
 {
     int data = 0;
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         SSMReadFBCN310MEMCVal(&data);
         return data;
-    }
+    }*/
 
     return -1;
 }
@@ -1167,10 +1167,10 @@ int CTvFactory::colorTempBatchSet(vpp_color_temperature_mode_t Tempmode, tcon_rg
     b_offset = (params.b_post_offset + 1024) * 255 / 2047;
     LOGD ( "~colorTempBatchSet##%d,%d,%d,%d,%d,%d,##", r_gain, g_gain, b_gain, r_offset, g_offset, b_offset );
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Set_WB_Batch(COMM_DEV_SERIAL, mode, r_gain, g_gain, b_gain, r_offset, g_offset, b_offset);
         return 0;
-    }
+    }*/
 
     return -1;
 }
@@ -1195,7 +1195,7 @@ int CTvFactory::colorTempBatchGet ( vpp_color_temperature_mode_t Tempmode, tcon_
         break;
     }
 
-    if (mFbcObj != NULL) {
+    /*if (mFbcObj != NULL) {
         mFbcObj->cfbc_Get_WB_Batch(COMM_DEV_SERIAL, mode, &r_gain, &g_gain, &b_gain, &r_offset, &g_offset, &b_offset);
         LOGD ( "~colorTempBatchGet##%d,%d,%d,%d,%d,%d,##", r_gain, g_gain, b_gain, r_offset, g_offset, b_offset );
 
@@ -1206,7 +1206,7 @@ int CTvFactory::colorTempBatchGet ( vpp_color_temperature_mode_t Tempmode, tcon_
         params->g_post_offset = (g_offset * 2047) / 255 - 1024;
         params->b_post_offset = (b_offset * 2047) / 255 - 1024;
         return 0;
-    }
+    }*/
 
     return -1;
 }

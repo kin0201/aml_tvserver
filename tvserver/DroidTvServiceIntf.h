@@ -98,8 +98,6 @@ public:
     void dtvGetScanFreqListMode(int mode, std::vector<FreqList> &freqlist);
     int atvdtvGetScanStatus();
     int SSMInitDevice();
-    void startAutoBacklight();
-    void stopAutoBacklight();
     int FactoryCleanAllTableForProgram();
     std::string getTvSupportCountries();
     std::string getTvDefaultCountry();

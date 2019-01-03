@@ -30,7 +30,6 @@
 #include "../tvsetting/CTvSetting.h"
 #include <tvutils.h>
 #include <tvconfig.h>
-#include "fbcutils/CFbcCommunication.h"
 
 #define AFE_DEV_PATH        "/dev/tvafe0"
 #define AMLVIDEO2_DEV_PATH  "/dev/video11"
@@ -332,7 +331,7 @@ int CTvin::VDIN_GetDisplayVFreq (int need_freq, int *iSswitch, char * display_mo
     return ret;
 }
 
-int CTvin::VDIN_SetDisplayVFreq ( int freq, bool isFbc)
+int CTvin::VDIN_SetDisplayVFreq(int freq)
 {
     int iSswitch = 0;
     char display_mode[32] = {0};
@@ -348,11 +347,10 @@ int CTvin::VDIN_SetDisplayVFreq ( int freq, bool isFbc)
         } else {
             LOGD("%s: set display mode to %s\n", __FUNCTION__, display_mode);
         }
-
-        if ( isFbc ) {
-            GetSingletonFBC()->cfbc_Set_VMute (COMM_DEV_SERIAL, 2);
-            usleep ( 300000 );
-        }
+    /*if ( isFbc ) {
+        GetSingletonFBC()->cfbc_Set_VMute (COMM_DEV_SERIAL, 2);
+        usleep ( 300000 );
+    }*/
 
         tvWriteDisplayMode(display_mode);
         return 0;

@@ -639,8 +639,7 @@ public:
     int VDIN_SetVdinParam ( const struct tvin_parm_s *vdinParam );
     int VDIN_GetVdinParam ( const struct tvin_parm_s *vdinParam );
     int VDIN_GetDisplayVFreq (int need_freq, int *iSswitch, char * display_mode);
-    int VDIN_SetDisplayVFreq ( int freq, bool isFbc);
-
+    int VDIN_SetDisplayVFreq ( int freq);
     int VDIN_Get_avg_luma(void);
     int VDIN_SetMVCViewMode ( int mode );
     int VDIN_GetMVCViewMode ( void );

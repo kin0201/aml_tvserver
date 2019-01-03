@@ -732,14 +732,6 @@ int DroidTvServiceIntf::SSMInitDevice() {
     return mpTv->Tv_SSMRestoreDefaultSetting();
 }
 
-void DroidTvServiceIntf::startAutoBacklight() {
-    mpTv->setAutoBackLightStatus(1);
-}
-
-void DroidTvServiceIntf::stopAutoBacklight() {
-    mpTv->setAutoBackLightStatus(0);
-}
-
 int DroidTvServiceIntf::FactoryCleanAllTableForProgram() {
     int ret = mpTv->ClearAnalogFrontEnd();
     mpTv->clearDbAllProgramInfoTable();
@@ -2067,19 +2059,6 @@ int DroidTvServiceIntf::processCmd(const Parcel &p) {
             prog.deleteProgram(progid);
             break;
         }
-        case START_AUTO_BACKLIGHT:
-            mpTv->setAutoBackLightStatus(1);
-            break;
-
-        case STOP_AUTO_BACKLIGHT:
-            mpTv->setAutoBackLightStatus(0);
-            break;
-
-        case IS_AUTO_BACKLIGHTING: {
-            int on = mpTv->getAutoBackLightStatus();
-            break;
-        }
-
         case GET_AVERAGE_LUMA:
             ret = mpTv->getAverageLuma();
             break;

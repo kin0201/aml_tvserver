@@ -47,7 +47,6 @@
 #include <tvscanconfig.h>
 #include <CFile.h>
 #include <serial_operate.h>
-#include <CFbcHelper.h>
 
 #include "CTvDatabase.h"
 #include "../version/version.h"
@@ -73,33 +72,6 @@ extern "C" {
 #include "CTv.h"
 
 using namespace android;
-
-bool CTv::insertedFbcDevice()
-{
-    bool ret = false;
-
-    if (hdmiOutWithFbc()) {
-        CFbcCommunication *fbc = GetSingletonFBC();
-        char panel_model[64] = {0};
-
-        if (fbc == NULL) {
-            LOGD ("%s, there is no fbc!!!", __func__);
-        }
-        else {
-            fbc->cfbc_Get_FBC_Get_PANel_INFO(COMM_DEV_SERIAL, panel_model);
-
-            if (0 == panel_model[0]) {
-                LOGD ("%s, device is not fbc", __func__);
-            }
-            else {
-                LOGD ("%s, get panel info from fbc is %s", __func__, panel_model);
-                ret = true;
-            }
-        }
-    }
-
-    return ret;
-}
 
 CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
 {
@@ -127,7 +99,6 @@ CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
     AM_EVT_Init();
 #endif
     mpObserver = NULL;
-    fbcIns = NULL;
     mAutoSetDisplayFreq = false;
     mPreviewEnabled = false;
     mTvMsgQueue.startMsgQueue();
@@ -151,8 +122,6 @@ CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
     mFactoryMode.init();
     mDtvScanRunningStatus = DTV_SCAN_RUNNING_NORMAL;
 
-    mHdmiOutFbc = insertedFbcDevice();
-
     SetHdmiEdidForUboot();
     mSetHdmiEdid = false;
 
@@ -160,11 +129,6 @@ CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
     mFrontDev->setObserver ( &mTvMsgQueue );
     mTvEas = CTvEas::GetInstance();
     mTvEas->setObserver(&mTvMsgQueue);
-    if (mHdmiOutFbc) {
-        fbcIns = GetSingletonFBC();
-        setUpgradeFbcObserver(this);
-        fbcIns->cfbc_Set_DNLP(COMM_DEV_SERIAL, 0);//disable dnlp for fbc project.
-    }
     mSubtitle.setObserver(this);
     mHeadSet.setObserver(this);
     mAv.setObserver(&mTvMsgQueue);
@@ -184,12 +148,6 @@ CTv::~CTv()
     mAv.Close();
     mTvStatus = TV_INIT_ED;
     mFrontDev->Close();
-
-    if (fbcIns != NULL) {
-        fbcIns->fbcRelease();
-        delete fbcIns;
-        fbcIns = NULL;
-    }
 
     if (pGpio != NULL) {
         delete pGpio;
@@ -368,7 +326,7 @@ void CTv::onEvent(const CAv::AVEvent &ev)
                 mAv.setVideoScreenMode ( CAv::VIDEO_WIDEOPTION_FULL_STRETCH );
             }
             if (mAutoSetDisplayFreq && !mPreviewEnabled) {
-                mpTvin->VDIN_SetDisplayVFreq(50, mHdmiOutFbc);
+                mpTvin->VDIN_SetDisplayVFreq(50);
             }
 
             mAv.EnableVideoNow(true);
@@ -1731,30 +1689,20 @@ int CTv::OpenTv ( void )
         iSBlackPattern = false;
     }
 
-    value = config_get_str ( CFG_SECTION_TV, CFG_FBC_PANEL_INFO, "null" );
+    /*value = config_get_str ( CFG_SECTION_TV, CFG_FBC_PANEL_INFO, "null" );
     LOGD("open tv, get fbc panel info:%s\n", value);
     if (strcmp(value, "edid") == 0 ) {
         rebootSystemByEdidInfo();
     } else if (strcmp(value, "uart") == 0 ) {
         rebootSystemByUartPanelInfo(fbcIns);
-    }
+    }*/
 
     //tv ssm check
     SSMHandlePreCopying();
 
-    /*SSM_status_t SSM_status = (SSM_status_t)(CVpp::getInstance()->VPP_GetSSMStatus());
-    LOGD ("Ctv-SSM status= %d\n", SSM_status);
-
-    if ( SSMDeviceMarkCheck() < 0 || SSM_status == SSM_HEADER_INVALID) {
-        LOGD ("Restore SSMData file");
-        Tv_SSMRestoreDefaultSetting();
-    }else if (SSM_status == SSM_HEADER_STRUCT_CHANGE) {
-        CVpp::getInstance()->TV_SSMRecovery();
-    }*/
-
     mpTvin->OpenTvin();
 
-    CVpp::getInstance()->Vpp_Init(mHdmiOutFbc);
+    CVpp::getInstance()->Vpp_Init();
 
     SSMSetHDCPKey();
     system ( "/vendor/bin/dec" );
@@ -1883,7 +1831,7 @@ int CTv::StopTvLock ( void )
     }
 
     if (mAutoSetDisplayFreq && !mPreviewEnabled) {
-        mpTvin->VDIN_SetDisplayVFreq(60, mHdmiOutFbc);
+        mpTvin->VDIN_SetDisplayVFreq(60);
     }
     mFrontDev->Close();
     mTvAction &= ~TV_ACTION_STOPING;
@@ -2160,12 +2108,11 @@ void CTv::onSigToStable()
                 LOGD("%s, Now is panel mode!\n", __FUNCTION__);
                 tvWriteSysfs(SYS_PANEL_FRAME_RATE, fps, 10);
             } else {
-                mpTvin->VDIN_SetDisplayVFreq(freq, mHdmiOutFbc);
+                mpTvin->VDIN_SetDisplayVFreq(freq);
             }
         } else if ( CTvin::Tvin_is50HzFrameRateFmt ( m_cur_sig_info.fmt ) ) {
-            mpTvin->VDIN_SetDisplayVFreq(50, mHdmiOutFbc);
+            mpTvin->VDIN_SetDisplayVFreq(50);
         }
-
     }
     //showbo mark  hdmi auto 3d, tran fmt  is 3d, so switch to 3d
 
@@ -2444,27 +2391,6 @@ int CTv::getBlackoutEnable()
     return enable;
 }
 
-int CTv::setAutoBackLightStatus(int status)
-{
-    if (mHdmiOutFbc) {
-        return mFactoryMode.fbcSetAutoBacklightOnOff(status);
-    }
-
-    return tvWriteSysfs(BL_LOCAL_DIMING_FUNC_ENABLE, status);
-}
-
-int CTv::getAutoBackLightStatus()
-{
-    if (mHdmiOutFbc) {
-        return mFactoryMode.fbcGetAutoBacklightOnOff();
-    }
-
-    char str_value[3] = {0};
-    tvReadSysfs(BL_LOCAL_DIMING_FUNC_ENABLE, str_value);
-    int value = atoi(str_value);
-    return (value < 0) ? -1 : value;
-}
-
 int CTv::getAverageLuma()
 {
     return mpTvin->VDIN_Get_avg_luma();
@@ -2518,14 +2444,7 @@ int CTv::getAutoBacklightData(int *data)
 
 int CTv::setLcdEnable(bool enable)
 {
-    int ret = -1;
-    if (mHdmiOutFbc) {
-        ret = fbcIns->fbcSetPanelStatus(COMM_DEV_SERIAL, enable ? 1 : 0);
-    } else {
-        ret = tvWriteSysfs(LCD_ENABLE, enable ? 1 : 0);
-    }
-
-    return ret;
+    return tvWriteSysfs(LCD_ENABLE, enable ? 1 : 0);
 }
 
 int CTv::Tv_GetIwattRegs()
@@ -2645,19 +2564,6 @@ bool CTv::hdmiOutWithFbc()
     return false;
 }
 
-void CTv::onUpgradeStatus(int state, int param)
-{
-    TvEvent::UpgradeFBCEvent ev;
-    ev.mState = state;
-    ev.param = param;
-    sendTvEvent(ev);
-}
-
-int CTv::StartUpgradeFBC(char *file_name, int mode, int upgrade_blk_size)
-{
-    return fbcIns->fbcStartUpgrade(file_name, mode, upgrade_blk_size);
-}
-
 int CTv::StartHeadSetDetect()
 {
     mHeadSet.startDetect();
@@ -2712,16 +2618,6 @@ void CTv::onThermalDetect(int state)
     } else {
         LOGD ( "%s, tvin thermal threshold disable\n", __FUNCTION__);
     }
-}
-
-int CTv::Tv_GetProjectInfo(project_info_t *ptrInfo)
-{
-    return GetProjectInfo(ptrInfo, fbcIns);
-}
-
-int CTv::Tv_GetPlatformType()
-{
-    return mHdmiOutFbc ? 1 : 0;
 }
 
 int CTv::Tv_HDMIEDIDFileSelect(tv_hdmi_port_id_t port, tv_hdmi_edid_version_t version)
@@ -2807,24 +2703,6 @@ int CTv::Tv_SetWssStatus (int status)
     return mpTvin->VDIN_SetWssStatus(status);
 }
 
-int CTv::Tv_SetBacklight_Switch ( int value )
-{
-    if (mHdmiOutFbc) {
-        return mFactoryMode.fbcBacklightOnOffSet(value);
-    } else {
-        return CVpp::getInstance()->VPP_SetBackLight_Switch(value);
-    }
-}
-
-int CTv::Tv_GetBacklight_Switch ( void )
-{
-    if (mHdmiOutFbc) {
-        return mFactoryMode.fbcBacklightOnOffGet();
-    } else {
-        return CVpp::getInstance()->VPP_GetBackLight_Switch();
-    }
-}
-
 int CTv::Tv_Easupdate()
 {
     int ret = 0;
@@ -2865,7 +2743,7 @@ void CTv::updateSubtitle(int pic_width, int pic_height)
 int CTv::SendCmdToOffBoardFBCExternalDac(int cmd, int para)
 {
     int set_val = 0;
-    CFbcCommunication *pFBC = GetSingletonFBC();
+    /*CFbcCommunication *pFBC = GetSingletonFBC();
     if (pFBC != NULL) {
         if (cmd == AUDIO_CMD_SET_MUTE) {
             if (para == CC_AUDIO_MUTE) {
@@ -2887,7 +2765,7 @@ int CTv::SendCmdToOffBoardFBCExternalDac(int cmd, int para)
             LOGD("%s, send AUDIO_CMD_SET_SOURCE (para = %d) to fbc.\n", __FUNCTION__, para);
             return pFBC->cfbc_Set_FBC_Audio_Source(COMM_DEV_SERIAL, para);
         }
-    }
+    }*/
     return 0;
 }
 
@@ -3344,8 +3222,7 @@ void CTv::dump(String8 &result)
     result.appendFormat("\naction = %x\n", mTvAction);
     result.appendFormat("status = %d\n", mTvStatus);
     result.appendFormat("current source input = %d\n", m_source_input);
-    result.appendFormat("last source input = %d\n", m_last_source_input);
-    result.appendFormat("hdmi out with fbc = %d\n\n", mHdmiOutFbc);
+    result.appendFormat("last source input = %d\n\n", m_last_source_input);
 
     result.appendFormat("tvserver git branch:%s\n", tvservice_get_git_branch_info());
     result.appendFormat("tvserver git version:%s\n", tvservice_get_git_version_info());

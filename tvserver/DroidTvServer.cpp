@@ -324,16 +324,6 @@ Return<int32_t> DroidTvServer::SSMInitDevice() {
     return mTvServiceIntf->SSMInitDevice();
 }
 
-Return<void> DroidTvServer::startAutoBacklight() {
-    mTvServiceIntf->startAutoBacklight();
-    return Void();
-}
-
-Return<void> DroidTvServer::stopAutoBacklight() {
-    mTvServiceIntf->stopAutoBacklight();
-    return Void();
-}
-
 Return<int32_t> DroidTvServer::FactoryCleanAllTableForProgram() {
     return mTvServiceIntf->FactoryCleanAllTableForProgram();
 }

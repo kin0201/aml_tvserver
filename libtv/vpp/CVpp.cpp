@@ -42,8 +42,7 @@ CVpp *CVpp::getInstance()
 
 CVpp::CVpp()
 {
-    mHdmiOutFbc = false;
-    fbcIns = GetSingletonFBC();
+
 }
 
 CVpp::~CVpp()
@@ -51,13 +50,11 @@ CVpp::~CVpp()
 
 }
 
-int CVpp::Vpp_Init(bool hdmiOutFbc)
+int CVpp::Vpp_Init()
 {
     int ret = -1;
     int backlight = DEFAULT_BACKLIGHT_BRIGHTNESS;
     int offset_r = 0, offset_g = 0, offset_b = 0, gain_r = 1024, gain_g = 1024, gain_b = 1024;
-
-    mHdmiOutFbc = hdmiOutFbc;
 
     if (SSMReadNonStandardValue() & 1) {
         Set_Fixed_NonStandard(0); //close
@@ -100,15 +97,15 @@ void CVpp::enableMonitorMode(bool enable)
     if (enable) {
         tvWriteSysfs(DI_NR2_ENABLE, "0");
         tvWriteSysfs(AMVECM_PC_MODE, "0");
-        if (mHdmiOutFbc && fbcIns) {
+        /*if (mHdmiOutFbc && fbcIns) {
             fbcIns->cfbc_EnterPCMode(0);
-        }
+        }*/
     } else {
         tvWriteSysfs(DI_NR2_ENABLE, "1");
         tvWriteSysfs(AMVECM_PC_MODE, "1");
-        if (mHdmiOutFbc && fbcIns) {
+        /*if (mHdmiOutFbc && fbcIns) {
             fbcIns->cfbc_EnterPCMode(1);
-        }
+        }*/
     }
 }
 
@@ -199,87 +196,6 @@ int CVpp::VPP_SetScalerPathSel(const unsigned int value)
     fclose(fp);
     fp = NULL;
     return 0;
-}
-
-int CVpp::VPP_FBCSetColorTemperature(vpp_color_temperature_mode_t temp_mode)
-{
-    int ret = -1;
-    if (fbcIns != NULL) {
-        ret = fbcIns->fbcSetEyeProtection(COMM_DEV_SERIAL, 1/*GetEyeProtectionMode()*/);
-        ret |= fbcIns->cfbc_Set_ColorTemp_Mode(COMM_DEV_SERIAL, temp_mode);
-    }
-    return ret;
-}
-
-int CVpp::VPP_FBCColorTempBatchSet(vpp_color_temperature_mode_t Tempmode, tcon_rgb_ogo_t params)
-{
-    unsigned char mode = 0, r_gain, g_gain, b_gain, r_offset, g_offset, b_offset;
-    switch (Tempmode) {
-    case VPP_COLOR_TEMPERATURE_MODE_STANDARD:
-        mode = 1;   //COLOR_TEMP_STD
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_WARM:
-        mode = 2;   //COLOR_TEMP_WARM
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_COLD:
-        mode = 0;  //COLOR_TEMP_COLD
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_USER:
-        mode = 3;   //COLOR_TEMP_USER
-        break;
-    default:
-        break;
-    }
-    r_gain = (params.r_gain * 255) / 2047; // u1.10, range 0~2047, default is 1024 (1.0x)
-    g_gain = (params.g_gain * 255) / 2047;
-    b_gain = (params.b_gain * 255) / 2047;
-    r_offset = (params.r_post_offset + 1024) * 255 / 2047; // s11.0, range -1024~+1023, default is 0
-    g_offset = (params.g_post_offset + 1024) * 255 / 2047;
-    b_offset = (params.b_post_offset + 1024) * 255 / 2047;
-    LOGD ( "~colorTempBatchSet##%d,%d,%d,%d,%d,%d,##", r_gain, g_gain, b_gain, r_offset, g_offset, b_offset );
-
-    if (fbcIns != NULL) {
-        fbcIns->cfbc_Set_WB_Batch(COMM_DEV_SERIAL, mode, r_gain, g_gain, b_gain, r_offset, g_offset, b_offset);
-        return 0;
-    }
-
-    return -1;
-}
-
-int CVpp::VPP_FBCColorTempBatchGet(vpp_color_temperature_mode_t Tempmode, tcon_rgb_ogo_t *params)
-{
-    unsigned char mode = 0, r_gain, g_gain, b_gain, r_offset, g_offset, b_offset;
-    switch (Tempmode) {
-    case VPP_COLOR_TEMPERATURE_MODE_STANDARD:
-        mode = 1;   //COLOR_TEMP_STD
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_WARM:
-        mode = 2;   //COLOR_TEMP_WARM
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_COLD:
-        mode = 0;  //COLOR_TEMP_COLD
-        break;
-    case VPP_COLOR_TEMPERATURE_MODE_USER:
-        mode = 3;   //COLOR_TEMP_USER
-        break;
-    default:
-        break;
-    }
-
-    if (fbcIns != NULL) {
-        fbcIns->cfbc_Get_WB_Batch(COMM_DEV_SERIAL, mode, &r_gain, &g_gain, &b_gain, &r_offset, &g_offset, &b_offset);
-        LOGD ( "~colorTempBatchGet##%d,%d,%d,%d,%d,%d,##", r_gain, g_gain, b_gain, r_offset, g_offset, b_offset );
-
-        params->r_gain = (r_gain * 2047) / 255;
-        params->g_gain = (g_gain * 2047) / 255;
-        params->b_gain = (b_gain * 2047) / 255;
-        params->r_post_offset = (r_offset * 2047) / 255 - 1024;
-        params->g_post_offset = (g_offset * 2047) / 255 - 1024;
-        params->b_post_offset = (b_offset * 2047) / 255 - 1024;
-        return 0;
-    }
-
-    return -1;
 }
 
 int CVpp::VPP_SSMRestorToDefault(int id, bool resetAll)
