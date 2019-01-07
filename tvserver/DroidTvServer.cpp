@@ -473,6 +473,7 @@ void DroidTvServer::handleServiceDeath(uint32_t cookie) {
     AutoMutex _l(mLock);
     mClients[cookie]->unlinkToDeath(mDeathRecipient);
     mClients[cookie].clear();
+    mClients[cookie] = nullptr;
     LOGI("%s, client size:%d", __FUNCTION__,(int)mClients.size());
 }
 
