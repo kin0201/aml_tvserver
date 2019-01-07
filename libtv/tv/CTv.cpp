@@ -44,6 +44,7 @@
 
 #include <tvutils.h>
 #include <tvconfig.h>
+#include <tvscanconfig.h>
 #include <CFile.h>
 #include <serial_operate.h>
 #include <CFbcHelper.h>
@@ -131,6 +132,7 @@ CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
     mPreviewEnabled = false;
     mTvMsgQueue.startMsgQueue();
     tv_config_load (TV_CONFIG_FILE_PATH);
+    tv_scan_config_load(TV_SCAN_CONFIG_FILE_PATH);
     mFrontDev = CFrontEnd::getInstance();
     mpTvin = CTvin::getInstance();
     mTvScanner = CTvScanner::getInstance();
@@ -178,6 +180,7 @@ CTv::~CTv()
     mpObserver = NULL;
     CTvDatabase::deleteTvDb();
     tv_config_unload();
+    tv_scan_config_unload();
     mAv.Close();
     mTvStatus = TV_INIT_ED;
     mFrontDev->Close();

@@ -344,6 +344,60 @@ Return<void> DroidTvServer::getTvSupportCountries(getTvSupportCountries_cb _hidl
     return Void();
 }
 
+Return<void> DroidTvServer::getTvDefaultCountry(getTvDefaultCountry_cb _hidl_cb) {
+    std::string Country = mTvServiceIntf->getTvDefaultCountry();
+    _hidl_cb(Country);
+    return Void();
+}
+
+Return<void> DroidTvServer::getTvCountryName(const hidl_string& country_code, getTvCountryName_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvCountryName(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<void> DroidTvServer::getTvSearchMode(const hidl_string& country_code, getTvSearchMode_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvSearchMode(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<bool> DroidTvServer::getTvDtvSupport(const hidl_string& country_code) {
+    return mTvServiceIntf->getTvDtvSupport(country_code);
+}
+
+Return<void> DroidTvServer::getTvDtvSystem(const hidl_string& country_code, getTvDtvSystem_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvDtvSystem(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<bool> DroidTvServer::getTvAtvSupport(const hidl_string& country_code) {
+    return mTvServiceIntf->getTvAtvSupport(country_code);
+}
+
+Return<void> DroidTvServer::getTvAtvColorSystem(const hidl_string& country_code, getTvAtvColorSystem_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvAtvColorSystem(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<void> DroidTvServer::getTvAtvSoundSystem(const hidl_string& country_code, getTvAtvSoundSystem_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvAtvSoundSystem(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<void> DroidTvServer::getTvAtvMinMaxFreq(const hidl_string& country_code, getTvAtvMinMaxFreq_cb _hidl_cb) {
+    std::string str = mTvServiceIntf->getTvAtvMinMaxFreq(country_code);
+    _hidl_cb(str);
+    return Void();
+}
+
+Return<bool> DroidTvServer::getTvAtvStepScan(const hidl_string& country_code) {
+    return mTvServiceIntf->getTvAtvStepScan(country_code);
+}
+
 Return<void> DroidTvServer::setTvCountry(const hidl_string& country) {
     mTvServiceIntf->setTvCountry(country);
     return Void();

@@ -102,6 +102,16 @@ public:
     void stopAutoBacklight();
     int FactoryCleanAllTableForProgram();
     std::string getTvSupportCountries();
+    std::string getTvDefaultCountry();
+    std::string getTvCountryName(const std::string& country_code);
+    std::string getTvSearchMode(const std::string& country_code);
+    bool getTvDtvSupport(const std::string& country_code);
+    std::string getTvDtvSystem(const std::string& country_code);
+    bool getTvAtvSupport(const std::string& country_code);
+    std::string getTvAtvColorSystem(const std::string& country_code);
+    std::string getTvAtvSoundSystem(const std::string& country_code);
+    std::string getTvAtvMinMaxFreq(const std::string& country_code);
+    bool getTvAtvStepScan(const std::string& country_code);
     void setTvCountry(const std::string& country);
     int setAudioOutmode(int32_t mode);
     int getAudioOutmode();

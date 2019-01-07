@@ -117,7 +117,17 @@ public:
     Return<void> startAutoBacklight() override;
     Return<void> stopAutoBacklight() override;
     Return<int32_t> FactoryCleanAllTableForProgram() override;
-	Return<void> getTvSupportCountries(getTvSupportCountries_cb _hidl_cb) override;
+    Return<void> getTvSupportCountries(getTvSupportCountries_cb _hidl_cb) override;
+    Return<void> getTvDefaultCountry(getTvDefaultCountry_cb _hidl_cb) override;
+    Return<void> getTvCountryName(const hidl_string& country_code, getTvCountryName_cb _hidl_cb) override;
+    Return<void> getTvSearchMode(const hidl_string& country_code, getTvSearchMode_cb _hidl_cb) override;
+    Return<bool> getTvDtvSupport(const hidl_string& country_code) override;
+    Return<void> getTvDtvSystem(const hidl_string& country_code, getTvDtvSystem_cb _hidl_cb) override;
+    Return<bool> getTvAtvSupport(const hidl_string& country_code) override;
+    Return<void> getTvAtvColorSystem(const hidl_string& country_code, getTvAtvColorSystem_cb _hidl_cb) override;
+    Return<void> getTvAtvSoundSystem(const hidl_string& country_code, getTvAtvSoundSystem_cb _hidl_cb) override;
+    Return<void> getTvAtvMinMaxFreq(const hidl_string& country_code, getTvAtvMinMaxFreq_cb _hidl_cb) override;
+    Return<bool> getTvAtvStepScan(const hidl_string& country_code) override;
     Return<void> setTvCountry(const hidl_string& country) override;
     Return<int32_t> setAudioOutmode(int32_t mode) override;
     Return<int32_t> getAudioOutmode() override;
