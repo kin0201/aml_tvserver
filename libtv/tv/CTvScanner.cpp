@@ -1663,6 +1663,20 @@ int CTvScanner::createDtvParas(AM_SCAN_DTVCreatePara_t &dtv_para, CFrontEnd::FEP
 
     if (scp.getDtvMode() == TV_SCAN_DTVMODE_ALLBAND) {
         CTvRegion::getChannelListByName((char *)list_name, vcp);
+    } else if (scp.getDtvMode() == TV_SCAN_DTVMODE_AUTO) {
+        Vector<sp<CTvChannel>> vcptemp;
+        CTvRegion::getChannelListByName((char *)list_name, vcptemp);
+        //add two channel at most
+        if (vcptemp.size() >= 2) {
+            vcptemp[0]->setFrequency(scp.getDtvFrequency1());
+            vcptemp[0]->setSymbolRate(fp.getSymbolrate());
+            vcp.add(vcptemp[0]);
+            if (scp.getDtvFrequency1() != scp.getDtvFrequency2()) {
+                vcptemp[1]->setFrequency(scp.getDtvFrequency2());
+                vcptemp[1]->setSymbolRate(fp.getSymbolrate());
+                vcp.add(vcptemp[1]);
+            }
+        }
     } else {
         CTvRegion::getChannelListByNameAndFreqRange((char *)list_name, scp.getDtvFrequency1(), scp.getDtvFrequency2(), vcp);
     }
