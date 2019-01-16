@@ -134,6 +134,7 @@ public:
     Return<int32_t> updateEAS(int32_t freq, int32_t moudle, int32_t mode) override;
     Return<int32_t> setDeviceIdForCec(int32_t DeviceId) override;
     Return<int32_t> getTvRunStatus(void) override;
+    Return<int32_t> setLcdEnable(int32_t enable) override;
     Return<void> setCallback(const sp<ITvServerCallback>& callback, ConnectType type) override;
 
     virtual void onEvent(const TvHidlParcel &hidlParcel);

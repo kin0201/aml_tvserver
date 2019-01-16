@@ -418,6 +418,10 @@ Return<int32_t> DroidTvServer::getTvRunStatus(void) {
     return mTvServiceIntf->getTvRunStatus();
 }
 
+Return<int32_t> DroidTvServer::setLcdEnable(int32_t enable) {
+    return mTvServiceIntf->setLcdEnable(enable);
+}
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {

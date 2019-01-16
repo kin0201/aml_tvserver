@@ -808,6 +808,10 @@ int DroidTvServiceIntf::getTvRunStatus(void) {
     return mpTv->GetTvStatus();
 }
 
+int DroidTvServiceIntf::setLcdEnable(int enable) {
+    return mpTv->setLcdEnable(enable);
+}
+
 int DroidTvServiceIntf::processCmd(const Parcel &p) {
     unsigned char dataBuf[512] = {0};
     int ret = -1;

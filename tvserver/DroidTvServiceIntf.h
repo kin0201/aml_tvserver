@@ -118,6 +118,7 @@ public:
     int updateEAS(int freq, int moudle, int mode);
     int setDeviceIdForCec(int DeviceId);
     int getTvRunStatus(void);
+    int setLcdEnable(int enable);
     virtual status_t dump(int fd, const Vector<String16>& args);
 
     //wp<Client> mpScannerClient;
