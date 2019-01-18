@@ -1613,9 +1613,10 @@ int CTvScanner::createAtvParas(AM_SCAN_ATVCreatePara_t &atv_para, CFrontEnd::FEP
     }
     atv_para.fe_cnt = 3;
     if (atv_para.mode == TV_SCAN_ATVMODE_AUTO) {
-        atv_para.afc_unlocked_step = 3000000;
+        atv_para.afc_unlocked_step = 4500000;
         atv_para.cvbs_unlocked_step = 1500000;
         atv_para.cvbs_locked_step = 6000000;
+        atv_para.afc_range = 1500000;
     } else {
         if (atv_para.fe_paras != NULL)
         {
@@ -1623,6 +1624,7 @@ int CTvScanner::createAtvParas(AM_SCAN_ATVCreatePara_t &atv_para, CFrontEnd::FEP
         }
         atv_para.cvbs_unlocked_step = 1000000;
         atv_para.cvbs_locked_step = 3000000;
+        atv_para.afc_range = 1000000;
     }
     return 0;
 }
