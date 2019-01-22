@@ -3346,7 +3346,12 @@ int CTv::GetAtvAutoScanMode()
 int CTv::SetSnowShowEnable(bool enable)
 {
     if (enable) {
+        mLastScreenMode = mAv.getVideoScreenMode();
+        LOGD("%s: Get LastScreenMode = %d", __FUNCTION__, mLastScreenMode);
         mAv.setVideoScreenMode(1);//while show snow,need show full screen
+    } else {
+        LOGD("%s: Set LastScreenMode = %d", __FUNCTION__, mLastScreenMode);
+        mAv.setVideoScreenMode(mLastScreenMode);
     }
 
     return mpTvin->SwitchSnow(enable);
