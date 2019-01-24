@@ -554,16 +554,17 @@ void CTvScanner::processTsInfo(AM_SCAN_Result_t *result, AM_SCAN_TS_t *ts, SCAN_
     } else {
         /*tsid*/
        dvbpsi_pat_t *pats = getValidPats(ts);
+       if (pats != NULL) {
+           ts_info->pat_ts_id = pats->i_ts_id;
+       }
        if (pats != NULL && !ts->digital.use_vct_tsid) {
             ts_info->tsid = pats->i_ts_id;
-            ts_info->pat_ts_id = pats->i_ts_id;
             if (ts->digital.sdts)
                 ts_info->tsid = ts->digital.sdts->i_ts_id;
             else if (IS_DVBT2_TS(ts->digital.fend_para) && ts->digital.dvbt2_data_plp_num > 0 && ts->digital.dvbt2_data_plps[0].sdts)
                 ts_info->tsid = ts->digital.dvbt2_data_plps[0].sdts->i_ts_id;
         } else if (ts->digital.vcts != NULL) {
             ts_info->tsid = ts->digital.vcts->i_extension;
-            ts_info->pat_ts_id = ts_info->tsid;
         }
 
         /*nid*/
