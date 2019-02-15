@@ -2128,7 +2128,7 @@ void CTv::onSigToStable()
                         freq = fps;
                     } else {
                         LOGD("Output device don't support %d frame rate!\n", fps);
-                        if ((30 == fps) || (60 == fps)) {
+                        if ((30 == fps) || (60 == fps) || (24 == fps)) {
                             freq = 60;
                         } else {
                             freq = 50;
@@ -2137,7 +2137,7 @@ void CTv::onSigToStable()
                 }
             } else {
                 LOGD("%s: Don't support hdmi TX mode!\n", __FUNCTION__);
-                if ((30 == fps) || (60 == fps)) {
+                if ((30 == fps) || (60 == fps) || (24 == fps)) {
                     freq = 60;
                 } else {
                     freq = 50;
