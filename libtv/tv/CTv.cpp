@@ -2966,28 +2966,44 @@ int CTv::KillMediaServerClient()
 int CTv::autoSwitchToMonitorMode()
 {
     int ret = -1;
-    tvin_latency_t allmInfo;
-    memset(&allmInfo, 0x0, sizeof(tvin_latency_t));
-    mpTvin->VDIN_GetAllmInfo(&allmInfo);
-    LOGD("%s: allm_mode is %d, it_content is %d, cn_type is %d!\n", __FUNCTION__, allmInfo.allm_mode,
-                               allmInfo.it_content, allmInfo.cn_type);
+    if (!MnoNeedAutoSwitchToMonitorMode) {
+        LOGD("%s, PQ mode set by signal!\n", __FUNCTION__);
+        tvin_latency_t allmInfo;
+        memset(&allmInfo, 0x0, sizeof(tvin_latency_t));
+        mpTvin->VDIN_GetAllmInfo(&allmInfo);
+        LOGD("%s: allm_mode is %d, it_content is %d, cn_type is %d!\n", __FUNCTION__, allmInfo.allm_mode,
+                                   allmInfo.it_content, allmInfo.cn_type);
 
-    if (allmInfo.allm_mode) {
-        LOGD("%s autoswitch to game mode!\n", __FUNCTION__);
-        ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_GAME, m_source_input, m_cur_sig_info.fmt,
-                                            m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
-    } else if (allmInfo.it_content){
-        if (allmInfo.cn_type == GAME) {//GAME
+        if (allmInfo.allm_mode) {
             LOGD("%s autoswitch to game mode!\n", __FUNCTION__);
             ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_GAME, m_source_input, m_cur_sig_info.fmt,
                                                 m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
-        } else {//Graphics/photo/cinema
-            LOGD("%s autoswitch to monitor mode!\n", __FUNCTION__);
+        } else if (allmInfo.it_content){
+            if (allmInfo.cn_type == GAME) {//GAME
+                LOGD("%s autoswitch to game mode!\n", __FUNCTION__);
+                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_GAME, m_source_input, m_cur_sig_info.fmt,
+                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            } else {//Graphics/photo/cinema
+                LOGD("%s:vesa fmt, autoswitch to monitor mode!\n", __FUNCTION__);
+                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_MONITOR, m_source_input, m_cur_sig_info.fmt,
+                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            }
+        } else if (m_cur_sig_info.is_dvi) {//dvi fmt
+            LOGD("%s: DVI fmt, autoswitch to monitor mode!\n", __FUNCTION__);
             ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_MONITOR, m_source_input, m_cur_sig_info.fmt,
-                                                m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+        } else {
+            int cur_mode = CVpp::getInstance()->GetPQMode(m_source_input);
+            if ((cur_mode == VPP_PICTURE_MODE_GAME) || (cur_mode == VPP_PICTURE_MODE_MONITOR)) {
+                LOGD("%d, auto switch to standard mode!\n", __LINE__);
+                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_STANDARD, m_source_input, m_cur_sig_info.fmt,
+                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            } else {
+                LOGD("%s, Signal don't match autoswitch condition!\n", __FUNCTION__);
+            }
         }
-    } else {
-        LOGD("%d, Signal don't match autoswitch condition!\n", __LINE__);
+    }else {
+        LOGD("%s, PQ mode set by user!\n", __FUNCTION__);
     }
 
     return ret;
