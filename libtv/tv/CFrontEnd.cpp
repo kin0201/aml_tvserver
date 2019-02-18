@@ -621,6 +621,8 @@ int CFrontEnd::stdAndColorToAudioEnum(int data)
         std = CC_ATV_AUDIO_STD_M;
     } else if ((data & V4L2_STD_SECAM_L) == V4L2_STD_SECAM_L) {
         std = CC_ATV_AUDIO_STD_L;
+    } else if (!data) {
+        std = CC_ATV_AUDIO_STD_AUTO;
     }
 #endif
     return  std ;
@@ -635,6 +637,8 @@ int CFrontEnd::stdAndColorToVideoEnum(int std)
         video_standard = CC_ATV_VIDEO_STD_NTSC;
     } else if ((std & V4L2_COLOR_STD_SECAM) == V4L2_COLOR_STD_SECAM) {
         video_standard = CC_ATV_VIDEO_STD_SECAM;
+    } else if (!std) {
+        video_standard = CC_ATV_VIDEO_STD_AUTO;
     }
     return video_standard;
 }

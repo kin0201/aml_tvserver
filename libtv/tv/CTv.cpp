@@ -690,7 +690,7 @@ int CTv::dtvManualScan (int beginFreq, int endFreq, int modulation)
 }
 
 //searchType 0:not 256 1:is 256 Program
-int CTv::atvAutoScan(int videoStd __unused, int audioStd __unused, int searchType, int procMode)
+int CTv::atvAutoScan(int videoStd, int audioStd, int searchType, int procMode)
 {
     int minScanFreq, maxScanFreq, vStd, aStd;
     AutoMutex _l( mLock );
@@ -710,8 +710,8 @@ int CTv::atvAutoScan(int videoStd __unused, int audioStd __unused, int searchTyp
         SetSnowShowEnable( true );
     }
 
-    vStd = CC_ATV_VIDEO_STD_PAL;
-    aStd = CC_ATV_AUDIO_STD_DK;
+    vStd = videoStd;
+    aStd = audioStd;
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(SOURCE_TV);
     mpTvin->VDIN_OpenPort ( source_port );
     unsigned long stdAndColor = mFrontDev->enumToStdAndColor(vStd, aStd);
