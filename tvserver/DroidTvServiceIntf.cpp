@@ -922,6 +922,30 @@ int DroidTvServiceIntf::setLcdEnable(int enable) {
     return mpTv->setLcdEnable(enable);
 }
 
+int DroidTvServiceIntf::readMacAddress(unsigned char *dataBuf) {
+    unsigned char tempBuf[CC_MAC_LEN] = {0};
+    int ret = KeyData_ReadMacAddress(tempBuf);
+    if (ret != 0) {
+        for (int i = 0; i < CC_MAC_LEN; i++) {
+            dataBuf[i] = tempBuf[i];
+        }
+        ret = 0;
+    } else {
+        ret = -1;
+    }
+
+    return ret;
+}
+
+int DroidTvServiceIntf::saveMacAddress(unsigned char *dataBuf) {
+    unsigned char tempBuf[CC_MAC_LEN] = {0};
+    for (int i = 0; i < CC_MAC_LEN; i++) {
+        tempBuf[i] = dataBuf[i];
+    }
+
+    return KeyData_SaveMacAddress(tempBuf);
+}
+
 int DroidTvServiceIntf::processCmd(const Parcel &p) {
     unsigned char dataBuf[512] = {0};
     int ret = -1;

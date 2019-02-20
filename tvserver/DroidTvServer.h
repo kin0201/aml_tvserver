@@ -51,6 +51,7 @@ using ::android::hardware::Return;
 using ::android::hardware::Void;
 using ::android::hidl::memory::V1_0::IMemory;
 using ::android::sp;
+using ::android::hardware::hidl_array;
 
 using namespace android;
 
@@ -145,6 +146,8 @@ public:
     Return<int32_t> setDeviceIdForCec(int32_t DeviceId) override;
     Return<int32_t> getTvRunStatus(void) override;
     Return<int32_t> setLcdEnable(int32_t enable) override;
+    Return<void> readMacAddress(readMacAddress_cb _hidl_cb) override;
+    Return<int32_t> saveMacAddress(const hidl_array<int32_t, 6>& data_buf) override;
     Return<void> setCallback(const sp<ITvServerCallback>& callback, ConnectType type) override;
 
     virtual void onEvent(const TvHidlParcel &hidlParcel);

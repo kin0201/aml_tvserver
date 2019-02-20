@@ -476,6 +476,30 @@ Return<int32_t> DroidTvServer::setLcdEnable(int32_t enable) {
     return mTvServiceIntf->setLcdEnable(enable);
 }
 
+Return<void> DroidTvServer::readMacAddress(readMacAddress_cb _hidl_cb)  {
+    unsigned char value[6] = {0};
+    int ret = mTvServiceIntf->readMacAddress(value);
+    if (ret >= 0) {
+        int i;
+        hidl_array<int32_t, 6> result;
+        for (i=0;i<6;i++) {
+            result[i] = value[i];
+        }
+        _hidl_cb(Result::OK, result);
+    }
+
+    return Void();
+}
+
+Return<int32_t> DroidTvServer::saveMacAddress(const hidl_array<int32_t, 6>& data_buf) {
+    unsigned char tempBuf[6] = {0};
+    int i = 0;
+    for (i=0;i<6;i++) {
+        tempBuf[i] = data_buf[i];
+    }
+    return mTvServiceIntf->saveMacAddress(tempBuf);
+}
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {
