@@ -354,7 +354,7 @@ void CTvScanner::notifyService(SCAN_ServiceInfo_t *srv)
                 mCurEv.mSid[i] = srv->cap_info.captions[i].service_number
                     + (srv->cap_info.captions[i].type ? (AM_CC_CAPTION_SERVICE1-1) : (AM_CC_CAPTION_CC1));
                 mCurEv.mSstype[i] = srv->cap_info.captions[i].type ? TYPE_DTV_CC : TYPE_ATV_CC;
-                mCurEv.mSid1[i] = srv->cap_info.captions[i].pid_or_line21;
+                mCurEv.mSid1[i] = srv->cap_info.captions[i].private_data;
                 mCurEv.mSid2[i] = srv->cap_info.captions[i].flags;
                 strncpy(mCurEv.mSlang[i], srv->cap_info.captions[i].lang, 10);
             }
