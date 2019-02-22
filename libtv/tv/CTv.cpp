@@ -2144,11 +2144,19 @@ void CTv::onSigToStable()
                 }
             }
             autoSwitchToMonitorMode();
+
+            char display_mode[32] = {0};
+            tvReadSysfs(SYS_DISPLAY_MODE_PATH, display_mode);
+            if (strstr(display_mode, "panel") != NULL) {//Panel
+                LOGD("%s, Now is panel mode!\n", __FUNCTION__);
+                tvWriteSysfs(SYS_PANEL_FRAME_RATE, fps, 10);
+            } else {
+                mpTvin->VDIN_SetDisplayVFreq(freq, mHdmiOutFbc);
+            }
         } else if ( CTvin::Tvin_is50HzFrameRateFmt ( m_cur_sig_info.fmt ) ) {
-            freq = 50;
+            mpTvin->VDIN_SetDisplayVFreq(50, mHdmiOutFbc);
         }
 
-        mpTvin->VDIN_SetDisplayVFreq ( freq, mHdmiOutFbc );
     }
     //showbo mark  hdmi auto 3d, tran fmt  is 3d, so switch to 3d
 
