@@ -2410,16 +2410,22 @@ unsigned int CTv::Vpp_GetDisplayResolutionInfo(tvin_window_pos_t *win_pos)
     return 0;
 }
 
-int CTv::setBlackoutEnable(int enable)
+int CTv::setBlackoutEnable(int enable, int isSave)
 {
+    LOGD("%s: setValue = %d, isSave = %d\n", __FUNCTION__, enable, isSave);
     mBlackoutEnable = ((enable==1)?true:false);
-    return SSMSaveBlackoutEnable(enable);
+    if (isSave == 1) {
+        SSMSaveBlackoutEnable(enable);
+    }
+
+    return 0;
 }
 
 int CTv::getBlackoutEnable()
 {
     int8_t enable;
     SSMReadBlackoutEnable(&enable);
+    LOGD("%s: getValue = %d\n", __FUNCTION__, enable);
     return enable;
 }
 

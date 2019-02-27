@@ -596,8 +596,8 @@ int DroidTvServiceIntf::setSourceInput(int32_t inputSrc, int32_t vInputSrc) {
     return mpTv->SetSourceSwitchInput((tv_source_input_t)vInputSrc, (tv_source_input_t)inputSrc);
 }
 
-int DroidTvServiceIntf::setBlackoutEnable(int32_t status) {
-    return mpTv->setBlackoutEnable(status);
+int DroidTvServiceIntf::setBlackoutEnable(int32_t status, int32_t is_save) {
+    return mpTv->setBlackoutEnable(status, is_save);
 }
 
 int DroidTvServiceIntf::getBlackoutEnable() {

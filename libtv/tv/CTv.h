@@ -237,7 +237,7 @@ public:
     int getFrontendSNR();
     int getFrontendBER();
     int getChannelInfoBydbID ( int dbID, channel_info_t &chan_info );
-    int setBlackoutEnable(int enable);
+    int setBlackoutEnable(int enable, int isSave);
     int getBlackoutEnable();
     int saveATVProgramID ( int dbID );
     int getATVProgramID ( void );

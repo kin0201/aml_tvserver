@@ -74,7 +74,7 @@ public:
     int handleGPIO(const std::string& key, int is_out, int edge);
     int setSourceInput(int32_t inputSrc);
     int setSourceInput(int32_t inputSrc, int32_t vInputSrc);
-    int setBlackoutEnable(int32_t status);
+    int setBlackoutEnable(int32_t status, int32_t is_save);
     int getBlackoutEnable();
     int getATVMinMaxFreq(int32_t &scanMinFreq, int32_t &scanMaxFreq);
     int setAmAudioPreMute(int32_t mute);
