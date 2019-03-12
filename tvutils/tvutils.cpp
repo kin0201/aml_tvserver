@@ -795,6 +795,31 @@ void Paras::setInt(const char *key, int v)
     }
 }
 
+std::string Paras::getString(const char *key) const
+{
+    std::string def;
+    STR_MAP::const_iterator it = mparas.find(std::string(key));
+    if (it == mparas.end())
+        return def;
+    return it->second;
+}
+
+void Paras::setString(const char *key, std::string v)
+{
+    char cs[64];
+    sprintf(cs, "%s", v.c_str());
+    STR_MAP::iterator it = mparas.find(std::string(key));
+    if (it != mparas.end()) {
+        it->second.assign(cs);
+    } else {
+        std::pair<std::map<std::string, std::string>::iterator, bool> ret;
+        ret = mparas.insert(std::pair<std::string, std::string>(std::string(key), std::string(cs)));
+        if (ret.second == false) {
+            LOGE("error: map can not insert string");
+        }
+    }
+}
+
 float getUptimeSeconds() {
     timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

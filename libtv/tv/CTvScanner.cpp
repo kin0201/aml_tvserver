@@ -99,6 +99,9 @@ int CTvScanner::Scan(CFrontEnd::FEParas &fp, ScanParas &sp) {
     mFEParas = fp;
     mScanParas = sp;
 
+    //current system lang iso_639 3bytes language code
+    systemLanguage = fp.getLanguage();
+
     /*for convenient use*/
     mCurScanStartFreq = sp.getAtvFrequency1();
     mCurScanEndFreq = sp.getAtvFrequency2();
@@ -726,31 +729,50 @@ void CTvScanner::extractSrvInfoFromSdt(AM_SCAN_Result_t *result, dvbpsi_sdt_t *s
             break;
         }
         AM_SI_LIST_END()
-#if 0   //The upper layer don't have the logic of parse multi service names according to 0x80, Use only one for the time being.
+#if 1   //The upper layer don't have the logic of parse multi service names according to 0x80, Use only one for the time being.
         /* store multilingual service name */
         AM_SI_LIST_BEGIN(srv->p_first_descriptor, descr)
-        if (descr->p_decoded && descr->i_tag == AM_SI_DESCR_MULTI_SERVICE_NAME) {
+        bool isChinaStream = (strcmp("CN", CTvRegion::getTvCountry()) == 0);
+        if (isChinaStream && descr->p_decoded && descr->i_tag == AM_SI_DESCR_MULTI_SERVICE_NAME) {
             int i;
             dvbpsi_multi_service_name_dr_t *pmsnd = (dvbpsi_multi_service_name_dr_t *)descr->p_decoded;
 
             for (i = 0; i < pmsnd->i_name_count; i++) {
+                /*judge 3bytes language code is current system language or not*/
+                const char *iso_639_code = (const char *)(pmsnd->p_service_name[i].i_iso_639_code);
+                if (!(strncmp(systemLanguage.c_str(), iso_639_code, 3) == 0)) {
+                    LOGD("not found multi matched current lang [%s] parsed [%3s]", systemLanguage.c_str(), iso_639_code);
+                    continue;
+                } else {
+                    LOGD("found multi matched current lang [%s] parsed [%3s]", systemLanguage.c_str(), iso_639_code);
+                }
+                //clear other info if matched one found
+                memset(name, 0, sizeof(name));
+                memset(srv_info->name, 0, sizeof(srv_info->name));
+                curr_name_len = 0,
+                tmp_len = 0;
                 name[0] = 0;
                 AM_SI_ConvertDVBTextCode((char *)pmsnd->p_service_name[i].i_service_name,
                                          pmsnd->p_service_name[i].i_service_name_length,
                                          name, AM_DB_MAX_SRV_NAME_LEN);
                 name[AM_DB_MAX_SRV_NAME_LEN] = 0;
-                LOGD("found name [%s]", name);
+                LOGD("found multi matched name [%s]", name);
 
                 if (curr_name_len > 0) {
                     /*extra split mark*/
                     COPY_NAME(&split, 1);
                 }
+
                 /*3bytes language code*/
                 COPY_NAME(pmsnd->p_service_name[i].i_iso_639_code, 3);
                 /*following by name text*/
                 tmp_len = strlen(name);
                 COPY_NAME(name, tmp_len);
+                LOGD("found multi match lang text [%s]", name);
+                break;
             }
+        }else {
+            LOGD("no multi service name matched");
         }
         AM_SI_LIST_END()
 #endif

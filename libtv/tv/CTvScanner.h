@@ -506,6 +506,7 @@ private:
     int demuxID;//default 0
     String8 defaultTextLang;
     String8 orderedTextLangs;
+    std::string systemLanguage;
     //showboz
     //Vector<CTvChannel> ChannelList;//VS mvChooseListChannels
 
