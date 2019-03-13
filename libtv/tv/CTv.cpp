@@ -1769,7 +1769,6 @@ int CTv::OpenTv ( void )
 
     mBlackoutEnable = ((getBlackoutEnable() == 1)?true:false);
     mAv.Open();
-    resetDmxAndAvSource();
     //mDevicesPollStatusDetectThread.startDetect();
     //ClearAnalogFrontEnd();
     InitCurrenSignalInfo();
