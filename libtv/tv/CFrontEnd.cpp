@@ -979,7 +979,7 @@ int CFrontEnd::checkStatusOnce()
     return 0;
 }
 
-int CFrontEnd::stdEnumToCvbsFmt (int vfmt)
+int CFrontEnd::stdEnumToCvbsFmt (int vfmt, unsigned long std)
 {
     tvin_sig_fmt_e cvbs_fmt = TVIN_SIG_FMT_NULL;
 #ifdef SUPPORT_ADTV
@@ -1000,7 +1000,11 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt)
         case V4L2_STD_PAL_DK:
         case V4L2_STD_PAL_BG:
         case V4L2_STD_PAL_I:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
+            if (std & V4L2_STD_PAL_M) {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
+            } else {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
+            }
             break;
         case V4L2_STD_PAL_M:
             cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
@@ -1027,7 +1031,7 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt)
         }
     }
 
-    LOGD("stdEnumToCvbsFmt vfmt:0x%x, cvbs_fmt:0x%x", vfmt, cvbs_fmt);
+    LOGD("stdEnumToCvbsFmt vfmt:0x%x, cvbs_fmt:0x%x, std: 0x%x", vfmt, cvbs_fmt, std);
 #endif
     return cvbs_fmt;
 }

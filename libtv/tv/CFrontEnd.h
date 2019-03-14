@@ -137,7 +137,7 @@ public:
     static int printVideoStdStr(int videoStd, char strBuffer[], int buff_size);
     static int printAudioStdStr(int audioStd, char strBuffer[], int buff_size);
     static unsigned long enumToStdAndColor(int videoStd, int audioStd);
-    static int stdEnumToCvbsFmt (int vfmt);
+    static int stdEnumToCvbsFmt (int vfmt, unsigned long std);
 
     static CFrontEnd *getInstance();
 
