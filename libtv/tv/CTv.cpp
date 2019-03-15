@@ -1722,6 +1722,7 @@ int CTv::OpenTv ( void )
     } else {
         mATVDisplaySnow = false;
     }
+    mpTvin->AFE_EnableSnowByConfig(mATVDisplaySnow);
 
     value = config_get_str ( CFG_SECTION_TV, CFG_BLUE_SCREEN_COLOR, "null" );
     if ( strcmp ( value, "black" ) == 0 ) {

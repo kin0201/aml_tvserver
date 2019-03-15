@@ -1906,6 +1906,19 @@ int CTvin::Tvin_StartDecoder ( tvin_info_t &info )
     return -1;
 }
 
+int CTvin::AFE_EnableSnowByConfig ( bool enable )
+{
+    LOGD("%s: enable or not: %d\n", __FUNCTION__, enable);
+    unsigned int value = 0;
+    if (enable) {
+        value = 1;
+    } else {
+        value = 0;
+    }
+
+    return AFE_DeviceIOCtl(TVIN_IOC_S_AFE_SONWCFG, &value);
+}
+
 int CTvin::SwitchSnow(bool enable)
 {
     int ret = -1;

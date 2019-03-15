@@ -460,6 +460,7 @@ typedef struct tvafe_pin_mux_s {
 #define TVIN_IOC_S_AFE_ADC_DIFF     _IOW(TVIN_IOC_MAGIC, 0x21, struct tvafe_adc_cal_clamp_s)
 #define TVIN_IOC_S_AFE_SONWON       _IO(TVIN_IOC_MAGIC, 0x22)
 #define TVIN_IOC_S_AFE_SONWOFF      _IO(TVIN_IOC_MAGIC, 0x23)
+#define TVIN_IOC_S_AFE_SONWCFG      _IOW(TVIN_IOC_MAGIC, 0x27, unsigned int)
 
 
 // ***************************************************************************
@@ -677,6 +678,7 @@ public:
     int AFE_GetAdcCompCal ( struct tvafe_adc_comp_cal_s *adccalvalue );
     int AFE_SetAdcCompCal ( struct tvafe_adc_comp_cal_s *adccalvalue );
     int AFE_GetYPbPrWSSinfo ( struct tvafe_comp_wss_s *wssinfo );
+    int AFE_EnableSnowByConfig ( bool enable );
     unsigned int data_limit ( float data );
     void matrix_convert_yuv709_to_rgb ( unsigned int y, unsigned int u, unsigned int v, unsigned int *r, unsigned int *g, unsigned int *b );
     void re_order ( unsigned int *a, unsigned int *b );
