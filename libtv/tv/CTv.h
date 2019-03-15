@@ -262,6 +262,7 @@ public:
     int GetSourceConnectStatus(tv_source_input_t source_input);
     int IsDVISignal();
     int isVgaFmtInHdmi();
+    int GetTvAction();
     int getHDMIFrameRate ( void );
     unsigned int Vpp_GetDisplayResolutionInfo(tvin_window_pos_t *win_pos);
     //SSM

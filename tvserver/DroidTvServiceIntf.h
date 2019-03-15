@@ -129,6 +129,7 @@ public:
     int updateEAS(int freq, int moudle, int mode);
     int setDeviceIdForCec(int DeviceId);
     int getTvRunStatus(void);
+    int getTvAction(void);
     int setLcdEnable(int enable);
     int readMacAddress(unsigned char *dataBuf);
     int saveMacAddress(unsigned char *dataBuf);

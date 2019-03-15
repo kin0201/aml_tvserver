@@ -146,6 +146,7 @@ public:
     Return<int32_t> updateEAS(int32_t freq, int32_t moudle, int32_t mode) override;
     Return<int32_t> setDeviceIdForCec(int32_t DeviceId) override;
     Return<int32_t> getTvRunStatus(void) override;
+    Return<int32_t> getTvAction(void) override;
     Return<int32_t> setLcdEnable(int32_t enable) override;
     Return<void> readMacAddress(readMacAddress_cb _hidl_cb) override;
     Return<int32_t> saveMacAddress(const hidl_array<int32_t, 6>& data_buf) override;

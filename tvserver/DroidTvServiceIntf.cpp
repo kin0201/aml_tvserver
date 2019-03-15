@@ -923,6 +923,10 @@ int DroidTvServiceIntf::getTvRunStatus(void) {
     return mpTv->GetTvStatus();
 }
 
+int DroidTvServiceIntf::getTvAction(void) {
+    return mpTv->GetTvAction();
+}
+
 int DroidTvServiceIntf::setLcdEnable(int enable) {
     return mpTv->setLcdEnable(enable);
 }

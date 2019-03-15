@@ -477,6 +477,11 @@ Return<int32_t> DroidTvServer::getTvRunStatus(void) {
     return mTvServiceIntf->getTvRunStatus();
 }
 
+Return<int32_t> DroidTvServer::getTvAction(void) {
+    return mTvServiceIntf->getTvAction();
+}
+
+
 Return<int32_t> DroidTvServer::setLcdEnable(int32_t enable) {
     return mTvServiceIntf->setLcdEnable(enable);
 }

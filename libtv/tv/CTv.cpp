@@ -1710,6 +1710,10 @@ TvRunStatus_t CTv::GetTvStatus()
     return mTvStatus;
 }
 
+int CTv::GetTvAction() {
+    return mTvAction;
+}
+
 int CTv::OpenTv ( void )
 {
     LOGD("%s: start at %fs\n", __FUNCTION__, getUptimeSeconds());
