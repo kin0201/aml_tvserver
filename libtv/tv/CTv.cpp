@@ -2897,11 +2897,14 @@ int CTv::GetHdmiAvHotplugDetectOnoff()
 
 int CTv::SetHdmiEdidVersion(tv_hdmi_port_id_t port, tv_hdmi_edid_version_t version)
 {
-    mAv.DisableVideoWithBlackColor();
-    mpTvin->Tvin_StopDecoder();
-    Tv_HDMIEDIDFileSelect(port, version);
-    SSMSetHDMIEdid(port);
-    mHDMIRxManager.HdmiRxEdidUpdate();
+    LOGD("%s: port: %d, curent source: %d\n", __FUNCTION__, port, m_source_input);
+    if (m_source_input == (port + 4) ) {
+        mAv.DisableVideoWithBlackColor();
+        mpTvin->Tvin_StopDecoder();
+        Tv_HDMIEDIDFileSelect(port, version);
+        SSMSetHDMIEdid(port);
+        mHDMIRxManager.HdmiRxEdidUpdate();
+    }
     return 0;
 }
 
