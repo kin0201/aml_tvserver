@@ -276,6 +276,16 @@ public:
     CTvSubtitle mSubtitle;
     CTv2d4GHeadSetDetect mHeadSet;
 
+    void SetCurrentLanguage(std::string lang)
+    {
+        mCurrentSystemLang = lang;
+    }
+
+    std::string GetCurrentLanguage()
+    {
+        return mCurrentSystemLang;
+    }
+
     int SendHDMIRxCECCustomMessage(unsigned char data_buf[]);
     int SendHDMIRxCECCustomMessageAndWaitReply(unsigned char data_buf[], unsigned char reply_buf[], int WaitCmd, int timeout);
     int SendHDMIRxCECBoradcastStandbyMessage();
@@ -350,6 +360,7 @@ private:
     bool mATVDisplaySnow;
     bool iSBlackPattern;
     bool MnoNeedAutoSwitchToMonitorMode;
+    std::string mCurrentSystemLang;
 
 protected:
     class CTvMsgQueue: public CMsgQueueThread, public CAv::IObserver

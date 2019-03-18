@@ -113,6 +113,7 @@ public:
     std::string getTvAtvMinMaxFreq(const std::string& country_code);
     bool getTvAtvStepScan(const std::string& country_code);
     void setTvCountry(const std::string& country);
+    void setCurrentLanguage(const std::string& lang);
     int setAudioOutmode(int32_t mode);
     int getAudioOutmode();
     int getAudioStreamOutmode();

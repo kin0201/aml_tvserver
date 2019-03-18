@@ -403,6 +403,11 @@ Return<void> DroidTvServer::setTvCountry(const hidl_string& country) {
     return Void();
 }
 
+Return<void> DroidTvServer::setCurrentLanguage(const hidl_string& lang) {
+    mTvServiceIntf->setCurrentLanguage(lang);
+    return Void();
+}
+
 Return<int32_t> DroidTvServer::setAudioOutmode(int32_t mode) {
     return mTvServiceIntf->setAudioOutmode(mode);
 }

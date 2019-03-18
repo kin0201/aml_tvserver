@@ -115,8 +115,6 @@ public:
 
     int getInt (const char *key, int def) const;
     void setInt(const char *key, int v);
-    std::string getString (const char *key) const;
-    void setString(const char *key, std::string v);
 
     const std::string toString() { std::string s; mapToJson(s, mparas); return s; }
 

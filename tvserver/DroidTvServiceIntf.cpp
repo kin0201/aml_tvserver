@@ -865,6 +865,11 @@ void DroidTvServiceIntf::setTvCountry(const std::string& country) {
     LOGD("set tv country = %s", country.c_str());
 }
 
+void DroidTvServiceIntf::setCurrentLanguage(const std::string& lang) {
+    mpTv->SetCurrentLanguage(lang);
+    LOGD("set tv current lang = %s", lang.c_str());
+}
+
 int DroidTvServiceIntf::setAudioOutmode(int32_t mode) {
     int ret = mpTv->SetAtvAudioOutmode(mode);
     return ret;

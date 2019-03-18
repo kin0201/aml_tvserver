@@ -1126,7 +1126,6 @@ const char* CFrontEnd::FEParas::FEP_ASTD = "atd";
 const char* CFrontEnd::FEParas::FEP_AFC = "afc";
 const char* CFrontEnd::FEParas::FEP_VFMT = "vfmt";
 const char* CFrontEnd::FEParas::FEP_SOUNDSYS = "soundsys";
-const char* CFrontEnd::FEParas::FEP_LANGUAGE = "language";
 
 bool CFrontEnd::FEParas::operator == (const FEParas &fep) const
 {

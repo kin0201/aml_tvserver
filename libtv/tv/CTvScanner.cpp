@@ -99,9 +99,6 @@ int CTvScanner::Scan(CFrontEnd::FEParas &fp, ScanParas &sp) {
     mFEParas = fp;
     mScanParas = sp;
 
-    //current system lang iso_639 3bytes language code
-    systemLanguage = fp.getLanguage();
-
     /*for convenient use*/
     mCurScanStartFreq = sp.getAtvFrequency1();
     mCurScanEndFreq = sp.getAtvFrequency2();
@@ -740,11 +737,11 @@ void CTvScanner::extractSrvInfoFromSdt(AM_SCAN_Result_t *result, dvbpsi_sdt_t *s
             for (i = 0; i < pmsnd->i_name_count; i++) {
                 /*judge 3bytes language code is current system language or not*/
                 const char *iso_639_code = (const char *)(pmsnd->p_service_name[i].i_iso_639_code);
-                if (!(strncmp(systemLanguage.c_str(), iso_639_code, 3) == 0)) {
-                    LOGD("not found multi matched current lang [%s] parsed [%3s]", systemLanguage.c_str(), iso_639_code);
+                if (!(strncmp(mCurrentSystemLang.c_str(), iso_639_code, 3) == 0)) {
+                    LOGD("not found multi matched current lang [%s] parsed [%3s]", mCurrentSystemLang.c_str(), iso_639_code);
                     continue;
                 } else {
-                    LOGD("found multi matched current lang [%s] parsed [%3s]", systemLanguage.c_str(), iso_639_code);
+                    LOGD("found multi matched current lang [%s] parsed [%3s]", mCurrentSystemLang.c_str(), iso_639_code);
                 }
                 //clear other info if matched one found
                 memset(name, 0, sizeof(name));

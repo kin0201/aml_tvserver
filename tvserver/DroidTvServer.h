@@ -130,6 +130,7 @@ public:
     Return<void> getTvAtvMinMaxFreq(const hidl_string& country_code, getTvAtvMinMaxFreq_cb _hidl_cb) override;
     Return<bool> getTvAtvStepScan(const hidl_string& country_code) override;
     Return<void> setTvCountry(const hidl_string& country) override;
+    Return<void> setCurrentLanguage(const hidl_string& lang) override;
     Return<int32_t> setAudioOutmode(int32_t mode) override;
     Return<int32_t> getAudioOutmode() override;
     Return<int32_t> getAudioStreamOutmode() override;

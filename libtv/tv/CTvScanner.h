@@ -119,6 +119,16 @@ public:
     static const char *getDtvScanListName(int mode);
     static CTvScanner *getInstance();
 
+    void SetCurrentLanguage(std::string lang)
+    {
+        mCurrentSystemLang = lang;
+    }
+
+    std::string GetCurrentLanguage()
+    {
+        return mCurrentSystemLang;
+    }
+
     struct ScannerLcnInfo {
 
         public:
@@ -506,7 +516,6 @@ private:
     int demuxID;//default 0
     String8 defaultTextLang;
     String8 orderedTextLangs;
-    std::string systemLanguage;
     //showboz
     //Vector<CTvChannel> ChannelList;//VS mvChooseListChannels
 
@@ -517,6 +526,7 @@ private:
     CFrontEnd::FEParas mFEParas;
     ScanParas mScanParas;
 
+    std::string mCurrentSystemLang;
     int mFEType;
 
     static ScannerEvent mCurEv;

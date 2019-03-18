@@ -264,8 +264,6 @@ public:
         FEParas& setVFmt(int a) { setInt(FEP_VFMT, a); return *this; }
         int getSoundsys() const { return getInt(FEP_SOUNDSYS, -1); }
         FEParas& setSoundsys(int a) { setInt(FEP_SOUNDSYS, a); return *this; }
-        std::string getLanguage() const { return getString(FEP_LANGUAGE); }
-        FEParas& setLanguage(std::string a) { setString(FEP_LANGUAGE, a); return *this; }
 
 #ifdef SUPPORT_ADTV
         FEParas& fromDVBParameters(const FEMode& mode, const struct dvb_frontend_parameters *dvb);
@@ -288,7 +286,6 @@ public:
         static const char* FEP_AFC;
         static const char* FEP_VFMT;
         static const char* FEP_SOUNDSYS;
-        static const char* FEP_LANGUAGE;
     };
 
     /* freq: freq1==freq2 for single, else for range */

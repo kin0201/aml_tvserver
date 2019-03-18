@@ -618,6 +618,7 @@ int CTv::Scan(const char *feparas, const char *scanparas) {
     mFrontDev->Open(TV_FE_AUTO);
     mTvScanner->setObserver(&mTvMsgQueue);
     mDtvScanRunningStatus = DTV_SCAN_RUNNING_NORMAL;
+    mTvScanner->SetCurrentLanguage(GetCurrentLanguage());
 
     return mTvScanner->Scan(fp, sp);
 }
@@ -641,6 +642,7 @@ int CTv::dtvScan(int mode, int scan_mode, int beginFreq, int endFreq, int para1,
     }
     mTvScanner->setObserver(&mTvMsgQueue);
     mDtvScanRunningStatus = DTV_SCAN_RUNNING_NORMAL;
+    mTvScanner->SetCurrentLanguage(GetCurrentLanguage());
 
     return mTvScanner->dtvScan(mode, scan_mode, beginFreq, endFreq, para1, para2);
 }
@@ -726,6 +728,7 @@ int CTv::atvAutoScan(int videoStd, int audioStd, int searchType, int procMode)
     minScanFreq = mFrontDev->formatATVFreq ( minScanFreq );
     maxScanFreq = mFrontDev->formatATVFreq ( maxScanFreq );
     LOGD("%s, atv auto scan vstd=%d, astd=%d stdandcolor=0x%x", __FUNCTION__, vStd, aStd, stdAndColor);
+    mTvScanner->SetCurrentLanguage(GetCurrentLanguage());
 
     mTvScanner->autoAtvScan ( minScanFreq, maxScanFreq, stdAndColor, searchType, procMode);
     return 0;
@@ -778,6 +781,7 @@ int CTv::atvMunualScan ( int startFreq, int endFreq, int videoStd, int audioStd,
     int fmt = CFrontEnd::stdEnumToCvbsFmt (0, 0);
     mpTvin->AFE_SetCVBSStd ( ( tvin_sig_fmt_t ) TVIN_SIG_FMT_NULL );
     LOGD("%s, atv manual scan vstd=%d, astd=%d stdandcolor=0x%x", __FUNCTION__, vStd, aStd, stdAndColor);
+    mTvScanner->SetCurrentLanguage(GetCurrentLanguage());
 
     return mTvScanner->ATVManualScan ( minScanFreq, maxScanFreq, stdAndColor, store_Type, channel_num);
 }
