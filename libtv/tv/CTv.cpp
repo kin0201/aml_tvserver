@@ -1216,7 +1216,7 @@ int CTv::playAtvProgram (int freq, int videoStd, int audioStd, int vfmt, int sou
     mTvAction |= TV_ACTION_IN_VDIN;
     mTvAction |= TV_ACTION_PLAYING;
 
-    mpTvin->Tvin_StopDecoder();
+    /* mpTvin->Tvin_StopDecoder(); */ /* No, it will affect the handling of onVdinSignalChange */
     mFrontDev->Open(TV_FE_ANALOG);
     unsigned long stdAndColor = mFrontDev->enumToStdAndColor (videoStd, audioStd);
 
