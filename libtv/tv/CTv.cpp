@@ -2179,19 +2179,17 @@ void CTv::onSigToStable()
 void CTv::onSigStillStable()
 {
     LOGD ( "%s, signal Still Stable!\n", __FUNCTION__);
-    if ( !(mTvAction & TV_ACTION_SCANNING) ) {
-        LOGD("still stable , to start decoder");
-        if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
-            mpTvin->Tvin_StopDecoder();
-            SetSnowShowEnable( false );
-        }
-        int startdec_status = mpTvin->Tvin_StartDecoder ( m_cur_sig_info );
-        if ( startdec_status == 0 ) { //showboz  codes from  start decode fun
-            const char *value = config_get_str ( CFG_SECTION_TV, CFG_TVIN_DB_REG, "null" );
-            if ( strcmp ( value, "enable" ) == 0 ) {
-                usleep ( 20 * 1000 );
-                CVpp::getInstance()->VPP_SetCVD2Values();
-            }
+
+    if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
+        mpTvin->Tvin_StopDecoder();
+        SetSnowShowEnable( false );
+    }
+    int startdec_status = mpTvin->Tvin_StartDecoder ( m_cur_sig_info );
+    if ( startdec_status == 0 ) { //showboz  codes from  start decode fun
+        const char *value = config_get_str ( CFG_SECTION_TV, CFG_TVIN_DB_REG, "null" );
+        if ( strcmp ( value, "enable" ) == 0 ) {
+            usleep ( 20 * 1000 );
+            CVpp::getInstance()->VPP_SetCVD2Values();
         }
     }
     CMessage msg;
@@ -3062,7 +3060,7 @@ int CTv::autoSwitchToMonitorMode()
 void CTv::onVdinSignalChange()
 {
     AutoMutex _l( mLock );
-    if (!(mTvAction & TV_ACTION_IN_VDIN) || (mTvAction & TV_ACTION_SCANNING) || (SOURCE_SPDIF == m_source_input)) {
+    if (!((mTvAction & TV_ACTION_IN_VDIN) || (mTvAction & TV_ACTION_SCANNING)) || (SOURCE_SPDIF == m_source_input)) {
         return;
     }
 
