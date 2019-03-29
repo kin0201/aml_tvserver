@@ -1275,7 +1275,9 @@ int CTv::resetFrontEndPara ( frontend_para_set_t feParms )
 int CTv::setFrontEnd ( const char *paras, bool force )
 {
     AutoMutex _l( mLock );
-    LOGD("%s: mTvAction = %#x, paras = %s", __FUNCTION__, mTvAction, paras);
+    LOGD("%s: mTvAction = %#x, paras = %s, m_source_input = %d.",
+            __FUNCTION__, mTvAction, paras, m_source_input);
+
     if (mTvAction & TV_ACTION_SCANNING) {
         return -1;
     }
@@ -1291,10 +1293,10 @@ int CTv::setFrontEnd ( const char *paras, bool force )
     int FEMode_Base = fp.getFEMode().getBase();
     LOGD("%s: fp.getFEMode.getbase = %d", __FUNCTION__, FEMode_Base);
     if ( FEMode_Base == TV_FE_ANALOG ) {
+        mTvAction |= TV_ACTION_IN_VDIN;
         if (SOURCE_DTV == m_source_input) {
             /* DTV --> ATV */
             stopPlaying(false);
-            mTvAction |= TV_ACTION_IN_VDIN;
         }
         int tmpFreq = fp.getFrequency();
         int tmpfineFreq = fp.getFrequency2();
@@ -1320,17 +1322,13 @@ int CTv::setFrontEnd ( const char *paras, bool force )
             mFrontDev->fineTune ( tmpfineFreq / 1000, force );
         }
     } else {
-        if (SOURCE_ADTV == m_source_input_virtual) {
-            if (SOURCE_TV == m_source_input) {
-                /* ATV --> DTV */
-                mTvAction &= ~TV_ACTION_IN_VDIN;
-                mpTvin->Tvin_StopDecoder();
-                if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-                    SetSnowShowEnable( false );
-                }
-                mpTvin->VDIN_ClosePort();
-            }
+        mTvAction &= ~TV_ACTION_IN_VDIN;
+        mpTvin->Tvin_StopDecoder();
+        if ((SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
+            SetSnowShowEnable( false );
         }
+        mpTvin->VDIN_ClosePort();
+
         mFrontDev->Open(TV_FE_AUTO);
         mFrontDev->setMode(FEMode_Base);
         mFrontDev->setPara (paras, force);
@@ -1851,6 +1849,7 @@ int CTv::StopTvLock ( void )
     LOGD("%s: mTvStatus = %d, mBlackoutEnable = %d\n", __FUNCTION__, mTvStatus, mBlackoutEnable);
     AutoMutex _l( mLock );
     mTvAction |= TV_ACTION_STOPING;
+    mTvAction &= ~TV_ACTION_IN_VDIN;
 
     /* release ATV/DTV early */
     mFrontDev->setMode(TV_FE_AUTO);
@@ -1863,7 +1862,7 @@ int CTv::StopTvLock ( void )
         SetSnowShowEnable( false );
     }
     mpTvin->VDIN_ClosePort();
-    mTvAction &= ~TV_ACTION_IN_VDIN;
+
     //stop scan  if scanning
     stopScan();
     mFrontDev->SetAnalogFrontEndTimerSwitch(0);
