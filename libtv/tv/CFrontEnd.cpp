@@ -1000,7 +1000,7 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt, unsigned long std)
         case V4L2_STD_PAL_DK:
         case V4L2_STD_PAL_BG:
         case V4L2_STD_PAL_I:
-            if (std & V4L2_STD_PAL_M) {
+            if ((std & V4L2_STD_PAL_M) || (std & V4L2_STD_NTSC_M)) {
                 cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
             } else {
                 cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
@@ -1014,6 +1014,9 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt, unsigned long std)
             break;
         case V4L2_STD_PAL_Nc:
             cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_CN;
+            break;
+        case V4L2_STD_NTSC_M:
+            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
             break;
         default:
             cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
