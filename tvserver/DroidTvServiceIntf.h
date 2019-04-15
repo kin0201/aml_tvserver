@@ -132,6 +132,7 @@ public:
     int readMacAddress(unsigned char *dataBuf);
     int saveMacAddress(unsigned char *dataBuf);
     int getIwattRegs();
+    int setSameSourceEnable(bool isEnable);
 
     virtual status_t dump(int fd, const Vector<String16>& args);
 

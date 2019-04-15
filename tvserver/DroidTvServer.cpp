@@ -504,6 +504,17 @@ Return<int32_t> DroidTvServer::getIwattRegs() {
     return mTvServiceIntf->getIwattRegs();
 }
 
+Return<int32_t> DroidTvServer::setSameSourceEnable(int32_t isEnable) {
+    int ret = -1;
+    if (isEnable != 0) {
+        ret = mTvServiceIntf->setSameSourceEnable(true);
+    } else {
+        ret = mTvServiceIntf->setSameSourceEnable(false);
+    }
+
+    return ret;
+}
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {

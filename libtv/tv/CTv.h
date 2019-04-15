@@ -319,6 +319,7 @@ public:
 
     int GetAtvAutoScanMode();
     int SetSnowShowEnable(bool enable);
+    int TV_SetSameSourceEnable(bool enable);
 
 private:
     int SendCmdToOffBoardFBCExternalDac(int, int);
@@ -486,6 +487,7 @@ protected:
     CTvGpio *pGpio;
 
     bool mPreviewEnabled;
+    bool mbSameSourceEnableStatus;
 
 public:
     friend CTvPlayer;

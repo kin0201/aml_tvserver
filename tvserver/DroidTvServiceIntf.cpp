@@ -951,6 +951,10 @@ int DroidTvServiceIntf::getIwattRegs() {
     return mpTv->Tv_GetIwattRegs();
 }
 
+int DroidTvServiceIntf::setSameSourceEnable(bool isEnable) {
+    return mpTv->TV_SetSameSourceEnable(isEnable);
+}
+
 int DroidTvServiceIntf::processCmd(const Parcel &p) {
     unsigned char dataBuf[512] = {0};
     int ret = -1;

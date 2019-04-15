@@ -137,6 +137,7 @@ CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
     mTvStatus = TV_INIT_ED;
     pGpio = new CTvGpio();
     print_version_info();
+    mbSameSourceEnableStatus = false;
 }
 
 CTv::~CTv()
@@ -1795,58 +1796,63 @@ int CTv::DoResume(int type)
 
 int CTv::StopTvLock ( void )
 {
-    LOGD("%s: mTvStatus = %d, mBlackoutEnable = %d\n", __FUNCTION__, mTvStatus, mBlackoutEnable);
-    AutoMutex _l( mLock );
-    mTvAction |= TV_ACTION_STOPING;
-    mTvAction &= ~TV_ACTION_IN_VDIN;
+    LOGD("%s: mTvStatus = %d, mBlackoutEnable = %d, SameSourceEnableStatus = %d\n", __FUNCTION__, mTvStatus, mBlackoutEnable, mbSameSourceEnableStatus);
+    if (mbSameSourceEnableStatus) {
+        mbSameSourceEnableStatus = false;
+        return 0;
+    } else {
+        AutoMutex _l( mLock );
+        mTvAction |= TV_ACTION_STOPING;
+        mTvAction &= ~TV_ACTION_IN_VDIN;
 
-    /* release ATV/DTV early */
-    mFrontDev->setMode(TV_FE_AUTO);
+        /* release ATV/DTV early */
+        mFrontDev->setMode(TV_FE_AUTO);
 
-    mAv.DisableVideoWithBlackColor();
-    tryReleasePlayer(false, m_source_input);
-    stopPlaying(false);
-    mpTvin->Tvin_StopDecoder();
-    if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
-        SetSnowShowEnable( false );
+        mAv.DisableVideoWithBlackColor();
+        tryReleasePlayer(false, m_source_input);
+        stopPlaying(false);
+        mpTvin->Tvin_StopDecoder();
+        if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
+            SetSnowShowEnable( false );
+        }
+        mpTvin->VDIN_ClosePort();
+
+        //stop scan  if scanning
+        stopScan();
+        mFrontDev->SetAnalogFrontEndTimerSwitch(0);
+
+        setAudioChannel(TV_AOUT_OUTPUT_STEREO);
+        mpTvin->setMpeg2Vdin(0);
+        mAv.setLookupPtsForDtmb(0);
+        m_last_source_input = SOURCE_INVALID;
+        m_source_input = SOURCE_INVALID;
+        m_source_input_virtual = SOURCE_INVALID;
+
+        CVpp::getInstance()->LoadVppSettings(SOURCE_MPEG, TVIN_SIG_FMT_HDMI_1920X1080P_60HZ, TVIN_TFMT_2D);
+
+        int ret = tvSetCurrentSourceInfo(m_source_input, TVIN_SIG_FMT_NULL, TVIN_TFMT_2D);
+        if (ret < 0) {
+            LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
+        }
+
+        if (mAutoSetDisplayFreq && !mPreviewEnabled) {
+            mpTvin->VDIN_SetDisplayVFreq(60);
+        }
+        mFrontDev->Close();
+        mTvAction &= ~TV_ACTION_STOPING;
+        mTvStatus = TV_STOP_ED;
+        MnoNeedAutoSwitchToMonitorMode = false;
+        if (mBlackoutEnable) {
+            mAv.EnableVideoBlackout();
+        }
+        mAv.ClearVideoBuffer();
+        //send source switch event for cec
+        TvEvent::SourceSwitchEvent ev;
+        ev.DestSourceInput = -1;
+        ev.DestSourcePortNum = 0;
+        sendTvEvent(ev);
+        return 0;
     }
-    mpTvin->VDIN_ClosePort();
-
-    //stop scan  if scanning
-    stopScan();
-    mFrontDev->SetAnalogFrontEndTimerSwitch(0);
-
-    setAudioChannel(TV_AOUT_OUTPUT_STEREO);
-    mpTvin->setMpeg2Vdin(0);
-    mAv.setLookupPtsForDtmb(0);
-    m_last_source_input = SOURCE_INVALID;
-    m_source_input = SOURCE_INVALID;
-    m_source_input_virtual = SOURCE_INVALID;
-
-    CVpp::getInstance()->LoadVppSettings(SOURCE_MPEG, TVIN_SIG_FMT_HDMI_1920X1080P_60HZ, TVIN_TFMT_2D);
-
-    int ret = tvSetCurrentSourceInfo(m_source_input, TVIN_SIG_FMT_NULL, TVIN_TFMT_2D);
-    if (ret < 0) {
-        LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
-    }
-
-    if (mAutoSetDisplayFreq && !mPreviewEnabled) {
-        mpTvin->VDIN_SetDisplayVFreq(60);
-    }
-    mFrontDev->Close();
-    mTvAction &= ~TV_ACTION_STOPING;
-    mTvStatus = TV_STOP_ED;
-    MnoNeedAutoSwitchToMonitorMode = false;
-    if (mBlackoutEnable) {
-        mAv.EnableVideoBlackout();
-    }
-    mAv.ClearVideoBuffer();
-    //send source switch event for cec
-    TvEvent::SourceSwitchEvent ev;
-    ev.DestSourceInput = -1;
-    ev.DestSourcePortNum = 0;
-    sendTvEvent(ev);
-    return 0;
 }
 
 int CTv::Tv_MiscSetBySource ( tv_source_input_t source_input )
@@ -3299,4 +3305,10 @@ int CTv::SetSnowShowEnable(bool enable)
     }
 
     return mpTvin->SwitchSnow(enable);
+}
+
+int CTv::TV_SetSameSourceEnable(bool enable)
+{
+    mbSameSourceEnableStatus = enable;
+    return 0;
 }
