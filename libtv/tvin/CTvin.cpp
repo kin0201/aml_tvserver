@@ -126,7 +126,7 @@ int CTvin::VDIN_AddVideoPath ( int selPath )
 {
     int ret = -1;
     std::string vdinPath;
-    std::string suffixVideoPath("ppmgr deinterlace amvideo");
+    std::string suffixVideoPath("deinterlace amvideo");
     bool amlvideo2Exist = isFileExist(AMLVIDEO2_DEV_PATH);
     switch ( selPath ) {
     case TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO:
@@ -138,9 +138,9 @@ int CTvin::VDIN_AddVideoPath ( int selPath )
 
     case TV_PATH_DECODER_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO:
         if (amlvideo2Exist)
-            vdinPath = "add default decoder amlvideo2.0 ";
+            vdinPath = "add default decoder amlvideo2.0 ppmgr ";
         else
-            vdinPath = "add default decoder ";
+            vdinPath = "add default decoder ppmgr ";
         break;
     default:
         break;
