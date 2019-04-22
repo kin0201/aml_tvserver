@@ -349,6 +349,7 @@ private:
     //end audio
     bool mATVDisplaySnow;
     bool iSBlackPattern;
+    bool mAutoSwitchMonitorCfg;
     bool MnoNeedAutoSwitchToMonitorMode;
     std::string mCurrentSystemLang;
 

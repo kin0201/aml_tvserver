@@ -35,6 +35,7 @@
 #define CFG_TVCHANNEL_VGA                       "ro.tv.tvinchannel.vga"
 
 #define CGF_TV_SUPPORT_COUNTRY                  "tv.support.country.name"
+#define CGF_TV_AUTOSWITCH_MONITOR_EN            "tv.autoswitch.monitor.en"
 #define CFG_SSM_HDMI_AV_DETECT                  "ssm.hdmi_av.hotplug.detect.en"
 #define CFG_SSM_HDMI_EDID_EN                    "ssm.handle.hdmi.edid.en"
 #define CFG_SSM_HDMI_EDID_VERSION               "ssm.handle.hdmi.edid.version"

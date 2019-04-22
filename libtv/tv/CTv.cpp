@@ -1690,6 +1690,13 @@ int CTv::OpenTv ( void )
         iSBlackPattern = false;
     }
 
+    value = config_get_str ( CFG_SECTION_TV, CGF_TV_AUTOSWITCH_MONITOR_EN, "disable" );
+    if (strcmp(value, "enable") == 0 ) {
+        mAutoSwitchMonitorCfg = true;
+    } else {
+        mAutoSwitchMonitorCfg = false;
+    }
+
     /*value = config_get_str ( CFG_SECTION_TV, CFG_FBC_PANEL_INFO, "null" );
     LOGD("open tv, get fbc panel info:%s\n", value);
     if (strcmp(value, "edid") == 0 ) {
@@ -1826,10 +1833,7 @@ int CTv::StopTvLock ( void )
         m_last_source_input = SOURCE_INVALID;
         m_source_input = SOURCE_INVALID;
         m_source_input_virtual = SOURCE_INVALID;
-
-        CVpp::getInstance()->LoadVppSettings(SOURCE_MPEG, TVIN_SIG_FMT_HDMI_1920X1080P_60HZ, TVIN_TFMT_2D);
-
-        int ret = tvSetCurrentSourceInfo(m_source_input, TVIN_SIG_FMT_NULL, TVIN_TFMT_2D);
+        int ret = tvSetCurrentSourceInfo(SOURCE_MPEG, TVIN_SIG_FMT_NULL, TVIN_TFMT_2D);
         if (ret < 0) {
             LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
         }
@@ -2011,12 +2015,10 @@ int CTv::SetSourceSwitchInputLocked(tv_source_input_t virtual_input, tv_source_i
         //double confirm we set the main volume lut buffer to mpeg
         mpTvin->setMpeg2Vdin(1);
         mAv.setLookupPtsForDtmb(1);
-        int ret = tvSetCurrentSourceInfo(m_source_input, TVIN_SIG_FMT_HDMI_1920X1080P_60HZ, TVIN_TFMT_2D);
+        int ret = tvSetCurrentSourceInfo(m_source_input, TVIN_SIG_FMT_NULL, TVIN_TFMT_2D);
         if (ret < 0) {
             LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
         }
-
-        CVpp::getInstance()->LoadVppSettings(m_source_input, TVIN_SIG_FMT_HDMI_1920X1080P_60HZ, TVIN_TFMT_2D);
     } else {
         mpTvin->setMpeg2Vdin(0);
         mAv.setLookupPtsForDtmb(0);
@@ -2064,7 +2066,6 @@ void CTv::onSigToStable()
         LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
     }
 
-    CVpp::getInstance()->LoadVppSettings(m_source_input, m_cur_sig_info.fmt, m_cur_sig_info.trans_fmt);
     if (mAutoSetDisplayFreq && !mPreviewEnabled) {
         int freq = 60;
         if (CTvin::Tvin_SourceInputToSourceInputType(m_source_input) == SOURCE_TYPE_HDMI ) {
@@ -2105,7 +2106,10 @@ void CTv::onSigToStable()
                     freq = 50;
                 }
             }
-            autoSwitchToMonitorMode();
+
+            if (mAutoSwitchMonitorCfg) {
+                autoSwitchToMonitorMode();
+            }
 
             char display_mode[32] = {0};
             tvReadSysfs(SYS_DISPLAY_MODE_PATH, display_mode);
