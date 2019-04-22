@@ -565,7 +565,7 @@ int CAv::SetVideoScreenColor ( int vdin_blending_mask, int y, int u, int v )
     return 0;
 }
 
-int CAv::SetVideoLayerDisable ( int value )
+int CAv::SetVideoLayerStatus ( int value )
 {
     LOGD("%s, value = %d" , __FUNCTION__, value);
 

@@ -60,6 +60,12 @@ enum {
     VIDEO_LAYER_DISABLE_BLUE            = 2
 };
 
+enum {
+    ENABLE_VIDEO_LAYER,
+    DISABLE_VIDEO_LAYER,
+    ENABLE_AND_CLEAR_VIDEO_LAYER
+};
+
 typedef enum video_display_resolution_e {
     VPP_DISPLAY_RESOLUTION_1366X768,
     VPP_DISPLAY_RESOLUTION_1920X1080,
@@ -162,7 +168,7 @@ public:
     int WaittingVideoPlaying(int minFrameCount = 8, int waitTime = 5000);
     int EnableVideoBlackout();
     int DisableVideoBlackout();
-    int SetVideoLayerDisable ( int value );
+    int SetVideoLayerStatus ( int value );
     int ClearVideoBuffer();
     bool videoIsPlaying(int minFrameCount = 8);
     int setVideoScreenMode ( int value );

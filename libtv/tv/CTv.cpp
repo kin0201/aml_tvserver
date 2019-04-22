@@ -1765,7 +1765,7 @@ int CTv::StartTvLock ()
 
     setDvbLogLevel();
     //mAv.ClearVideoBuffer();
-    mAv.SetVideoLayerDisable(0);
+    mAv.SetVideoLayerStatus(ENABLE_AND_CLEAR_VIDEO_LAYER);
     //Tv_SetDisplayMode ( Tv_GetDisplayMode ( m_source_input ), m_source_input, m_cur_sig_info.fmt, 1);
     TvMisc_EnableWDT ( gTvinConfig.kernelpet_disable, gTvinConfig.userpet, gTvinConfig.kernelpet_timeout, gTvinConfig.userpet_timeout, gTvinConfig.userpet_reset );
     mpTvin->TvinApi_SetCompPhaseEnable ( 1 );
