@@ -2933,6 +2933,18 @@ int CTv::autoSwitchToMonitorMode()
                 LOGD("%s, Signal don't match autoswitch condition!\n", __FUNCTION__);
             }
         }
+
+        int pq_mode = CVpp::getInstance()->GetPQMode(m_source_input);
+        if (pq_mode == VPP_PICTURE_MODE_GAME) {
+            CVpp::getInstance()->enableMonitorMode(false);
+            mpTvin->VDIN_SetGameMode(MODE_ON);
+        } else if (pq_mode == VPP_PICTURE_MODE_MONITOR) {
+            CVpp::getInstance()->enableMonitorMode(true);
+            mpTvin->VDIN_SetGameMode(MODE_OFF);
+        } else {
+            CVpp::getInstance()->enableMonitorMode(false);
+            mpTvin->VDIN_SetGameMode(MODE_OFF);
+        }
     }else {
         LOGD("%s, PQ mode set by user!\n", __FUNCTION__);
     }

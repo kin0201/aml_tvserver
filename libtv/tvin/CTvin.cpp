@@ -535,11 +535,9 @@ int CTvin::VDIN_UpdateForPQMode(pq_status_update_e gameStatus, pq_status_update_
     memset(&signal_info, 0, sizeof(tvin_info_t));
     LOGD("%s: gameStatus= %d, pcStatus= %d\n", __FUNCTION__, gameStatus, pcStatus);
     if (gameStatus != MODE_STABLE) {
-        ret = VDIN_DeviceIOCtl(TVIN_IOC_GAME_MODE, &gameStatus);
-        if (ret < 0) {
-            LOGE("Vdin set game mode failed, error(%s)!", strerror(errno));
+        ret = VDIN_SetGameMode(gameStatus);
+        if (ret < 0)
             return -1;
-        }
     }
 
     if ((gameStatus != MODE_STABLE) || (pcStatus != MODE_STABLE)) {
@@ -2194,6 +2192,18 @@ int CTvin::VDIN_GetAllmInfo(tvin_latency_s *AllmInfo)
         if (ret < 0) {
             LOGE("%s: ioctl failed!\n", __FUNCTION__);
         }
+    }
+
+    return ret;
+}
+
+int CTvin::VDIN_SetGameMode(pq_status_update_e mode)
+{
+    int ret = -1;
+    LOGE("%s: game mode: %d\n!", __FUNCTION__, mode);
+    ret = VDIN_DeviceIOCtl(TVIN_IOC_GAME_MODE, &mode);
+    if (ret < 0) {
+        LOGE("%s failed, error(%s)!", __FUNCTION__, strerror(errno));
     }
 
     return ret;

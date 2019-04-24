@@ -691,6 +691,7 @@ public:
     int VDIN_GetPortConnect ( int port );
     int VDIN_OpenHDMIPinMuxOn ( bool flag );
     int VDIN_GetAllmInfo(tvin_latency_s *AllmInfo);
+    int VDIN_SetGameMode(pq_status_update_e mode);
     /*******************************************extend funs*********************/
     static tv_source_input_type_t Tvin_SourcePortToSourceInputType ( tvin_port_t source_port );
     static tv_source_input_type_t Tvin_SourceInputToSourceInputType ( tv_source_input_t source_input );
