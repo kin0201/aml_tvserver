@@ -360,7 +360,7 @@ int CAv::EnableVideoNow(bool IsShowTestScreen)
     }
     mVideoLayerState = VIDEO_LAYER_ENABLE;
     if (IsShowTestScreen) {
-        LOGD("%s: eableVideoWithBlackColor", __FUNCTION__);
+        LOGD("%s: eableVideoWithBlackColor SwitchSourceTime = %fs", __FUNCTION__,getUptimeSeconds());
         SetVideoScreenColor ( 0, 16, 128, 128 );
     }
 
