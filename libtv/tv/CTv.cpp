@@ -329,9 +329,6 @@ void CTv::onEvent(const CAv::AVEvent &ev)
             if (mAutoSetDisplayFreq && !mPreviewEnabled) {
                 mpTvin->VDIN_SetDisplayVFreq(50);
             }
-
-            mAv.EnableVideoNow(true);
-            LOGD("EVENT_AV_VIDEO_AVAILABLE, video available ok");
         }
 
         TvEvent::AVPlaybackEvent AvPlayBackEvt;
@@ -2162,12 +2159,7 @@ void CTv::onSigStillStable()
             CVpp::getInstance()->VPP_SetCVD2Values();
         }
     }
-    CMessage msg;
-    msg.mDelayMs = 0;
-    msg.mType = CTvMsgQueue::TV_MSG_ENABLE_VIDEO_LATER;
-    msg.mpPara[0] = 2;
-    mTvMsgQueue.sendMsg ( msg );
-
+    mAv.EnableVideoNow(true);
     TvEvent::SignalInfoEvent ev;
     ev.mTrans_fmt = m_cur_sig_info.trans_fmt;
     ev.mFmt = m_cur_sig_info.fmt;

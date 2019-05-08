@@ -643,6 +643,7 @@ video_display_resolution_t CAv::getVideoDisplayResolution()
 void CAv::av_evt_callback ( long dev_no, int event_type, void *param, void *user_data )
 {
     CAv *pAv = ( CAv * ) user_data;
+    CAv mAv;
     if (NULL == pAv ) {
         LOGD ( "%s, ERROR : av_evt_callback NULL == pTv\n", __FUNCTION__ );
         return ;
@@ -676,6 +677,7 @@ void CAv::av_evt_callback ( long dev_no, int event_type, void *param, void *user
         break;
     }
     case AM_AV_EVT_VIDEO_AVAILABLE: {
+        mAv.EnableVideoNow(true);
         pAv->mCurAvEvent.type = AVEvent::EVENT_AV_VIDEO_AVAILABLE;
         pAv->mCurAvEvent.param = ( long )param;
         pAv->mpObserver->onEvent(pAv->mCurAvEvent);
