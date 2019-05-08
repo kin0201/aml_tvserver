@@ -2147,17 +2147,18 @@ void CTv::onSigStillStable()
 {
     LOGD ( "%s, signal Still Stable!\n", __FUNCTION__);
 
-    if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
+    if ((SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
         mpTvin->Tvin_StopDecoder();
         SetSnowShowEnable( false );
     }
     LOGD ( "%s, startDecoder SwitchSourceTime Time = %fs\n", __FUNCTION__,getUptimeSeconds());
     int startdec_status = mpTvin->Tvin_StartDecoder ( m_cur_sig_info );
     LOGD ( "%s, startDecoder End SwitchSourceTime = %fs\n", __FUNCTION__,getUptimeSeconds());
-    if ( startdec_status == 0 ) { //showboz  codes from  start decode fun
+    //showboz  codes from  start decode fun
+    if ((startdec_status == 0) &&
+        ((SOURCE_TV == m_source_input) || (SOURCE_AV1 == m_source_input) || (SOURCE_AV2 == m_source_input))) {
         const char *value = config_get_str ( CFG_SECTION_TV, CFG_TVIN_DB_REG, "null" );
-        if ( strcmp ( value, "enable" ) == 0 ) {
-            usleep ( 20 * 1000 );
+        if (strcmp(value, "enable") == 0) {
             CVpp::getInstance()->VPP_SetCVD2Values();
         }
     }
