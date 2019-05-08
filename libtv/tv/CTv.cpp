@@ -2068,7 +2068,7 @@ void CTv::onSigToStable()
 
     if (mAutoSetDisplayFreq && !mPreviewEnabled) {
         int freq = 60;
-        if (CTvin::Tvin_SourceInputToSourceInputType(m_source_input) == SOURCE_TYPE_HDMI ) {
+        if (CTvin::Tvin_SourceInputToSourceInputType(m_source_input) == SOURCE_TYPE_HDMI ) {//HDMI source
             int fps = getHDMIFrameRate();
             LOGD("%s: HDMI source frame rate is %d\n", __FUNCTION__, fps);
             const char *value;
@@ -2119,8 +2119,14 @@ void CTv::onSigToStable()
             } else {
                 mpTvin->VDIN_SetDisplayVFreq(freq);
             }
-        } else if ( CTvin::Tvin_is50HzFrameRateFmt ( m_cur_sig_info.fmt ) ) {
-            mpTvin->VDIN_SetDisplayVFreq(50);
+        }else {//ATV or AV source
+            if (CTvin::Tvin_is50HzFrameRateFmt(m_cur_sig_info.fmt)) {
+                freq = 50;
+            } else {
+                freq = 60;
+            }
+
+            mpTvin->VDIN_SetDisplayVFreq(freq);
         }
     }
     //showbo mark  hdmi auto 3d, tran fmt  is 3d, so switch to 3d
