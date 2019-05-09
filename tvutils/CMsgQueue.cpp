@@ -18,6 +18,8 @@ CMessage::CMessage()
 {
     mDelayMs = 0;
     mWhenMs = 0;
+    mType = 0;
+    mpData = NULL;
 }
 
 CMessage::~CMessage()

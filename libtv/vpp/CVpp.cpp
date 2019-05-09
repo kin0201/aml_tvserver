@@ -258,7 +258,10 @@ int CVpp::VPP_SSMRestorToDefault(int id, bool resetAll)
     tmp_panorama_full = VPP_PANORAMA_MODE_FULL;
     for (i = 0; i < SOURCE_MAX; i++) {
         if (resetAll || VPP_DATA_POS_PANORAMA_START == id) {
-            if (i == SOURCE_TYPE_HDMI) {
+            if ((i == SOURCE_HDMI1) ||
+                (i == SOURCE_HDMI2) ||
+                (i == SOURCE_HDMI3) ||
+                (i == SOURCE_HDMI4)) {
                 SSMSavePanoramaStart(i, tmp_panorama_full);
             } else {
                 SSMSavePanoramaStart(i, tmp_panorama_nor);

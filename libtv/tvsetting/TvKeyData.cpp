@@ -302,28 +302,31 @@ int KeyData_ReadBarCode(unsigned char data_buf[])
     unsigned char rd_buf[CC_MAX_KEY_DATA_SIZE] = { 0 };
 
     tmp_len = KeyData_GetBarCodeDataLen();
-    rd_size = ReadKeyData(CS_BARCODE_KEY_NAME, rd_buf, tmp_len);
-    LOGD("%s, rd_size = %d\n", __FUNCTION__, rd_size);
+    if (tmp_len > 0) {
+        rd_size = ReadKeyData(CS_BARCODE_KEY_NAME, rd_buf, tmp_len);
+        LOGD("%s, rd_size = %d\n", __FUNCTION__, rd_size);
 
 #if ANDROID_PLATFORM_SDK_VERSION == 19
-    unsigned char tmp_buf[CC_MAX_KEY_DATA_SIZE] = { 0 };
+        unsigned char tmp_buf[CC_MAX_KEY_DATA_SIZE] = { 0 };
 
-    memcpy((void *)tmp_buf, (void *)rd_buf, CC_MAX_KEY_DATA_SIZE);
-    rd_size = TransStringToHex(rd_size, (char *)rd_buf, tmp_buf);
+        memcpy((void *)tmp_buf, (void *)rd_buf, CC_MAX_KEY_DATA_SIZE);
+        rd_size = TransStringToHex(rd_size, (char *)rd_buf, tmp_buf);
 
-    if (rd_size == tmp_len) {
-        memcpy(data_buf, tmp_buf, rd_size);
-        return rd_size;
-    }
+        if (rd_size == tmp_len) {
+            memcpy(data_buf, tmp_buf, rd_size);
+            return rd_size;
+        }
 #endif
 
 #if ANDROID_PLATFORM_SDK_VERSION >= 21
-    if (rd_size == tmp_len) {
-        memcpy(data_buf, rd_buf, rd_size);
-        return rd_size;
-    }
+        if (rd_size == tmp_len) {
+            memcpy(data_buf, rd_buf, rd_size);
+            return rd_size;
+        }
 #endif
-
+    } else {
+        LOGD("%s: KeyData_GetBarCodeDataLen failed!\n", __FUNCTION__);
+    }
     return 0;
 }
 
