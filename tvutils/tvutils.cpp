@@ -285,9 +285,13 @@ int tvSavePQMode ( vpp_picture_mode_t mode )
 
 int tvSetCurrentSourceInfo(tv_source_input_t tv_source_input, tvin_sig_fmt_t sig_fmt, tvin_trans_fmt_t trans_fmt)
 {
+    int s32Ret;
+    LOGD("tvSetCurrentSourceInfo , Start LoadPQ SwitchSourceTime = %f", getUptimeSeconds());
     const sp<SystemControlClient> &sws = getSystemControlService();
     if (sws != nullptr) {
-        return sws->setCurrentSourceInfo((int)tv_source_input, (int)sig_fmt, (int)trans_fmt);
+        s32Ret = sws->setCurrentSourceInfo((int)tv_source_input, (int)sig_fmt, (int)trans_fmt);
+        LOGD("tvSetCurrentSourceInfo , End LoadPQ SwitchSourceTime = %f", getUptimeSeconds());
+        return s32Ret;
     }
     return -1;
 }
