@@ -2708,7 +2708,13 @@ int CTv::Tv_SetVdinForPQ (int gameStatus, int pcStatus, int autoSwitchFlag)
         LOGD("%s: not about pc mode!\n", __FUNCTION__);
     }
 
-    return mpTvin->VDIN_UpdateForPQMode((pq_status_update_e)gameStatus, (pq_status_update_e)pcStatus);
+    if (gameStatus != MODE_STABLE) {
+        ret = mpTvin->VDIN_SetGameMode((pq_status_update_e)gameStatus);
+    }
+
+    tvin_port_t cur_port = mpTvin->Tvin_GetSourcePortBySourceInput(m_source_input);
+    mpTvin->SwitchPort (cur_port);
+    return 0;
 }
 
 int CTv::Tv_SetWssStatus (int status)
