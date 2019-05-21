@@ -1834,7 +1834,7 @@ bool CTvin::Tvin_is50HzFrameRateFmt ( tvin_sig_fmt_t fmt )
             || fmt == TVIN_SIG_FMT_HDMI_720X576P_50HZ_FRAME_PACKING
             /** cvbs **/
             || fmt == TVIN_SIG_FMT_CVBS_PAL_I
-            || fmt == TVIN_SIG_FMT_CVBS_PAL_M
+            || fmt == TVIN_SIG_FMT_CVBS_NTSC_50
             || fmt == TVIN_SIG_FMT_CVBS_PAL_CN
             || fmt == TVIN_SIG_FMT_CVBS_SECAM ) {
         LOGD ( "%s, Frame rate == 50Hz.", CFG_SECTION_TV );
