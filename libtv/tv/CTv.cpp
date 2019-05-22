@@ -1849,11 +1849,6 @@ int CTv::StopTvLock ( void )
             mAv.EnableVideoBlackout();
         }
         mAv.ClearVideoBuffer();
-        //send source switch event for cec
-        TvEvent::SourceSwitchEvent ev;
-        ev.DestSourceInput = -1;
-        ev.DestSourcePortNum = 0;
-        sendTvEvent(ev);
         LOGD("%s StopTvLock End SwitchSourceTime Time = %fs\n", __FUNCTION__,getUptimeSeconds());
         return 0;
     }
@@ -2739,15 +2734,10 @@ int CTv::Tv_Easupdate()
 int CTv::Tv_SetDeviceIdForCec(int deviceId)
 {
     //send source switch event for cec while HDMI source
-    if (mpTvin->Tvin_SourceInputToSourceInputType((tv_source_input_t)deviceId) == SOURCE_TYPE_HDMI) {
-        TvEvent::SourceSwitchEvent ev;
-        ev.DestSourceInput = deviceId;
-        ev.DestSourcePortNum = (mpTvin->Tvin_GetSourcePortBySourceInput((tv_source_input_t)deviceId) & 0xf) + 1;
-        sendTvEvent(ev);
-        return 0;
-    }
-
-    return -1;
+    TvEvent::SourceSwitchEvent ev;
+    ev.DestSourceInput = deviceId;
+    sendTvEvent(ev);
+    return 0;
 }
 //audio
 
