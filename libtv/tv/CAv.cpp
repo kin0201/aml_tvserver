@@ -441,7 +441,9 @@ int CAv::setTimeShiftSpeed(int speed)
     LOGD ( "%s: [%d]", __FUNCTION__, speed);
     int ret = 0;
 #ifdef SUPPORT_ADTV
-    if (speed < 0)
+    if (speed == 0)
+        ret = AM_AV_ResumeTimeshift (mTvPlayDevId);
+    else if (speed < 0)
         ret = AM_AV_FastBackwardTimeshift(mTvPlayDevId, -speed);
     else
         ret = AM_AV_FastForwardTimeshift(mTvPlayDevId, speed);
