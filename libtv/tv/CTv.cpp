@@ -1838,9 +1838,6 @@ int CTv::StopTvLock ( void )
             LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
         }
 
-        if (mAutoSetDisplayFreq && !mPreviewEnabled) {
-            mpTvin->VDIN_SetDisplayVFreq(60);
-        }
         mFrontDev->Close();
         mTvAction &= ~TV_ACTION_STOPING;
         mTvStatus = TV_STOP_ED;
