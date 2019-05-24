@@ -1770,9 +1770,7 @@ int CTv::StartTvLock ()
     }
 
     setDvbLogLevel();
-    //mAv.ClearVideoBuffer();
     mAv.SetVideoLayerStatus(ENABLE_AND_CLEAR_VIDEO_LAYER);
-    //Tv_SetDisplayMode ( Tv_GetDisplayMode ( m_source_input ), m_source_input, m_cur_sig_info.fmt, 1);
     TvMisc_EnableWDT ( gTvinConfig.kernelpet_disable, gTvinConfig.userpet, gTvinConfig.kernelpet_timeout, gTvinConfig.userpet_timeout, gTvinConfig.userpet_reset );
     mpTvin->TvinApi_SetCompPhaseEnable ( 1 );
     mpTvin->VDIN_EnableRDMA ( 1 );
@@ -2151,7 +2149,6 @@ void CTv::onSigStillStable()
             CVpp::getInstance()->VPP_SetCVD2Values();
         }
     }
-    mAv.EnableVideoNow(true);
     TvEvent::SignalInfoEvent ev;
     ev.mTrans_fmt = m_cur_sig_info.trans_fmt;
     ev.mFmt = m_cur_sig_info.fmt;
