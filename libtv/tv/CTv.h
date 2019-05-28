@@ -75,6 +75,8 @@ static const char *TV_CONFIG_EDID20_FILE_PATH = "/vendor/etc/tvconfig/hdmi/port_
 #define DTV_DVBT_MODE        "dvbt"
 #define DTV_ISDBT_MODE       "isdbt"
 
+#define NEW_FRAME_TIME_OUT_COUNT  100
+
 typedef enum tv_window_mode_e {
     NORMAL_WONDOW,
     PREVIEW_WONDOW,
@@ -399,6 +401,8 @@ protected:
     bool isTvViewBlocked();
     void onEnableVideoLater(int framecount);
     void onVideoAvailableLater(int framecount);
+    //add available frame judge
+    void isVideoFrameAvailable(unsigned int u32NewFrameCount = 1);
     int resetDmxAndAvSource();
     int stopScan();
     int stopPlaying(bool isShowTestScreen);
@@ -441,6 +445,7 @@ protected:
 
     virtual void onBootvideoRunning();
     virtual void onBootvideoStopped();
+
 
     CTvEpg mTvEpg;
     CTvRrt *mTvRrt;

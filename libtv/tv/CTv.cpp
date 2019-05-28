@@ -330,7 +330,7 @@ void CTv::onEvent(const CAv::AVEvent &ev)
                 mpTvin->VDIN_SetDisplayVFreq(50);
             }
         }
-
+        isVideoFrameAvailable();
         TvEvent::AVPlaybackEvent AvPlayBackEvt;
         AvPlayBackEvt.mMsgType = TvEvent::AVPlaybackEvent::EVENT_AV_VIDEO_AVAILABLE;
         AvPlayBackEvt.mProgramId = (int)ev.param;
@@ -421,7 +421,7 @@ void CTv::CTvMsgQueue::handleMessage ( CMessage &msg )
 
     case TV_MSG_ENABLE_VIDEO_LATER: {
         int fc = msg.mpPara[0];
-        mpTv->onEnableVideoLater(fc);
+        mpTv->isVideoFrameAvailable();
         break;
     }
 
@@ -2149,6 +2149,12 @@ void CTv::onSigStillStable()
             CVpp::getInstance()->VPP_SetCVD2Values();
         }
     }
+    CMessage msg;
+    msg.mDelayMs = 0;
+    msg.mType = CTvMsgQueue::TV_MSG_ENABLE_VIDEO_LATER;
+    msg.mpPara[0] = 2;
+    mTvMsgQueue.sendMsg ( msg );
+
     TvEvent::SignalInfoEvent ev;
     ev.mTrans_fmt = m_cur_sig_info.trans_fmt;
     ev.mFmt = m_cur_sig_info.fmt;
@@ -2164,7 +2170,24 @@ bool CTv::isTvViewBlocked() {
     LOGD("%s, persist.sys.tvview.blocked = %s", __FUNCTION__, prop_value);
     return (strcmp(prop_value, "true") == 0) ? true : false;
 }
-
+void CTv::isVideoFrameAvailable(unsigned int u32NewFrameCount)
+{
+    unsigned int u32TimeOutCount = 0;
+    while(1) {
+        if (mAv.getVideoFrameCount() >= u32NewFrameCount) {
+            LOGD("%s video available SwitchSourceTime = %f", __FUNCTION__,getUptimeSeconds());
+            break;
+        } else {
+            if (u32TimeOutCount >= NEW_FRAME_TIME_OUT_COUNT) {
+            LOGD("%s Not available frame consume time = %f", __FUNCTION__,getUptimeSeconds());
+            break;
+            }
+        }
+        LOGD("%s new frame count = %d",__FUNCTION__,mAv.getVideoFrameCount());
+        usleep(10*1000);
+        u32TimeOutCount++;
+    }
+}
 void CTv::onEnableVideoLater(int framecount)
 {
     mAv.EnableVideoWhenVideoPlaying(framecount);
