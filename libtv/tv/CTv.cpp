@@ -2095,10 +2095,6 @@ void CTv::onSigToStable()
                 }
             }
 
-            if (mAutoSwitchMonitorCfg) {
-                autoSwitchToMonitorMode();
-            }
-
             char display_mode[32] = {0};
             tvReadSysfs(SYS_DISPLAY_MODE_PATH, display_mode);
             if (strstr(display_mode, "panel") != NULL) {//Panel
@@ -2107,6 +2103,11 @@ void CTv::onSigToStable()
             } else {
                 mpTvin->VDIN_SetDisplayVFreq(freq);
             }
+
+            if (mAutoSwitchMonitorCfg) {//autoswitch for hdmi source
+                autoSwitchToMonitorMode();
+            }
+
         }else {//ATV or AV source
             if (CTvin::Tvin_is50HzFrameRateFmt(m_cur_sig_info.fmt)) {
                 freq = 50;
@@ -2922,46 +2923,47 @@ int CTv::autoSwitchToMonitorMode()
         LOGD("%s: allm_mode is %d, it_content is %d, cn_type is %d!\n", __FUNCTION__, allmInfo.allm_mode,
                                    allmInfo.it_content, allmInfo.cn_type);
 
+        int CurrentMode = CVpp::getInstance()->GetPQMode(m_source_input);
+        LOGD("%s, CurrentMode is %d!\n", __FUNCTION__, CurrentMode);
+        vpp_picture_mode_t NewMode = VPP_PICTURE_MODE_STANDARD;
+
         if (allmInfo.allm_mode) {
             LOGD("%s autoswitch to game mode!\n", __FUNCTION__);
-            ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_GAME, m_source_input, m_cur_sig_info.fmt,
-                                                m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            NewMode = VPP_PICTURE_MODE_GAME;
         } else if (allmInfo.it_content){
             if (allmInfo.cn_type == GAME) {//GAME
                 LOGD("%s autoswitch to game mode!\n", __FUNCTION__);
-                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_GAME, m_source_input, m_cur_sig_info.fmt,
-                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+                NewMode = VPP_PICTURE_MODE_GAME;
             } else {//Graphics/photo/cinema
                 LOGD("%s:vesa fmt, autoswitch to monitor mode!\n", __FUNCTION__);
-                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_MONITOR, m_source_input, m_cur_sig_info.fmt,
-                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+                NewMode = VPP_PICTURE_MODE_MONITOR;
             }
         } else if (m_cur_sig_info.is_dvi) {//dvi fmt
             LOGD("%s: DVI fmt, autoswitch to monitor mode!\n", __FUNCTION__);
-            ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_MONITOR, m_source_input, m_cur_sig_info.fmt,
-                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            NewMode = VPP_PICTURE_MODE_MONITOR;
         } else {
-            int cur_mode = CVpp::getInstance()->GetPQMode(m_source_input);
-            if ((cur_mode == VPP_PICTURE_MODE_GAME) || (cur_mode == VPP_PICTURE_MODE_MONITOR)) {
-                LOGD("%d, auto switch to standard mode!\n", __LINE__);
-                ret = CVpp::getInstance()->SetPQMode(VPP_PICTURE_MODE_STANDARD, m_source_input, m_cur_sig_info.fmt,
-                                                    m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
+            if ((CurrentMode == VPP_PICTURE_MODE_GAME) || (CurrentMode == VPP_PICTURE_MODE_MONITOR)) {
+                LOGD("%s, auto switch to standard mode!\n", __FUNCTION__);
+                NewMode = VPP_PICTURE_MODE_STANDARD;
             } else {
                 LOGD("%s, Signal don't match autoswitch condition!\n", __FUNCTION__);
+                NewMode = (vpp_picture_mode_t)CurrentMode;
             }
         }
 
-        int pq_mode = CVpp::getInstance()->GetPQMode(m_source_input);
-        if (pq_mode == VPP_PICTURE_MODE_GAME) {
-            CVpp::getInstance()->enableMonitorMode(false);
+        if (NewMode == VPP_PICTURE_MODE_GAME) {
             mpTvin->VDIN_SetGameMode(MODE_ON);
-        } else if (pq_mode == VPP_PICTURE_MODE_MONITOR) {
+        } else if (NewMode == VPP_PICTURE_MODE_MONITOR) {
             CVpp::getInstance()->enableMonitorMode(true);
-            mpTvin->VDIN_SetGameMode(MODE_OFF);
-        } else {
+        } else if (CurrentMode == VPP_PICTURE_MODE_MONITOR) {
             CVpp::getInstance()->enableMonitorMode(false);
+        }
+
+        if ((CurrentMode == VPP_PICTURE_MODE_GAME) && (NewMode != VPP_PICTURE_MODE_GAME)) {
             mpTvin->VDIN_SetGameMode(MODE_OFF);
         }
+
+        ret = CVpp::getInstance()->SetPQMode(NewMode, m_source_input, m_cur_sig_info.fmt, m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
     }else {
         LOGD("%s, PQ mode set by user!\n", __FUNCTION__);
     }
