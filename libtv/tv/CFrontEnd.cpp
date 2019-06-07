@@ -986,10 +986,16 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt, unsigned long std)
     if ((vfmt & 0xff000000) == V4L2_COLOR_STD_NTSC) {
         switch (vfmt & 0x00ffffff) {
         case V4L2_STD_NTSC_M:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_M;
-            break;
         case V4L2_STD_NTSC_443:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_443;
+        case V4L2_STD_PAL_I:
+            if ((std & V4L2_STD_PAL_M) || (std & V4L2_STD_NTSC_M)) {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_M;
+            } else if ((std & V4L2_STD_PAL_DK) || (std & V4L2_STD_PAL_BG)
+                    || (std & V4L2_STD_PAL_I)) {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_443;
+            } else {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_M;
+            }
             break;
         default:
             cvbs_fmt = TVIN_SIG_FMT_CVBS_NTSC_M;
@@ -1000,23 +1006,27 @@ int CFrontEnd::stdEnumToCvbsFmt (int vfmt, unsigned long std)
         case V4L2_STD_PAL_DK:
         case V4L2_STD_PAL_BG:
         case V4L2_STD_PAL_I:
+        case V4L2_STD_PAL_M:
+        case V4L2_STD_NTSC_M:
             if ((std & V4L2_STD_PAL_M) || (std & V4L2_STD_NTSC_M)) {
                 cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
             } else {
                 cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
             }
             break;
-        case V4L2_STD_PAL_M:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
-            break;
         case V4L2_STD_PAL_60:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_60;
+            if ((std & V4L2_STD_PAL_M) || (std & V4L2_STD_NTSC_M)) {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_60;
+            } else {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
+            }
             break;
         case V4L2_STD_PAL_Nc:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_CN;
-            break;
-        case V4L2_STD_NTSC_M:
-            cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_M;
+            if ((std & V4L2_STD_PAL_M) || (std & V4L2_STD_NTSC_M)) {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_CN;
+            } else {
+                cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
+            }
             break;
         default:
             cvbs_fmt = TVIN_SIG_FMT_CVBS_PAL_I;
