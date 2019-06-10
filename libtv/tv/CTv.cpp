@@ -1942,6 +1942,8 @@ int CTv::SetSourceSwitchInputLocked(tv_source_input_t virtual_input, tv_source_i
     m_source_input_virtual = virtual_input;
 
     Tv_SetDDDRCMode(source_input);
+    // set sync mode to vmaster. 0: vmaster; 1:amaster
+    tvWriteSysfs(VIDEO_SYNC_MODE, "0");
     if (source_input == m_source_input ) {
         LOGW("%s,same source input, return", __FUNCTION__ );
         return 0;
