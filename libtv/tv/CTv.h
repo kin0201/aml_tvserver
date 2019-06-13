@@ -62,7 +62,7 @@ static const char *TV_CONFIG_EDID14_FILE_PATH = "/vendor/etc/tvconfig/hdmi/port_
 static const char *TV_CONFIG_EDID20_FILE_PATH = "/vendor/etc/tvconfig/hdmi/port_20.bin";
 
 
-#define LCD_ENABLE "/sys/class/lcd/enable"
+#define LCD_ENABLE "/sys/class/lcd/power"
 #define DEVICE_CLASS_TSYNC_AV_THRESHOLD_MIN "/sys/class/tsync/av_threshold_min"
 #define IWATT_SHELL_PATH    "/system/bin/get_iwatt_regs.sh"
 
