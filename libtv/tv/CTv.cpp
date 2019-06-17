@@ -2065,15 +2065,9 @@ void CTv::onSigToStable()
         if (CTvin::Tvin_SourceInputToSourceInputType(m_source_input) == SOURCE_TYPE_HDMI ) {//HDMI source
             int fps = getHDMIFrameRate();
             LOGD("%s: HDMI source frame rate is %d\n", __FUNCTION__, fps);
-            const char *value;
-            bool PreviewWindowFlag = false;
-            value = config_get_str ( CFG_SECTION_TV, CFG_TVIN_DISPLAY_PREVIEW_WINDOW, "null" );
-            if ( strcmp ( value, "enable" ) == 0 ) {
-                PreviewWindowFlag = true;
-            }
 
             int HdmiTxStatus = access(FRAME_RATE_SUPPORT_LIST_PATH, 0);
-            if ((HdmiTxStatus == 0) && (PreviewWindowFlag)) {
+            if (HdmiTxStatus == 0) {
                 LOGD("%s: Support hdmi TX mode!\n", __FUNCTION__);
                 std::string str = std::to_string(fps);
                 std::vector<std::string> supportFrameRates;
