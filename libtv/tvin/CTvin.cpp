@@ -1952,12 +1952,7 @@ int CTvin::SwitchPort (tvin_port_t source_port )
     }
 
     VDIN_ClosePort();
-    if (Tvin_WaitPathInactive () == -1) {
-        return -1;
-    }
-    // need free codec heap first
-    tvWriteSysfs(SYS_CODEC_MM_FREE, "10");
-    usleep ( 400 * 1000 );
+    Tvin_WaitPathInactive ( TV_PATH_TYPE_TVIN );
     // Open Port
     if ( VDIN_OpenPort ( source_port ) < 0 ) {
         LOGD ( "%s, OpenPort failed, source_port =%x ", __FUNCTION__,  source_port );
@@ -1993,13 +1988,13 @@ int CTvin::uninit_vdin ( void )
     return 0;
 }
 
-int CTvin::Tvin_WaitPathInactive ()
+int CTvin::Tvin_WaitPathInactive ( tv_path_type_t pathtype )
 {
     int ret = -1;
-    int i = 0, dly = 20;
+    int i = 0, dly = 100;
 
     for ( i = 0; i<50; i++ ) {
-        ret = Tvin_CheckPathActive ();
+        ret = Tvin_CheckPathActive ( pathtype );
         if ( ret == TV_PATH_STATUS_INACTIVE ) {
             LOGD ( "%s, check path is inactive, %d ms gone.\n", CFG_SECTION_TV, ( dly * i ) );
             break;
@@ -2008,9 +2003,8 @@ int CTvin::Tvin_WaitPathInactive ()
         }
     }
 
-    if ( i == 50 ) {
+    if ( i == 500 ) {
         LOGE ( "%s, check path active faild, %d ms gone.\n", "TV", ( dly * i ) );
-        return -1;
     }
     return 0;
 }
@@ -2020,8 +2014,7 @@ int CTvin::Tvin_RemovePath ( tv_path_type_t pathtype )
     int ret = -1;
     int i = 0, dly = 10;
 
-    if (Tvin_WaitPathInactive() == -1)
-        return ret;
+    Tvin_WaitPathInactive(pathtype);
     if ( pathtype == TV_PATH_TYPE_DEFAULT ) {
         for ( i = 0; i < 50; i++ ) {
             ret = VDIN_RmDefPath();
@@ -2052,13 +2045,17 @@ int CTvin::Tvin_RemovePath ( tv_path_type_t pathtype )
     return ret;
 }
 
-int CTvin::Tvin_CheckPathActive ()
+int CTvin::Tvin_CheckPathActive ( tv_path_type_t path_type)
 {
     FILE *f = NULL;
-    char path[300] = {0};
+    char path[100] = {0};
+    char decoder_str[20] = "default {";
+    char tvin_str[20] = "tvpath {";
 
     char *str_find = NULL;
     char active_str[4] = "(1)";
+    int mount_freq;
+    int match;
     int is_active = TV_PATH_STATUS_INACTIVE;
 
     f = fopen ( SYS_VFM_MAP_PATH, "r" );
@@ -2067,11 +2064,23 @@ int CTvin::Tvin_CheckPathActive ()
         return TV_PATH_STATUS_NO_DEV;
     }
 
-    fgets ( path, sizeof(path)-1, f );
-    if ( strstr ( path, active_str) ) {
-        is_active = TV_PATH_STATUS_ACTIVE;
-    } else {
-        is_active = TV_PATH_STATUS_INACTIVE;
+    while ( fgets ( path, sizeof(path)-1, f ) ) {
+        if ( path_type == TV_PATH_TYPE_DEFAULT ) {
+            str_find = strstr ( path, decoder_str );
+        } else if ( path_type == TV_PATH_TYPE_TVIN) {
+            str_find = strstr ( path, tvin_str );
+        } else {
+            break;
+        }
+
+        if ( str_find ) {
+            if ( strstr ( str_find, active_str) ) {
+                is_active = TV_PATH_STATUS_ACTIVE;
+            } else {
+                is_active = TV_PATH_STATUS_INACTIVE;
+            }
+            break;
+        }
     }
 
     fclose ( f );
