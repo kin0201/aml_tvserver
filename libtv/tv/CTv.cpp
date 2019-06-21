@@ -791,8 +791,8 @@ int CTv::stopScan()
     }
 
     LOGD("%s, tv scanning , stop it\n", __FUNCTION__);
+    mpTvin->Tvin_StopDecoder();
     if ((SOURCE_TV == m_source_input) && mATVDisplaySnow) {
-        mpTvin->Tvin_StopDecoder();
         SetSnowShowEnable( false );
         mAv.DisableVideoWithBlackColor();
     } else {
