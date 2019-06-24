@@ -133,6 +133,8 @@ public:
     int saveMacAddress(unsigned char *dataBuf);
     int getIwattRegs();
     int setSameSourceEnable(bool isEnable);
+    int setPreviewWindow(int x1, int y1, int x2, int y2);
+    int setPreviewWindowMode(bool enable);
 
     virtual status_t dump(int fd, const Vector<String16>& args);
 

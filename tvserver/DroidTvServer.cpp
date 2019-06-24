@@ -509,6 +509,15 @@ Return<int32_t> DroidTvServer::setSameSourceEnable(int32_t isEnable) {
     return ret;
 }
 
+Return<int32_t> DroidTvServer::setPreviewWindow(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
+    return mTvServiceIntf->setPreviewWindow(x1, y1, x2, y2);
+}
+
+Return<int32_t> DroidTvServer::setPreviewWindowMode(int32_t enable) {
+    return mTvServiceIntf->setPreviewWindowMode(enable == 1 ? true : false);
+}
+
+
 Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {

@@ -955,6 +955,19 @@ int DroidTvServiceIntf::setSameSourceEnable(bool isEnable) {
     return mpTv->TV_SetSameSourceEnable(isEnable);
 }
 
+int DroidTvServiceIntf::setPreviewWindow(int x1, int y1, int x2, int y2) {
+    tvin_window_pos_t win_pos;
+    win_pos.x1 = x1;
+    win_pos.y1 = y1;
+    win_pos.x2 = x2;
+    win_pos.y2 = y2;
+    return mpTv->SetPreviewWindow(win_pos);
+}
+
+int DroidTvServiceIntf::setPreviewWindowMode(bool enable) {
+    return mpTv->setPreviewWindowMode(enable);
+}
+
 int DroidTvServiceIntf::processCmd(const Parcel &p) {
     unsigned char dataBuf[512] = {0};
     int ret = -1;
