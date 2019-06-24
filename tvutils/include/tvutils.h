@@ -49,6 +49,7 @@ vpp_picture_mode_t tvGetPQMode ( void );
 int tvSavePQMode ( vpp_picture_mode_t mode);
 int tvSetCurrentSourceInfo(tv_source_input_t tv_source_input, tvin_sig_fmt_t sig_fmt, tvin_trans_fmt_t trans_fmt);
 int tvSetCVD2Values();
+int tvSetCurrentHdrInfo(unsigned int hdr_info);
 //PQ end
 
 extern int Tv_MiscRegs(const char *cmd);

@@ -304,6 +304,18 @@ int tvSetCVD2Values()
     }
     return -1;
 }
+
+int tvSetCurrentHdrInfo(unsigned int hdr_info)
+{
+    int s32Ret;
+    const sp<SystemControlClient> &sws = getSystemControlService();
+    if (sws != nullptr) {
+        s32Ret = sws->setCurrentHdrInfo((int)hdr_info);
+        return s32Ret;
+    }
+    return -1;
+}
+
 //PQ end
 
 int Tv_MiscRegs(const char *cmd)

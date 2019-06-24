@@ -2055,6 +2055,11 @@ void CTv::onSigToStable()
 {
     LOGD ( "SwitchSourceTime Time = %fs, onSigToStable start", getUptimeSeconds());
 
+    tv_source_input_type_t source_type = CTvin::Tvin_SourceInputToSourceInputType(m_source_input);
+    if (source_type == SOURCE_TYPE_HDMI) {
+        tvSetCurrentHdrInfo(m_cur_sig_info.hdr_info);
+    }
+
     int ret = tvSetCurrentSourceInfo(m_source_input, m_cur_sig_info.fmt, m_cur_sig_info.trans_fmt);
     if (ret < 0) {
         LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
@@ -2062,7 +2067,7 @@ void CTv::onSigToStable()
 
     if (mAutoSetDisplayFreq && !mPreviewEnabled) {
         int freq = 60;
-        if (CTvin::Tvin_SourceInputToSourceInputType(m_source_input) == SOURCE_TYPE_HDMI ) {//HDMI source
+        if (source_type == SOURCE_TYPE_HDMI ) {//HDMI source
             int fps = getHDMIFrameRate();
             LOGD("%s: HDMI source frame rate is %d\n", __FUNCTION__, fps);
 
@@ -2984,8 +2989,8 @@ void CTv::onVdinSignalChange()
         m_cur_sig_info.status = TVIN_SIG_STATUS_NULL;
     }
 
-    LOGD("%s: trans_fmt is %d, sig_fmt is %d, status is %d, isDVI is %d\n", __FUNCTION__, m_cur_sig_info.trans_fmt,
-        m_cur_sig_info.fmt, m_cur_sig_info.status, m_cur_sig_info.is_dvi);
+    LOGD("%s: trans_fmt is %d, sig_fmt is %d, status is %d, isDVI is %d, hdr_info is 0x%x\n", __FUNCTION__,
+     m_cur_sig_info.trans_fmt, m_cur_sig_info.fmt, m_cur_sig_info.status, m_cur_sig_info.is_dvi, m_cur_sig_info.hdr_info);
     if ( m_cur_sig_info.status == TVIN_SIG_STATUS_STABLE ) {
         onSigToStable();
         onSigStillStable();
