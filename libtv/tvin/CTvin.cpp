@@ -2189,7 +2189,7 @@ int CTvin::VDIN_GetAllmInfo(tvin_latency_s *AllmInfo)
 int CTvin::VDIN_SetGameMode(pq_status_update_e mode)
 {
     int ret = -1;
-    LOGE("%s: game mode: %d!\n", __FUNCTION__, mode);
+    LOGD("%s: game mode: %d!\n", __FUNCTION__, mode);
     ret = VDIN_DeviceIOCtl(TVIN_IOC_GAME_MODE, &mode);
     if (ret < 0) {
         LOGE("%s failed, error(%s)!", __FUNCTION__, strerror(errno));

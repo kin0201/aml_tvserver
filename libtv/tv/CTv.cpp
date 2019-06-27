@@ -2708,12 +2708,6 @@ int CTv::Tv_SetVdinForPQ (int gameStatus, int pcStatus, int autoSwitchFlag)
     LOGD("%s: game mode: %d, pc mode: %d, autoSwitchFlag: %d\n", __FUNCTION__, gameStatus, pcStatus, autoSwitchFlag);
 
     int ret = -1;
-    if (autoSwitchFlag) {
-        MnoNeedAutoSwitchToMonitorMode = false;
-    } else {
-        MnoNeedAutoSwitchToMonitorMode = true;
-    }
-
     if (pcStatus == MODE_ON) {
         CVpp::getInstance()->enableMonitorMode(true);
     } else if (pcStatus == MODE_OFF){
@@ -2726,8 +2720,14 @@ int CTv::Tv_SetVdinForPQ (int gameStatus, int pcStatus, int autoSwitchFlag)
         ret = mpTvin->VDIN_SetGameMode((pq_status_update_e)gameStatus);
     }
 
-    tvin_port_t cur_port = mpTvin->Tvin_GetSourcePortBySourceInput(m_source_input);
-    mpTvin->SwitchPort (cur_port);
+    if (autoSwitchFlag == PQ_MODE_SWITCH_TYPE_AUTO) {
+        MnoNeedAutoSwitchToMonitorMode = false;
+    } else if (autoSwitchFlag == PQ_MODE_SWITCH_TYPE_MANUAL) {
+        MnoNeedAutoSwitchToMonitorMode = true;
+        tvin_port_t cur_port = mpTvin->Tvin_GetSourcePortBySourceInput(m_source_input);
+        mpTvin->SwitchPort (cur_port);
+    }
+
     return 0;
 }
 
@@ -2954,18 +2954,6 @@ int CTv::autoSwitchToMonitorMode()
                 LOGD("%s, Signal don't match autoswitch condition!\n", __FUNCTION__);
                 NewMode = (vpp_picture_mode_t)CurrentMode;
             }
-        }
-
-        if (NewMode == VPP_PICTURE_MODE_GAME) {
-            mpTvin->VDIN_SetGameMode(MODE_ON);
-        } else if (NewMode == VPP_PICTURE_MODE_MONITOR) {
-            CVpp::getInstance()->enableMonitorMode(true);
-        } else if (CurrentMode == VPP_PICTURE_MODE_MONITOR) {
-            CVpp::getInstance()->enableMonitorMode(false);
-        }
-
-        if ((CurrentMode == VPP_PICTURE_MODE_GAME) && (NewMode != VPP_PICTURE_MODE_GAME)) {
-            mpTvin->VDIN_SetGameMode(MODE_OFF);
         }
 
         ret = CVpp::getInstance()->SetPQMode(NewMode, m_source_input, m_cur_sig_info.fmt, m_cur_sig_info.trans_fmt, INDEX_2D, 1, 1);
