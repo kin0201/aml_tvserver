@@ -548,10 +548,9 @@ int CTv::clearFrontEnd(int para)
 
 int CTv::Scan(const char *feparas, const char *scanparas) {
     AutoMutex _l(mLock);
-    m_source_input = SOURCE_INVALID;
     mTvAction = mTvAction | TV_ACTION_SCANNING;
-    LOGD("mTvAction = %#x, %s", mTvAction, __FUNCTION__);
-    LOGD("fe[%s], scan[%s] %s", feparas, scanparas, __FUNCTION__);
+    LOGD("%s: mTvAction = 0x%x\n", __FUNCTION__, mTvAction);
+    LOGD("%s: fe[%s], scan[%s]!\n", __FUNCTION__, feparas, scanparas);
 
     mAv.StopTS();
     mAv.DisableVideoWithBlackColor();
@@ -560,12 +559,25 @@ int CTv::Scan(const char *feparas, const char *scanparas) {
     CTvScanner::ScanParas sp(scanparas);
     CFrontEnd::FEParas fp(feparas);
 
-    if (sp.getAtvMode() & TV_SCAN_ATVMODE_AUTO) {
+    int AtvMode = sp.getAtvMode();
+    int DtvMode = sp.getDtvMode();
+    LOGD("%s: AtvMode = %d, DtvMode = %d\n", __FUNCTION__, AtvMode, DtvMode);
+    if (AtvMode != TV_SCAN_ATVMODE_NONE) {
+        m_source_input = SOURCE_TV;
+    } else {
+        m_source_input = SOURCE_INVALID;
+    }
+
+    if (AtvMode & TV_SCAN_ATVMODE_AUTO) {
+        LOGD("%s: clean all ATV channal!\n", __FUNCTION__);
         CTvProgram::CleanAllProgramBySrvType ( CTvProgram::TYPE_ATV );
     }
-    if (sp.getDtvMode() & TV_SCAN_DTVMODE_MANUAL) {
+
+    if (DtvMode & TV_SCAN_DTVMODE_MANUAL) {
+        LOGD("%s: clean appointed DTV channal!\n", __FUNCTION__);
         CTvChannel::DeleteBetweenFreq(sp.getDtvFrequency1(), sp.getDtvFrequency2());
     } else {
+        LOGD("%s: clean All DTV channal!\n", __FUNCTION__);
         CTvProgram::CleanAllProgramBySrvType ( CTvProgram::TYPE_DTV );
         CTvProgram::CleanAllProgramBySrvType ( CTvProgram::TYPE_RADIO );
         CTvEvent::CleanAllEvent();
@@ -791,16 +803,17 @@ int CTv::stopScan()
     }
 
     LOGD("%s, tv scanning , stop it\n", __FUNCTION__);
-    mpTvin->Tvin_StopDecoder();
     if ((SOURCE_TV == m_source_input) && mATVDisplaySnow) {
         SetSnowShowEnable( false );
         mAv.DisableVideoWithBlackColor();
     } else {
         mAv.DisableVideoWithBlackColor();
     }
+    mpTvin->Tvin_StopDecoder();
     //mTvEpg.leaveChannel();
     mTvScanner->stopScan();
     mFrontDev->Close();
+    m_source_input = SOURCE_INVALID;
     mTvAction &= ~TV_ACTION_SCANNING;
     return 0;
 }
@@ -1263,8 +1276,10 @@ int CTv::setFrontEnd ( const char *paras, bool force )
 
         LOGD("%s: vstd=%d astd=%d stdandcolor=0x%x", __FUNCTION__, fp.getVideoStd(), fp.getAudioStd(), stdAndColor);
         //set frontend parameters to tuner dev
+        if ((SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
+            SetSnowShowEnable( false );
+        }
         mpTvin->Tvin_StopDecoder();
-
         //set CVBS
         int fmt = CFrontEnd::stdEnumToCvbsFmt (fp.getVFmt(), stdAndColor);
         mpTvin->AFE_SetCVBSStd ( ( tvin_sig_fmt_t ) fmt );
@@ -1280,10 +1295,10 @@ int CTv::setFrontEnd ( const char *paras, bool force )
         }
     } else {
         mTvAction &= ~TV_ACTION_IN_VDIN;
-        mpTvin->Tvin_StopDecoder();
         if ((SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
             SetSnowShowEnable( false );
         }
+        mpTvin->Tvin_StopDecoder();
         mpTvin->VDIN_ClosePort();
 
         mFrontDev->Open(TV_FE_AUTO);
@@ -1815,10 +1830,10 @@ int CTv::StopTvLock ( void )
         mAv.DisableVideoWithBlackColor();
         tryReleasePlayer(false, m_source_input);
         stopPlaying(false);
-        mpTvin->Tvin_StopDecoder();
         if ( (SOURCE_TV == m_source_input) && mATVDisplaySnow ) {
             SetSnowShowEnable( false );
         }
+        mpTvin->Tvin_StopDecoder();
         mpTvin->VDIN_ClosePort();
 
         //stop scan  if scanning
@@ -2137,8 +2152,8 @@ void CTv::onSigStillStable()
     LOGD ( "%s, signal Still Stable!\n", __FUNCTION__);
 
     if ((SOURCE_TV == m_source_input) && mATVDisplaySnow && mpTvin->getSnowStatus()) {
-        mpTvin->Tvin_StopDecoder();
         SetSnowShowEnable( false );
+        mpTvin->Tvin_StopDecoder();
     }
     LOGD ( "%s, startDecoder SwitchSourceTime Time = %fs\n", __FUNCTION__,getUptimeSeconds());
     int startdec_status = mpTvin->Tvin_StartDecoder ( m_cur_sig_info );
@@ -2967,6 +2982,7 @@ int CTv::autoSwitchToMonitorMode()
 void CTv::onVdinSignalChange()
 {
     AutoMutex _l( mLock );
+    LOGD("%s: mTvAction = 0x%x, m_source_input = %d\n", __FUNCTION__, mTvAction, m_source_input);
     if (!((mTvAction & TV_ACTION_IN_VDIN) || (mTvAction & TV_ACTION_SCANNING)) || (SOURCE_SPDIF == m_source_input)) {
         return;
     }
