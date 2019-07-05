@@ -152,8 +152,8 @@ public:
     Return<int32_t> setPreviewWindow(int32_t x1, int32_t y1, int32_t x2, int32_t y2) override;
     Return<int32_t> setPreviewWindowMode(int32_t enable) override;
 
-    Return<void> setCallback(const sp<ITvServerCallback>& callback, ConnectType type) override;
-
+    Return<void> setCallback(const sp<ITvServerCallback>& callback, ConnectType type, int32_t callbackpid) override;
+    Return<void> unregisterCallback(const sp<ITvServerCallback>& callback, ConnectType type,int32_t callbackpid) override;
     virtual void onEvent(const TvHidlParcel &hidlParcel);
 
 private:
@@ -167,7 +167,7 @@ private:
     bool mListenerStarted = false;
     DroidTvServiceIntf *mTvServiceIntf;
     std::map<uint32_t, sp<ITvServerCallback>> mClients;
-
+    std::map<uint32_t, int32_t> mCallbackPid;
     mutable Mutex mLock;
 
     class DeathRecipient : public android::hardware::hidl_death_recipient  {

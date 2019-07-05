@@ -518,7 +518,7 @@ Return<int32_t> DroidTvServer::setPreviewWindowMode(int32_t enable) {
 }
 
 
-Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type) {
+Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, ConnectType type, int32_t callbackpid) {
     AutoMutex _l(mLock);
     if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {
         LOGE("%s don't support type:%d", __FUNCTION__, (int)type);
@@ -533,6 +533,7 @@ Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, C
                 LOGI("%s, client index:%d had died, this id give the new client", __FUNCTION__, i);
                 cookie = i;
                 mClients[i] = callback;
+                mCallbackPid[i] = callbackpid;
                 break;
             }
         }
@@ -540,13 +541,14 @@ Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, C
         if (cookie < 0) {
             cookie = clientSize;
             mClients[clientSize] = callback;
+            mCallbackPid[clientSize] = callbackpid;
         }
         Return<bool> linkResult = callback->linkToDeath(mDeathRecipient, cookie);
         bool linkSuccess = linkResult.isOk() ? static_cast<bool>(linkResult) : false;
         if (!linkSuccess) {
             LOGW("Couldn't link death recipient for type: %s, client: %d", getConnectTypeStr(type), cookie);
         }
-        LOGI("%s client type:%s, client size:%d, cookie:%d", __FUNCTION__, getConnectTypeStr(type), (int)mClients.size(), cookie);
+        LOGI("%s client type:%s, client size:%d, cookie:%d callbackpid:%d", __FUNCTION__, getConnectTypeStr(type), (int)mClients.size(), cookie,callbackpid);
    }
 
     if (!mListenerStarted) {
@@ -554,6 +556,24 @@ Return<void> DroidTvServer::setCallback(const sp<ITvServerCallback>& callback, C
         mListenerStarted= true;
     }
 
+    return Void();
+}
+
+Return<void> DroidTvServer::unregisterCallback(const sp<ITvServerCallback>& callback, ConnectType type, int32_t callbackpid) {
+    AutoMutex _l(mLock);
+    if ((int)type > (int)ConnectType::TYPE_TOTAL - 1) {
+        LOGE("%s don't support type:%d", __FUNCTION__, (int)type);
+        return Void();
+    }
+    int clientSize = mClients.size();
+    for (int i = 0; i < clientSize; i++) {
+        if (mCallbackPid[i] == callbackpid) {
+            mClients[i]->unlinkToDeath(mDeathRecipient);
+            mClients.erase(i);
+            mCallbackPid.erase(i);
+        }
+    }
+    LOGD("%s mClients size = %d pid = %d", __FUNCTION__, mClients.size(),callbackpid);
     return Void();
 }
 
@@ -572,8 +592,8 @@ void DroidTvServer::handleServiceDeath(uint32_t cookie) {
     LOGI("tvserver daemon client:%d died", cookie);
     AutoMutex _l(mLock);
     mClients[cookie]->unlinkToDeath(mDeathRecipient);
-    mClients[cookie].clear();
-    mClients[cookie] = nullptr;
+    mClients.erase(cookie);
+    mCallbackPid.erase(cookie);
     LOGI("%s, client size:%d", __FUNCTION__,(int)mClients.size());
 }
 
