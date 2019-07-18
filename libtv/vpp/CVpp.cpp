@@ -52,17 +52,13 @@ CVpp::~CVpp()
 
 int CVpp::Vpp_Init()
 {
-    int ret = -1;
-    int backlight = DEFAULT_BACKLIGHT_BRIGHTNESS;
-    int offset_r = 0, offset_g = 0, offset_b = 0, gain_r = 1024, gain_g = 1024, gain_b = 1024;
-
     if (SSMReadNonStandardValue() & 1) {
         Set_Fixed_NonStandard(0); //close
     } else {
         Set_Fixed_NonStandard(2); //open
     }
 
-    return ret;
+    return 0;
 }
 
 int CVpp::LoadVppSettings(tv_source_input_t tv_source_input, tvin_sig_fmt_t sig_fmt, tvin_trans_fmt_t trans_fmt)
@@ -74,21 +70,20 @@ int CVpp::LoadVppSettings(tv_source_input_t tv_source_input, tvin_sig_fmt_t sig_
     return tvLoadPQSettings(source_input_param);
 }
 
-int CVpp::SetPQMode(vpp_picture_mode_t pq_mode, tv_source_input_t tv_source_input, tvin_sig_fmt_t sig_fmt,
-                        tvin_trans_fmt_t trans_fmt, is_3d_type_t is3d, int is_save, int is_autoswitch)
+int CVpp::SetPQMode(vpp_picture_mode_t pq_mode, tv_source_input_t tv_source_input __unused,
+                       tvin_sig_fmt_t sig_fmt __unused, tvin_trans_fmt_t trans_fmt __unused,
+                       is_3d_type_t is3d __unused, int is_save, int is_autoswitch)
 {
     return tvSetPQMode(pq_mode, is_save, is_autoswitch);
-
 }
 
-vpp_picture_mode_t CVpp::GetPQMode(tv_source_input_t tv_source_input)
+vpp_picture_mode_t CVpp::GetPQMode(tv_source_input_t tv_source_input __unused)
 {
     return tvGetPQMode();
 }
 
-int CVpp::SavePQMode(vpp_picture_mode_t pq_mode, tv_source_input_t tv_source_input)
+int CVpp::SavePQMode(vpp_picture_mode_t pq_mode, tv_source_input_t tv_source_input __unused)
 {
-
     return tvSavePQMode(pq_mode);
 }
 
@@ -200,7 +195,7 @@ int CVpp::VPP_SetScalerPathSel(const unsigned int value)
 
 int CVpp::VPP_SSMRestorToDefault(int id, bool resetAll)
 {
-    int i = 0, tmp_val = 0;
+    int i = 0;
     int tmp_panorama_nor = 0, tmp_panorama_full = 0;
 
     if (resetAll || VPP_DATA_USER_NATURE_SWITCH_START == id)

@@ -92,7 +92,6 @@ int CFrontEnd::Open(int mode)
 
     AM_FEND_OpenPara_t para;
     int rc = 0;
-    int devID = 0;
 
     LOGD("%s, mode %d", __FUNCTION__, mode);
 
@@ -750,7 +749,7 @@ int CFrontEnd::getStrength()
 
 int CFrontEnd::formatATVFreq(int tmp_freq)
 {
-    const int ATV_1MHZ = 1000000;
+    //const int ATV_1MHZ = 1000000;
     const int ATV_50KHZ = 50 * 1000;
     const int ATV_25KHZ = 25 * 1000;
     int mastar = (tmp_freq / ATV_50KHZ) * ATV_50KHZ;

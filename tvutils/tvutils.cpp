@@ -42,7 +42,7 @@
 #include <string>
 using namespace android;
 
-static pthread_mutex_t file_attr_control_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
+//static pthread_mutex_t file_attr_control_flag_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_t UserPet_ThreadId = 0;
 static unsigned char is_turnon_user_pet_thread = false;
@@ -627,7 +627,7 @@ int GetPlatformHaveDDFlag()
 
 int GetFileAttrIntValue(const char *fp, int flag)
 {
-    int fd = -1, ret = -1;
+    int fd = -1;
     int temp = -1;
     char temp_str[32];
 

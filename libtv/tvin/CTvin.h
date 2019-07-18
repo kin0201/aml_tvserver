@@ -25,6 +25,7 @@ using namespace android;
 #define SYS_VFM_MAP_PATH            "/sys/class/vfm/map"
 #define SYS_DISPLAY_MODE_PATH       "/sys/class/display/mode"
 #define SYS_PANEL_FRAME_RATE        "/sys/class/lcd/frame_rate"
+#define FRAME_RATE_SUPPORT_LIST_PATH    "/sys/class/amhdmitx/amhdmitx0/disp_cap"//RX support display mode
 
 #define DEPTH_LEVEL_2DTO3D 33
 static const int DepthTable_2DTO3D[DEPTH_LEVEL_2DTO3D] = {
@@ -124,6 +125,11 @@ typedef struct tvin_latency_s {
     bool it_content;
     tvin_cn_type_e cn_type;
 } tvin_latency_t;
+
+typedef enum best_displaymode_condition_e {
+    BEST_DISPLAYMODE_CONDITION_RESOLUTION = 0,
+    BEST_DISPLAYMODE_CONDITION_FRAMERATE,
+} best_displaymode_condition_t;
 
 // ***************************************************************************
 // *** AFE module definition/enum/struct *************************************
@@ -593,8 +599,6 @@ typedef enum tv_source_connect_detect_status_e {
 
 #define CC_REQUEST_LIST_SIZE            (32)
 #define CC_SOURCE_DEV_REFRESH_CNT       (E_LA_MAX)
-#define FRAME_RATE_SUPPORT_LIST_PATH    "/sys/class/amhdmitx/amhdmitx0/disp_cap"//RX support display mode
-
 class CTvin {
 public:
     CTvin();
@@ -661,6 +665,11 @@ public:
     int VDIN_UpdateForPQMode(pq_status_update_e gameStatus, pq_status_update_e pcStatus);
     int VDIN_GetVdinDeviceFd(void);
     int VDIN_SetWssStatus(int status);
+    int VDIN_GetDisplayModeSupportList(std::vector<std::string> *SupportDisplayModes);
+    int VDIN_GetBestDisplayMode(best_displaymode_condition_t condition,
+                                         std::string ConditionParam,
+                                         std::vector<std::string> SupportDisplayModes,
+                                         char *BestDisplayMode);
     int VDIN_GetFrameRateSupportList(std::vector<std::string> *supportFrameRates);
 
     int AFE_OpenModule ( void );
@@ -723,6 +732,7 @@ private:
     static int mSourceInputToPortMap[SOURCE_MAX];
     char gVideoPath[256];
     bool mDecoderStarted;
+    bool mbResolutionPriority;
 
     char config_tv_path[64];
     char config_default_path[64];

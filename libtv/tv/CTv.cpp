@@ -75,9 +75,9 @@ using namespace android;
 
 CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
 {
-    //copy file to param
+    /*copy file to param
     char buf[PROPERTY_VALUE_MAX] = {0};
-    int len = property_get("tv.tvconfig.force_copy", buf, "true");
+    int len = property_get("tv.tvconfig.force_copy", buf, "true");*/
 
     if (isFileExist(TV_RRT_DEFINE_SYSTEM_PATH)) {
         if (!isFileExist(TV_RRT_DEFINE_PARAM_PATH)) {
@@ -185,7 +185,6 @@ void CTv::onEvent ( const CTvEas::EasEvent &ev )
 
 void CTv::onEvent ( const CFrontEnd::FEEvent &ev )
 {
-    const char *config_value = NULL;
     LOGD ( "%s, FE event type = %d tvaction=%x", __FUNCTION__, ev.mCurSigStaus, mTvAction);
     if (mTvAction & TV_ACTION_SCANNING) return;
 
@@ -420,7 +419,7 @@ void CTv::CTvMsgQueue::handleMessage ( CMessage &msg )
     }
 
     case TV_MSG_ENABLE_VIDEO_LATER: {
-        int fc = msg.mpPara[0];
+        //int fc = msg.mpPara[0];
         mpTv->isVideoFrameAvailable();
         break;
     }
@@ -522,9 +521,9 @@ int CTv::setTvObserver ( TvIObserver *ob )
 
 void CTv::sendTvEvent ( const CTvEv &ev )
 {
-    if (ev.getEvType() == CTvEv::TV_EVENT_SIGLE_DETECT) {
+    /*if (ev.getEvType() == CTvEv::TV_EVENT_SIGLE_DETECT) {
         TvEvent::SignalInfoEvent *pEv = (TvEvent::SignalInfoEvent *)(&ev);
-    }
+    }*/
 
     LOGD ( "%s, tvaction=%x", __FUNCTION__, mTvAction);
     if ((mTvAction & TV_ACTION_SCANNING) && (ev.getEvType() == CTvEv::TV_EVENT_SIGLE_DETECT)) {
@@ -686,7 +685,7 @@ int CTv::atvAutoScan(int videoStd, int audioStd, int searchType, int procMode)
     mpTvin->VDIN_OpenPort ( source_port );
     unsigned long stdAndColor = mFrontDev->enumToStdAndColor(vStd, aStd);
 
-    int fmt = CFrontEnd::stdEnumToCvbsFmt (0, 0);
+    //int fmt = CFrontEnd::stdEnumToCvbsFmt (0, 0);
     mpTvin->AFE_SetCVBSStd ( ( tvin_sig_fmt_t ) TVIN_SIG_FMT_NULL );
 
     if (searchType == 0) {
@@ -746,7 +745,7 @@ int CTv::atvMunualScan ( int startFreq, int endFreq, int videoStd, int audioStd,
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(SOURCE_TV);
     mpTvin->VDIN_OpenPort ( source_port );
 
-    int fmt = CFrontEnd::stdEnumToCvbsFmt (0, 0);
+    //int fmt = CFrontEnd::stdEnumToCvbsFmt (0, 0);
     mpTvin->AFE_SetCVBSStd ( ( tvin_sig_fmt_t ) TVIN_SIG_FMT_NULL );
     LOGD("%s, atv manual scan vstd=%d, astd=%d stdandcolor=0x%x", __FUNCTION__, vStd, aStd, stdAndColor);
     mTvScanner->SetCurrentLanguage(GetCurrentLanguage());
@@ -1043,7 +1042,7 @@ int CTv::setAudioAD (int enable, int aPid, int aFmt)
 }
 
 int CTv::playDtvProgramUnlocked (const char *feparas, int mode, int freq, int para1, int para2,
-                          int vpid, int vfmt, int apid, int afmt, int pcr, int audioCompetation)
+                          int vpid, int vfmt, int apid, int afmt, int pcr, int audioCompetation __unused)
 {
     int ret = 0;
     int FeMode = 0;
@@ -1104,7 +1103,7 @@ int CTv::playDtvProgram(const char* feparas, int vpid, int vfmt, int apid,
 }
 
 
-int CTv::playDtvTimeShiftUnlocked (const char *feparas, void *para, int audioCompetation)
+int CTv::playDtvTimeShiftUnlocked (const char *feparas, void *para, int audioCompetation __unused)
 {
     int ret = 0;
     int FeMode = 0;
@@ -1141,7 +1140,7 @@ int CTv::playDtmbProgram ( int progId )
     int aindex;
     CTvProgram::Audio *pA;
     CTvProgram::Video *pV;
-    int ret = CTvProgram::selectByID ( progId, prog );
+    CTvProgram::selectByID ( progId, prog );
     saveDTVProgramID ( progId );
     prog.getChannel ( channel );
     int chanVolCompValue = 0;
@@ -1179,7 +1178,7 @@ int CTv::playDtmbProgram ( int progId )
     return 0;
 }
 
-int CTv::playAtvProgram (int freq, int videoStd, int audioStd, int vfmt, int soundsys, int fineTune __unused, int audioCompetation)
+int CTv::playAtvProgram (int freq, int videoStd, int audioStd, int vfmt, int soundsys, int fineTune __unused, int audioCompetation __unused)
 {
     LOGD("%s Start SwitchSourceTime = %fs",__FUNCTION__,getUptimeSeconds());
     SetSourceSwitchInputLocked(m_source_input_virtual, SOURCE_TV);
@@ -1209,10 +1208,10 @@ int CTv::resetFrontEndPara ( frontend_para_set_t feParms )
     }
 
     if ( feParms.mode == TV_FE_ANALOG ) {
-        int progID = -1;
+        //int progID = -1;
         int tmpFreq = feParms.freq;
         int tmpfineFreq = feParms.para2;
-        int mode = feParms.mode;
+        //int mode = feParms.mode;
 
         //get tunerStd from videoStd and audioStd
         unsigned long stdAndColor = mFrontDev->enumToStdAndColor (feParms.videoStd, feParms.audioStd);
@@ -1268,7 +1267,7 @@ int CTv::setFrontEnd ( const char *paras, bool force )
             /* DTV --> ATV */
             stopPlaying(false);
         }
-        int tmpFreq = fp.getFrequency();
+        //int tmpFreq = fp.getFrequency();
         int tmpfineFreq = fp.getFrequency2();
 
         //get tunerStd from videoStd and audioStd
@@ -1802,12 +1801,12 @@ int CTv::startTvDetect()
     return 0;
 }
 
-int CTv::DoSuspend(int type)
+int CTv::DoSuspend(int type __unused)
 {
     return 0;
 }
 
-int CTv::DoResume(int type)
+int CTv::DoResume(int type __unused)
 {
     return 0;
 }
@@ -2080,63 +2079,25 @@ void CTv::onSigToStable()
         LOGE("%s Set CurrentSourceInfo error!\n", __FUNCTION__);
     }
 
+    if ((source_type == SOURCE_TYPE_HDMI) && mAutoSwitchMonitorCfg) {//autoswitch for hdmi source
+            autoSwitchToMonitorMode();
+    }
+
     if (mAutoSetDisplayFreq && !mPreviewEnabled) {
         int freq = 60;
         if (source_type == SOURCE_TYPE_HDMI ) {//HDMI source
             int fps = getHDMIFrameRate();
             LOGD("%s: HDMI source frame rate is %d\n", __FUNCTION__, fps);
-
-            int HdmiTxStatus = access(FRAME_RATE_SUPPORT_LIST_PATH, 0);
-            if (HdmiTxStatus == 0) {
-                LOGD("%s: Support hdmi TX mode!\n", __FUNCTION__);
-                std::string str = std::to_string(fps);
-                std::vector<std::string> supportFrameRates;
-                ret = mpTvin->VDIN_GetFrameRateSupportList(&supportFrameRates);
-                if (ret == 0) {
-                    std::vector<std::string>::iterator result = find(supportFrameRates.begin( ), supportFrameRates.end( ), str);
-                    if (result != supportFrameRates.end()) {
-                        LOGD("Output device support %d frame rate!\n", fps);
-                        freq = fps;
-                    } else {
-                        LOGD("Output device don't support %d frame rate!\n", fps);
-                        if ((30 == fps) || (60 == fps) || (24 == fps)) {
-                            freq = 60;
-                        } else {
-                            freq = 50;
-                        }
-                    }
-                }
-            } else {
-                LOGD("%s: Don't support hdmi TX mode!\n", __FUNCTION__);
-                if ((30 == fps) || (60 == fps) || (24 == fps)) {
-                    freq = 60;
-                } else {
-                    freq = 50;
-                }
-            }
-
-            char display_mode[32] = {0};
-            tvReadSysfs(SYS_DISPLAY_MODE_PATH, display_mode);
-            if (strstr(display_mode, "panel") != NULL) {//Panel
-                LOGD("%s, Now is panel mode!\n", __FUNCTION__);
-                tvWriteSysfs(SYS_PANEL_FRAME_RATE, fps, 10);
-            } else {
-                mpTvin->VDIN_SetDisplayVFreq(freq);
-            }
-
-            if (mAutoSwitchMonitorCfg) {//autoswitch for hdmi source
-                autoSwitchToMonitorMode();
-            }
-
+            freq = fps;
         }else {//ATV or AV source
             if (CTvin::Tvin_is50HzFrameRateFmt(m_cur_sig_info.fmt)) {
                 freq = 50;
             } else {
                 freq = 60;
             }
-
-            mpTvin->VDIN_SetDisplayVFreq(freq);
         }
+
+        mpTvin->VDIN_SetDisplayVFreq(freq);
     }
     //showbo mark  hdmi auto 3d, tran fmt  is 3d, so switch to 3d
 
@@ -2191,7 +2152,7 @@ void CTv::isVideoFrameAvailable(unsigned int u32NewFrameCount)
 {
     unsigned int u32TimeOutCount = 0;
     while(1) {
-        if (mAv.getVideoFrameCount() >= u32NewFrameCount) {
+        if ((unsigned int)mAv.getVideoFrameCount() >= u32NewFrameCount) {
             LOGD("%s video available SwitchSourceTime = %f", __FUNCTION__,getUptimeSeconds());
             break;
         } else {
@@ -2335,7 +2296,7 @@ void CTv::InitCurrenSignalInfo ( void )
 tvin_info_t CTv::GetCurrentSignalInfo ( void )
 {
     tvin_trans_fmt det_fmt = TVIN_TFMT_2D;
-    tvin_sig_status_t signalState = TVIN_SIG_STATUS_NULL;
+    //tvin_sig_status_t signalState = TVIN_SIG_STATUS_NULL;
     //tvin_info_t signal_info = m_cur_sig_info;
 
     int feState = mFrontDev->getStatus();
@@ -2783,10 +2744,10 @@ void CTv::updateSubtitle(int pic_width, int pic_height)
     sendTvEvent(ev);
 }
 
-int CTv::SendCmdToOffBoardFBCExternalDac(int cmd, int para)
+int CTv::SendCmdToOffBoardFBCExternalDac(int cmd __unused, int para __unused)
 {
-    int set_val = 0;
-    /*CFbcCommunication *pFBC = GetSingletonFBC();
+    /*int set_val = 0;
+    CFbcCommunication *pFBC = GetSingletonFBC();
     if (pFBC != NULL) {
         if (cmd == AUDIO_CMD_SET_MUTE) {
             if (para == CC_AUDIO_MUTE) {

@@ -92,7 +92,7 @@ int CTvScanner::Scan(CFrontEnd::FEParas &fp, ScanParas &sp) {
     AM_SCAN_CreatePara_t para;
     AM_DMX_OpenPara_t dmx_para;
     AM_SCAN_Handle_t handle = 0;
-    int i;
+    //int i;
 
     LOGD("Scan fe[%s] scan[%s]", fp.toString().c_str(), sp.toString().c_str());
 
@@ -235,7 +235,7 @@ int CTvScanner::stopScan()
     if (mbScanStart) { //if start ok and not stop
         if (needVbiAssist())
             stopVBI();
-        int ret = AM_SCAN_Destroy(mScanHandle, true);
+        AM_SCAN_Destroy(mScanHandle, true);
         AM_EVT_Unsubscribe((long)mScanHandle, AM_SCAN_EVT_PROGRESS, evtCallback, NULL);
         AM_EVT_Unsubscribe((long)mScanHandle, AM_SCAN_EVT_SIGNAL, evtCallback, NULL);
         AM_SEC_Cache_Reset(0);
@@ -534,8 +534,8 @@ void CTvScanner::getLcnInfo(AM_SCAN_Result_t *result, AM_SCAN_TS_t *sts, lcn_lis
 
 void CTvScanner::processTsInfo(AM_SCAN_Result_t *result, AM_SCAN_TS_t *ts, SCAN_TsInfo_t *ts_info)
 {
-    dvbpsi_nit_t *nit;
-    dvbpsi_descriptor_t *descr;
+    //dvbpsi_nit_t *nit;
+    //dvbpsi_descriptor_t *descr;
 
     ts_info->nid = -1;
     ts_info->tsid = -1;
@@ -817,7 +817,7 @@ void CTvScanner::updateServiceInfo(AM_SCAN_Result_t *result, SCAN_ServiceInfo_t 
 {
 #define str(i) (char*)(strings + i)
 
-    static char strings[14][256];
+    //static char strings[14][256];
 
     if (srv_info->src != TV_FE_ANALOG) {
         int standard = result->start_para->dtv_para.standard;
@@ -1245,7 +1245,7 @@ void CTvScanner::processAtscTs(AM_SCAN_Result_t *result, AM_SCAN_TS_t *ts, SCAN_
     dvbpsi_pmt_es_t *es;
     int mode = result->start_para->dtv_para.mode;
     int src = result->start_para->dtv_para.source;
-    bool stream_found_in_vct = false;
+    //bool stream_found_in_vct = false;
     bool program_found_in_vct = false;
     SCAN_ServiceInfo_t *psrv_info;
     int cc_fixed = getParamOption("cc.fixed");
@@ -1985,7 +1985,7 @@ int CTvScanner::getScanDtvStandard(ScanParas &scp) {
     return -1;
 }
 
-void CTvScanner::reconnectDmxToFend(int dmx_no, int fend_no)
+void CTvScanner::reconnectDmxToFend(int dmx_no, int fend_no __unused)
 {
 #ifdef SUPPORT_ADTV
     int isTV = config_get_int(CFG_SECTION_TV, FRONTEND_TS_SOURCE, 0);
@@ -2266,7 +2266,7 @@ int CTvScanner::FETypeHelperCB(int id, void *para, void *user) {
             }*/
             break;
         case AM_SCAN_PROGRESS_MGT_DONE: {
-            mgt_section_info_t *mgt = (mgt_section_info_t *)evt->data;
+            //mgt_section_info_t *mgt = (mgt_section_info_t *)evt->data;
 
             if (pT->mCurEv.mTotalChannelCount == 1) {
                 pT->mCurEv.mPercent += 10;

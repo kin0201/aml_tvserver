@@ -27,7 +27,9 @@
 #endif
 
 #define SYS_STR_LEN                         1024
-#define PROPERTY_VALUE_MAX                  92
+#ifndef PROPERTY_VALUE_MAX
+#define PROPERTY_VALUE_MAX                  (92)
+#endif
 #define SYS_VIDEO_INUSE_PATH                "/sys/class/video/video_inuse"
 #define AUDIO_STD_PATH                      "/sys/kernel/debug/aml_atvdemod/aud_std"
 #define AUDIO_OUTMODE_PATH                  "/sys/kernel/debug/aml_atvdemod/aud_mode"
