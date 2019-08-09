@@ -621,6 +621,8 @@ int CFrontEnd::stdAndColorToAudioEnum(int data)
         std = CC_ATV_AUDIO_STD_M;
     } else if ((data & V4L2_STD_SECAM_L) == V4L2_STD_SECAM_L) {
         std = CC_ATV_AUDIO_STD_L;
+    } else if ((data & V4L2_STD_SECAM_LC) == V4L2_STD_SECAM_LC) {
+        std = CC_ATV_AUDIO_STD_LC;
     } else if (!data) {
         std = CC_ATV_AUDIO_STD_AUTO;
     }
@@ -691,6 +693,8 @@ unsigned long CFrontEnd::enumToStdAndColor(int videoStd, int audioStd)
             tmpTunerStd |= V4L2_STD_NTSC_M;
         } else if (audioStd == CC_ATV_AUDIO_STD_L) {
             tmpTunerStd |= V4L2_STD_SECAM_L;
+        } else if (audioStd == CC_ATV_AUDIO_STD_LC) {
+            tmpTunerStd |= V4L2_STD_SECAM_LC;
         }
     }
 #endif
