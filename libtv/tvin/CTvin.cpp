@@ -2053,7 +2053,7 @@ int CTvin::Tvin_RemovePath ( tv_path_type_t pathtype )
 int CTvin::Tvin_CheckPathActive ()
 {
     FILE *f = NULL;
-    char path[300] = {0};
+    char path[100] = {0};
 
     char *str_find = NULL;
     char active_str[4] = "(1)";
@@ -2065,11 +2065,12 @@ int CTvin::Tvin_CheckPathActive ()
         return TV_PATH_STATUS_NO_DEV;
     }
 
-    fgets ( path, sizeof(path)-1, f );
-    if ( strstr ( path, active_str) ) {
-        is_active = TV_PATH_STATUS_ACTIVE;
-    } else {
-        is_active = TV_PATH_STATUS_INACTIVE;
+    while ( fgets ( path, sizeof(path)-1, f ) ) {
+        str_find = strstr ( path, active_str );
+        if (str_find) {
+            is_active = TV_PATH_STATUS_ACTIVE;
+            break;
+        }
     }
 
     fclose ( f );
