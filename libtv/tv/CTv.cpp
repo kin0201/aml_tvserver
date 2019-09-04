@@ -72,6 +72,14 @@ extern "C" {
 #include "CTv.h"
 
 using namespace android;
+pthread_t gSetHDCPKeyThreadID;
+
+static void * SetHDCPKey(void *data) {
+    SSMSetHDCPKey();
+    system ("/vendor/bin/dec");
+    LOGD("SetHDCPKey in thread\n");
+    return ((void *) 0);
+}
 
 CTv::CTv():mTvDmx(0), mTvDmx1(1), mTvDmx2(2), mTvMsgQueue(this)
 {
@@ -1684,6 +1692,26 @@ int CTv::GetTvAction() {
     return mTvAction;
 }
 
+int CTv::SetHDCPKey_Thread() {
+    pthread_attr_t attr;
+    struct sched_param param;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setschedpolicy(&attr, SCHED_RR);
+    param.sched_priority = 20;
+    pthread_attr_setschedparam(&attr, &param);
+
+    if (pthread_create(&gSetHDCPKeyThreadID, &attr,
+                       SetHDCPKey, NULL) < 0) {
+        pthread_attr_destroy(&attr);
+        return -1;
+    }
+    pthread_attr_destroy(&attr);
+
+    ALOGD("%s, exiting...\n", __FUNCTION__);
+    return 0;
+}
+
 int CTv::OpenTv ( void )
 {
     LOGD("%s: start at %fs\n", __FUNCTION__, getUptimeSeconds());
@@ -1725,8 +1753,8 @@ int CTv::OpenTv ( void )
 
     CVpp::getInstance()->Vpp_Init();
 
-    SSMSetHDCPKey();
-    system ( "/vendor/bin/dec" );
+    SetHDCPKey_Thread(); //move sethdcpkey in thread to reduce boot up time.
+
 
     value = config_get_str ( CFG_SECTION_TV, CFG_TVIN_DISPLAY_FREQ_AUTO, "null" );
     if ( strcmp ( value, "enable" ) == 0 ) {

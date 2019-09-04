@@ -345,6 +345,7 @@ private:
     CTvPlayer *getPlayer(const char *id, const char *param);
 
     int tryReleasePlayer(bool isEnter, tv_source_input_t si);
+    int SetHDCPKey_Thread();
 
     void setDvbLogLevel();
 
