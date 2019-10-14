@@ -8,7 +8,7 @@ DBUS_HEADER_DIR = $(STAGING_DIR)/usr/include/dbus-1.0
 LOCAL_PATH = $(shell pwd)
 LDFLAGS += -lstdc++ -lpthread -lz -ldl -L$(DBUS_LIB_DIR) -ldbus-1
 CFLAGS += -Wall -Wno-unknown-pragmas -Wno-format \
-          -O3 -fexceptions -fnon-call-exceptions -D_GNU_SOURCE -I$(DBUS_HEADER_DIR)
+          -O3 -fexceptions -fnon-call-exceptions -D_GNU_SOURCE -I$(DBUS_HEADER_DIR) -I$(DBUS_LIB_DIR)/dbus-1.0/include
 ################################################################################
 # libtv.so - src files
 ################################################################################
@@ -63,10 +63,10 @@ libtvclient.so: $(tvclient_SRCS)
 libtv.so: $(tv_SRCS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(LOCAL_PATH)/libtv/tvutils -o $@ $^ $(LDLIBS)
 
-tvservice: $(tvservice_SRCS)
+tvservice: $(tvservice_SRCS) libtv.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) -I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils -L$(LOCAL_PATH) -ltv -o $@ $^ $(LDLIBS)
 
-tvtest: $(tvtest_SRCS)
+tvtest: $(tvtest_SRCS) libtvclient.so
 	$(CC) $(CFLAGS) -I$(tvclient_HEADERS) -L$(LOCAL_PATH) -ltvclient $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 all: $(BUILD_TARGETS)
