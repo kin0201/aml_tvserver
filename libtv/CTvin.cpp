@@ -6,6 +6,10 @@
  *
  * Description: c++ file
  */
+
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "CTvin"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -20,13 +24,12 @@
 #include "CTvin.h"
 #include "TvConfigManager.h"
 #include "tvutils.h"
+#include "CTvLog.h"
 
 CTvin *CTvin::mInstance;
 
 CTvin *CTvin::getInstance()
 {
-    printf("start CTvin!\n");
-
     if (NULL == mInstance) {
         mInstance = new CTvin();
     }
@@ -36,7 +39,6 @@ CTvin *CTvin::getInstance()
 
 CTvin::CTvin()
 {
-    printf("new CTvin!\n");
     mDecoderStarted = false;
     //Tvin_LoadSourceInputToPortMap();
     mSourceInputToPortMap[SOURCE_TV] = TVIN_PORT_CVBS3;
@@ -68,7 +70,7 @@ int CTvin::VDIN_OpenModule()
 {
     int fd = open (VDIN_DEV_PATH, O_RDWR );
     if ( fd < 0 ) {
-        printf("Open %s error(%s)!\n", VDIN_DEV_PATH, strerror(errno));
+        LOGE("Open %s error(%s)!\n", VDIN_DEV_PATH, strerror(errno));
         return -1;
     }
 
@@ -114,7 +116,7 @@ int CTvin::VDIN_OpenPort ( tvin_port_t port )
     vdinParam.index = 0;
     int rt = VDIN_DeviceIOCtl ( TVIN_IOC_OPEN, &vdinParam );
     if ( rt < 0 ) {
-        printf("Vdin open port, error(%s)!", strerror(errno));
+        LOGE("Vdin open port, error(%s)!", strerror(errno));
     }
 
     return rt;
@@ -124,7 +126,7 @@ int CTvin::VDIN_ClosePort()
 {
     int rt = VDIN_DeviceIOCtl ( TVIN_IOC_CLOSE );
     if ( rt < 0 ) {
-        printf("Vdin close port, error(%s)!\n", strerror(errno));
+        LOGE("Vdin close port, error(%s)!\n", strerror(errno));
     }
 
     return rt;
@@ -137,11 +139,11 @@ int CTvin::VDIN_StartDec(tvin_parm_s *vdinParam)
         return ret;
     }
 
-    printf("VDIN_StartDec: index = [%d] port = [0x%x] format = [0x%x]\n",
+    LOGD("VDIN_StartDec: index = [%d] port = [0x%x] format = [0x%x]\n",
         vdinParam->index, ( unsigned int ) vdinParam->port, ( unsigned int ) ( vdinParam->info.fmt ));
     ret = VDIN_DeviceIOCtl(TVIN_IOC_START_DEC, vdinParam);
     if ( ret < 0 ) {
-        printf("Vdin start decode, error(%s)!\n", strerror ( errno ));
+        LOGE("Vdin start decode, error(%s)!\n", strerror ( errno ));
     }
 
     return ret;
@@ -151,7 +153,7 @@ int CTvin::VDIN_StopDec()
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_STOP_DEC );
     if (ret < 0) {
-        printf("Vdin stop decode, error(%s)", strerror ( errno ));
+        LOGE("Vdin stop decode, error(%s)", strerror ( errno ));
     }
     return ret;
 }
@@ -160,7 +162,7 @@ int CTvin::VDIN_GetSignalInfo ( struct tvin_info_s *SignalInfo )
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_G_SIG_INFO, SignalInfo );
     if ( ret < 0 ) {
-        printf("%s failed, error(%s).\n", __FUNCTION__, strerror ( errno ));
+        LOGE("%s failed, error(%s).\n", __FUNCTION__, strerror ( errno ));
     }
     return ret;
 }
@@ -169,7 +171,7 @@ int CTvin::VDIN_SetVdinParam (tvin_parm_s *vdinParam)
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_S_PARM, vdinParam );
     if ( ret < 0 ) {
-        printf ( "Vdin set signal param, error(%s)\n", strerror ( errno ) );
+        LOGE ( "Vdin set signal param, error(%s)\n", strerror ( errno ) );
     }
 
     return ret;
@@ -179,7 +181,7 @@ int CTvin::VDIN_GetVdinParam(tvin_parm_s *vdinParam)
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_G_PARM, vdinParam );
     if ( ret < 0 ) {
-        printf ( "Vdin get signal param, error(%s)\n", strerror ( errno ) );
+        LOGE ( "Vdin get signal param, error(%s)\n", strerror ( errno ) );
     }
 
     return ret;
@@ -187,10 +189,10 @@ int CTvin::VDIN_GetVdinParam(tvin_parm_s *vdinParam)
 
 int CTvin::VDIN_SetColorRangeMode(tvin_color_range_t range_mode)
 {
-    printf("mode = %d\n", range_mode);
+    LOGD("mode = %d\n", range_mode);
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_SET_COLOR_RANGE, &range_mode );
     if ( ret < 0 ) {
-        printf ( "Vdin Set ColorRange Mode error(%s)!\n", strerror(errno ));
+        LOGE ( "Vdin Set ColorRange Mode error(%s)!\n", strerror(errno ));
     }
 
     return ret;
@@ -201,9 +203,9 @@ int CTvin::VDIN_GetColorRangeMode(void)
     int range_mode = TVIN_COLOR_RANGE_AUTO;
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_GET_COLOR_RANGE, &range_mode );
     if ( ret < 0 ) {
-        printf ( "Vdin Get ColorRange Mode error(%s)!\n", strerror(errno ));
+        LOGE ( "Vdin Get ColorRange Mode error(%s)!\n", strerror(errno ));
     }
-    printf("%s: mode = %d\n", __FUNCTION__, range_mode);
+    LOGD("%s: mode = %d\n", __FUNCTION__, range_mode);
 
     return range_mode;
 }
@@ -213,11 +215,11 @@ int CTvin::AFE_OpenModule ( void )
 {
     int fd = open ( AFE_DEV_PATH, O_RDWR );
     if ( fd < 0 ) {
-        printf ( "Open tvafe module, error(%s).\n", strerror ( errno ) );
+        LOGE ( "Open tvafe module, error(%s).\n", strerror ( errno ) );
         return -1;
     }
 
-    printf ( "Open %s module fd = [%d]\n", AFE_DEV_PATH, fd );
+    LOGD ( "Open %s module fd = [%d]\n", AFE_DEV_PATH, fd );
     return fd;
 }
 
@@ -258,7 +260,7 @@ int CTvin::AFE_DeviceIOCtl ( int request, ... )
 
 int CTvin::Tvin_OpenPort(tvin_port_t source_port)
 {
-    printf ("%s, source_port = %x!\n", __FUNCTION__,  source_port);
+    LOGD ("%s, source_port = %x!\n", __FUNCTION__,  source_port);
 
     int ret = VDIN_OpenPort(source_port);
 
@@ -267,7 +269,7 @@ int CTvin::Tvin_OpenPort(tvin_port_t source_port)
 
 int CTvin::Tvin_ClosePort(tvin_port_t source_port)
 {
-    printf ("%s, source_port = %x!\n", __FUNCTION__,  source_port);
+    LOGD ("%s, source_port = %x!\n", __FUNCTION__,  source_port);
 
     int ret = VDIN_ClosePort();
 
@@ -443,17 +445,17 @@ void CTvin::Tvin_LoadSourceInputToPortMap()
 int CTvin::Tvin_StartDecoder(tvin_info_t info)
 {
     if (mDecoderStarted) {
-        printf("decoder already started.\n");
+        LOGD("decoder already started.\n");
         return 0;
     } else {
         mTvinParam.info = info;
 
         if (VDIN_StartDec(&mTvinParam) >= 0 ) {
-            printf("StartDecoder succeed.\n");
+            LOGD("StartDecoder succeed.\n");
             mDecoderStarted = true;
             return 0;
         } else {
-            printf("StartDecoder failed.\n");
+            LOGE("StartDecoder failed.\n");
             mDecoderStarted = false;
             return -1;
         }
@@ -463,15 +465,15 @@ int CTvin::Tvin_StartDecoder(tvin_info_t info)
 int CTvin::Tvin_StopDecoder()
 {
     if (!mDecoderStarted) {
-        printf("Decoder don't started!\n");
+        LOGD("Decoder don't started!\n");
         return 0;
     } else {
         if ( VDIN_StopDec() >= 0 ) {
-            printf("StopDecoder ok!\n");
+            LOGD("StopDecoder ok!\n");
             mDecoderStarted = false;
             return 0;
         } else {
-            printf("StopDecoder failed!\n");
+            LOGE("StopDecoder failed!\n");
             mDecoderStarted = false;
             return -1;
         }
@@ -512,7 +514,7 @@ int CTvin::Tvin_GetVdinDeviceFd(void)
 int CTvin::VDIN_AddPath ( const char *videopath )
 {
     if (strlen(videopath) > 1024) {
-        printf("video path too long\n");
+        LOGE("video path too long\n");
         return -1;
     }
 
@@ -532,7 +534,7 @@ int CTvin::VDIN_RemovePath(tv_path_type_t pathtype)
             ret = tvWriteSysfs(SYS_VFM_MAP_PATH, "rm tvpath");
             break;
         default:
-            printf("invalie videopath type!\n");
+            LOGE("invalie videopath type!\n");
             break;
     }
 
@@ -575,10 +577,10 @@ int CTvin::Tvin_RemoveVideoPath(tv_path_type_t pathtype)
     for ( i = 0; i < 50; i++ ) {
         ret = VDIN_RemovePath(pathtype);
         if ( ret > 0 ) {
-            printf("remove default path ok, %d ms gone.\n", (dly * i));
+            LOGE("remove default path ok, %d ms gone.\n", (dly * i));
             break;
         } else {
-            printf("remove default path faild, %d ms gone.\n", (dly * i));
+            LOGE("remove default path faild, %d ms gone.\n", (dly * i));
             usleep(dly * 1000);
         }
     }
@@ -599,7 +601,7 @@ int CTvin::Tvin_CheckVideoPathComplete(tv_path_type_t path_type)
 
     fp = fopen(SYS_VFM_MAP_PATH, "r");
     if (!fp) {
-        printf("%s, can not open %s!\n", SYS_VFM_MAP_PATH);
+        LOGE("%s, can not open %s!\n", SYS_VFM_MAP_PATH);
         return ret;
     }
 
@@ -616,10 +618,10 @@ int CTvin::Tvin_CheckVideoPathComplete(tv_path_type_t path_type)
             if ((strstr(str_find, di_str)) &&
                  (strstr(str_find, ppmgr_str)) &&
                  (strstr(str_find, amvideo_str))) {
-                printf("VideoPath is complete!\n");
+                LOGD("VideoPath is complete!\n");
                 ret = 0;
             } else {
-                printf("VideoPath is not complete!\n");
+                LOGD("VideoPath is not complete!\n");
                 ret = -1;
             }
             break;

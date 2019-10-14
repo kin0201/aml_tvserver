@@ -1,6 +1,8 @@
 #include <dbus/dbus.h>
 
 #include "tvcmd.h"
+#include "common.h"
+#include "CTvEvent.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,19 +10,38 @@ extern "C" {
 
 class TvClient {
 public:
+    class TvClientIObserver {
+    public:
+        TvClientIObserver() {};
+        virtual ~TvClientIObserver() {};
+        virtual void onTvClientEvent(CTvEvent &event) = 0;
+    };
+
     TvClient();
     ~TvClient();
-    int ConnectToTvClient();
+    TvClient *ConnectToTvClient();
     int DisConnectToTvClient();
-    int StartTv();
-    int StopTv();
+    int setTvClientObserver(TvClientIObserver *observer);
+    int StartTv(tv_source_input_t source);
+    int StopTv(tv_source_input_t source);
+    int SetEdidData(tv_source_input_t source, char *dataBuf);
+    int GetEdidData(tv_source_input_t source,char *dataBuf);
 private:
     DBusConnection *ClientBusInit();
-    int SendMethodCall(const char *CmdString);
+    int SendMethodCall(char *CmdString);
     int startDetect();
     static void *HandleTvServiceMessage(void *args);
+    static int HandSourceConnectEvent(DBusMessageIter messageIter);
+    static int HandSignalDetectEvent(DBusMessageIter messageIter);
+    int SendTvClientEvent(CTvEvent &event);
+    int SendCmdWithVoidParam(int cmd);
+    int SendCmdWithIntArrayParam(int cmd, int *values);
+    int sendCmdWithFloatArrayParam(int cmd, float *values);
+    int SendCmdWithStringArrayParam(int cmd, char *values);
 
-    DBusConnection *mpDBusConnection;
+    static TvClient *mStaticTvClient;
+    DBusConnection *mpDBusConnection = NULL;
+    TvClientIObserver *mpTvClientObserver = NULL;
 };
 #ifdef __cplusplus
 }

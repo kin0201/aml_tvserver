@@ -7,6 +7,9 @@
  * Description: c++ file
  */
 
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "CTvDevicesPollDetect"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,11 +18,10 @@
 
 #include "CTvin.h"
 #include "CTvDevicesPollDetect.h"
+#include "CTvLog.h"
 
 CTvDevicesPollDetect::CTvDevicesPollDetect()
 {
-    printf("new CTvDevicesPollDetect!\n");
-
     m_event.events = 0;
     m_avin_status[0].status = AVIN_STATUS_IN;
     m_avin_status[0].channel = AVIN_CHANNEL1;
@@ -59,17 +61,15 @@ CTvDevicesPollDetect::~CTvDevicesPollDetect()
 
 int CTvDevicesPollDetect::startDetect()
 {
-    printf("startDetect!\n");
-
     int ret;
     pthread_t thread_id;
 
     ret = pthread_create(&thread_id, NULL, TvDevicesPollDetectThread, (void *)this);
     if (ret != 0) {
-        printf("CTvDevicesPollDetect create thread fail\n");
+        LOGD("CTvDevicesPollDetect create thread fail\n");
         ret = -1;
     } else {
-        printf("CTvDevicesPollDetect thread id (%lu) done\n", thread_id);
+        LOGE("CTvDevicesPollDetect thread id (%lu) done\n", thread_id);
         ret = 0;
     }
 
@@ -78,8 +78,6 @@ int CTvDevicesPollDetect::startDetect()
 
 void* CTvDevicesPollDetect::TvDevicesPollDetectThread(void *param)
 {
-    printf("TvDevicesPollDetectThread!\n");
-
     CTvDevicesPollDetect *pThis = (CTvDevicesPollDetect *)param;
     pThis->ThreadLoop();
     return NULL;
@@ -201,22 +199,20 @@ int CTvDevicesPollDetect::GetSourceConnectStatus(tv_source_input_t source_input)
         break;
     }
     default:
-        printf("GetSourceConnectStatus not support source :%s", inputToName(source_input));
+        LOGD("%s; Not support source :%s", __FUNCTION__, inputToName(source_input));
         break;
     }
 
-    printf("GetSourceConnectStatus source :%s, status:%s", inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
+    LOGD("%: source :%s, status:%s", __FUNCTION__, inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
     return PlugStatus;
 }
 
 void* CTvDevicesPollDetect::ThreadLoop()
 {
-    printf("ThreadLoop!\n");
-
     //init status
     mHdmiDetectFile.readFile((void *)(&m_hdmi_status), sizeof(int));
     mAvinDetectFile.readFile((void *)(&m_avin_status), sizeof(struct report_data_s) * 2);
-    printf("ThreadLoop: hdmi = 0x%x  avin[0].status = %d, avin[1].status = %d\n", m_hdmi_status, m_avin_status[0].status, m_avin_status[1].status);
+    LOGD("%s: hdmi = 0x%x  avin[0].status = %d, avin[1].status = %d\n", __FUNCTION__, m_hdmi_status, m_avin_status[0].status, m_avin_status[1].status);
 
     while (1) {
         int num = mEpoll.wait();
@@ -241,11 +237,11 @@ void* CTvDevicesPollDetect::ThreadLoop()
                                 source = SOURCE_AV2;
                             }
 
-                            printf("%s detected\n", inputToName((tv_source_input_t)source));
+                            LOGD("%s detected\n", inputToName((tv_source_input_t)source));
                             if (mpObserver != NULL) {
                                 mpObserver->onSourceConnect(source, plug);
                             } else {
-                                printf("mpObserver is NULL\n");
+                                LOGE("mpObserver is NULL\n");
                             }
                         }//not equal
                         m_avin_status[i] = status[i];
@@ -253,7 +249,7 @@ void* CTvDevicesPollDetect::ThreadLoop()
                 } else if (fd == mHdmiDetectFile.getFd()) { //hdmi
                     int hdmi_status = 0;
                     mHdmiDetectFile.readFile((void *)(&hdmi_status), sizeof(int));
-                    printf("HDMI detected\n");
+                    LOGD("HDMI detected\n");
                     int source = -1, plug = -1;
                     if ((hdmi_status & HDMI_DETECT_STATUS_BIT_A) != (m_hdmi_status  & HDMI_DETECT_STATUS_BIT_A) ) {
                         if ((hdmi_status & HDMI_DETECT_STATUS_BIT_A) == HDMI_DETECT_STATUS_BIT_A) {
@@ -266,7 +262,7 @@ void* CTvDevicesPollDetect::ThreadLoop()
                         if (mpObserver != NULL) {
                             mpObserver->onSourceConnect(source, plug);
                         } else {
-                            printf("mpObserver is NULL\n");
+                            LOGE("mpObserver is NULL\n");
                         }
                     }
 
@@ -281,7 +277,7 @@ void* CTvDevicesPollDetect::ThreadLoop()
                         if (mpObserver != NULL) {
                             mpObserver->onSourceConnect(source, plug);
                         } else {
-                            printf("mpObserver is NULL\n");
+                            LOGE("mpObserver is NULL\n");
                         }
                     }
 
@@ -296,7 +292,7 @@ void* CTvDevicesPollDetect::ThreadLoop()
                         if (mpObserver != NULL) {
                             mpObserver->onSourceConnect(source, plug);
                         } else {
-                            printf("mpObserver is NULL\n");
+                            LOGE("mpObserver is NULL\n");
                         }
                     }
 
@@ -311,17 +307,17 @@ void* CTvDevicesPollDetect::ThreadLoop()
                         if (mpObserver != NULL) {
                             mpObserver->onSourceConnect(source, plug);
                         } else {
-                            printf("mpObserver is NULL\n");
+                            LOGE("mpObserver is NULL\n");
                         }
                     }
 
                     m_hdmi_status = hdmi_status;
                 }else if ( fd == mVdinDetectFd ) {
-                    printf("VDIN detected\n");
+                    LOGD("VDIN detected\n");
                     if (mpObserver != NULL) {
                         mpObserver->onVdinSignalChange();
                     } else {
-                        printf("mpObserver is NULL\n");
+                        LOGE("mpObserver is NULL\n");
                     }
                 }
 
@@ -332,5 +328,5 @@ void* CTvDevicesPollDetect::ThreadLoop()
         }
     }//exit
 
-    printf("CTvDevicesPollDetect, exiting...\n");
+    LOGD("CTvDevicesPollDetect, exiting...\n");
 }

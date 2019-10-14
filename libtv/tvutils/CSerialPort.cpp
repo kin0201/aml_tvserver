@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "FBC"
-#define LOG_FBC_TAG "CSerialPort"
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "CSerialPort"
 
 #include "CSerialPort.h"
 #include <pthread.h>

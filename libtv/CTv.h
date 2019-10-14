@@ -4,6 +4,7 @@
 #include "CTvEvent.h"
 #include "CHDMIRxManager.h"
 
+
 #define CONFIG_FILE_PATH_DEF    "/ventor/etc/tvconfig/tvconfig.conf"
 class CTv : public CTvDevicesPollDetect::ISourceConnectObserver {
 public:
@@ -11,7 +12,7 @@ public:
     public:
         TvIObserver() {};
         virtual ~TvIObserver() {};
-        virtual void onTvEvent (CTvEvent event) = 0;
+        virtual void onTvEvent (CTvEvent &event) = 0;
     };
     CTv();
     ~CTv();
@@ -19,7 +20,7 @@ public:
     int StartTv(tv_source_input_t source);
     int StopTv(tv_source_input_t source);
     int SwitchSource(tv_source_input_t dest_source);
-    void InitCurrenSourceInfo(void);
+    int SetCurrenSourceInfo(tvin_info_t sig_info);
     tvin_info_t GetCurrentSourceInfo(void);
     int UpdateEDID(tv_source_input_t source, char *data);
     int getEDIDData(char *data);
@@ -32,7 +33,7 @@ private:
     void onSigToUnstable();
     void onSigToUnSupport();
     void onSigToNoSig();
-    int  sendTvEvent(CTvEvent event);
+    int  sendTvEvent(CTvEvent &event);
 
     CTvin *mpTvin;
     CHDMIRxManager *mpHDMIRxManager;

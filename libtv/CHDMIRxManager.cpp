@@ -7,6 +7,9 @@
  * Description: c++ file
  */
 
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "CHDMIRxManager"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -19,6 +22,7 @@
 #include "CHDMIRxManager.h"
 #include "tvutils.h"
 #include "CTvin.h"
+#include "CTvLog.h"
 
 CHDMIRxManager::CHDMIRxManager()
 {
@@ -34,7 +38,7 @@ int CHDMIRxManager::HDMIRxOpenMoudle()
 {
     int fd = open ( CS_HDMIRX_DEV_PATH, O_RDWR );
     if ( fd < 0 ) {
-        printf("Open %s error(%s)!\n", CS_HDMIRX_DEV_PATH, strerror ( errno ));
+        LOGE("Open %s error(%s)!\n", CS_HDMIRX_DEV_PATH, strerror ( errno ));
         return -1;
     }
 
@@ -73,14 +77,14 @@ int CHDMIRxManager::HdmiRxEdidUpdate(char *data)
 
     int dev_fd = open(HDMI_EDID_DEV_PATH, O_RDWR);
     if (dev_fd < 0) {
-        printf("open edid file ERROR(%s)!!\n", strerror(errno));
+        LOGE("open edid file ERROR(%s)!!\n", strerror(errno));
         return -1;
     }
 
     if (write(dev_fd, data, SSM_HDMI_EDID_SIZE) < 0) {
         close(dev_fd);
         dev_fd = -1;
-        printf("write edid file ERROR(%s)!!\n", strerror(errno));
+        LOGE("write edid file ERROR(%s)!!\n", strerror(errno));
         return -1;
     }
 
@@ -97,7 +101,7 @@ int CHDMIRxManager::HdmiRxHdcpVerSwitch(tv_hdmi_hdcp_version_t version)
     } else if (HDMI_HDCP_VER_22 == version) {
         ret = HDMIRxDeviceIOCtl(HDMI_IOC_HDCP22_AUTO);
     } else {
-        printf("invalid hdcp version!\n");
+        LOGE("invalid hdcp version!\n");
         return -1;
     }
 
@@ -112,7 +116,7 @@ int CHDMIRxManager::HdmiRxHdcpOnOff(tv_hdmi_hdcpkey_enable_t flag)
     }else if (hdcpkey_disable == flag) {
         ret = HDMIRxDeviceIOCtl(HDMI_IOC_HDCP_OFF);
     }else {
-        printf("invalid hdcp enable status!\n");
+        LOGE("invalid hdcp enable status!\n");
         return -1;
     }
 
@@ -137,7 +141,7 @@ int CHDMIRxManager::CalHdmiPortCecPhysicAddr()
                              |((tmpHdmiPortCecPhysicAddr[2] == SOURCE_MAX? 0xf:(tmpHdmiPortCecPhysicAddr[2]-4)) << 8)
                              |((tmpHdmiPortCecPhysicAddr[3] == SOURCE_MAX? 0xf:(tmpHdmiPortCecPhysicAddr[3]-4)) << 12));
 
-    printf("hdmi port map: 0x%x\n", HdmiPortCecPhysicAddr);
+    LOGD("hdmi port map: 0x%x\n", HdmiPortCecPhysicAddr);
     return HdmiPortCecPhysicAddr;
 }
 

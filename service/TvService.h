@@ -22,8 +22,9 @@ public:
     int TvServiceHandleMessage();
 private:
     DBusConnection* TvServiceBusInit();
-    int TvServiceSendSignal();
-    virtual void onTvEvent(CTvEvent event);
+    virtual void onTvEvent(CTvEvent &event);
+    int SendSignalForSignalDetectEvent(CTvEvent &event);
+    int SendSignalForSourceConnectEvent(CTvEvent &event);
 
     //static TvService *mInstance;
     CTv *mpTv;

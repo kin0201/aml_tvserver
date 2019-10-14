@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "tvserver"
-#define LOG_TV_TAG "tvutils"
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "tvutils"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -24,22 +24,22 @@
 #include <ctype.h>
 #include <sys/prctl.h>
 #include <stdlib.h>
-//#include <json/json.h>
 
 #include "tvutils.h"
 
 #include <vector>
 #include <map>
 #include <string>
+#include "CTvLog.h"
 
 int writeSys(const char *path, const char *val) {
     int fd;
     if ((fd = open(path, O_RDWR)) < 0) {
-        printf("writeSys, open %s error(%s)", path, strerror (errno));
+        LOGE("writeSys, open %s error(%s)", path, strerror (errno));
         return -1;
     }
 
-    printf("write %s, val:%s\n", path, val);
+    LOGD("write %s, val:%s\n", path, val);
 
     int len = write(fd, val, strlen(val));
     close(fd);
@@ -50,18 +50,18 @@ int readSys(const char *path, char *buf, int count) {
     int fd, len;
 
     if ( NULL == buf ) {
-        printf("buf is NULL");
+        LOGE("buf is NULL");
         return -1;
     }
 
     if ((fd = open(path, O_RDONLY)) < 0) {
-        printf("readSys, open %s error(%s)", path, strerror (errno));
+        LOGE("readSys, open %s error(%s)", path, strerror (errno));
         return -1;
     }
 
     len = read(fd, buf, count);
     if (len < 0) {
-        printf("read %s error, %s\n", path, strerror(errno));
+        LOGE("read %s error, %s\n", path, strerror(errno));
         goto exit;
     }
 
@@ -104,7 +104,7 @@ int tvWriteSysfs(const char *path, int value, int base)
     } else {
         sprintf(str_value, "%d", value);
     }
-    printf("tvWriteSysfs, str_value = %s", str_value);
+    LOGD("tvWriteSysfs, str_value = %s", str_value);
     return writeSys(path, str_value);
 }
 
@@ -127,17 +127,17 @@ int GetFileAttrIntValue(const char *fp, int flag)
     fd = open(fp, flag);
 
     if (fd <= 0) {
-        printf("open %s ERROR(%s)!!\n", fp, strerror(errno));
+        LOGE("open %s ERROR(%s)!!\n", fp, strerror(errno));
         return -1;
     }
 
     if (read(fd, temp_str, sizeof(temp_str)) > 0) {
         if (sscanf(temp_str, "%d", &temp) >= 0) {
-            printf("%s -> get %s value =%d!\n", "TV", fp, temp);
+            LOGD("%s -> get %s value =%d!\n", "TV", fp, temp);
             close(fd);
             return temp;
         } else {
-            printf("%s -> get %s value error(%s)\n", "TV", fp, strerror(errno));
+            LOGD("%s -> get %s value error(%s)\n", "TV", fp, strerror(errno));
             close(fd);
             return -1;
         }

@@ -75,7 +75,7 @@ public:
     int getInt (const char *key, int def) const;
     void setInt(const char *key, int v);
 
-    const std::string toString() { std::string s; mapToJson(s, mparas); return s; }
+    const std::string toc_str() { std::string s; mapToJson(s, mparas); return s; }
 
     Paras operator + (const Paras &p);
     Paras& operator = (const Paras &p) { mparas = p.mparas; return *this; };

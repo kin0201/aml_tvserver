@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "tvserver"
-#define LOG_TV_TAG "tvconfig"
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "TvConfigManager"
 
 #include "TvConfigManager.h"
 #include "ConfigFile.h"

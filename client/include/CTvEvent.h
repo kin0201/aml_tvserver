@@ -43,27 +43,33 @@ public:
     static const int TV_EVENT_EAS = 24;//EAS
     static const int TV_EVENT_AUDIO_CB = 25;
 
-    CTvEvent(int type);
-    ~CTvEvent();
-    int getEventType();
+    CTvEvent(int type) {
+        mEventType = type;
+    }
+    ~CTvEvent() {
+
+    }
+    int getEventType() {
+        return mEventType;
+    }
 private:
     int mEventType;
 };
 
 namespace  TvEvent {
     //events
-    class SignalInfoEvent: public CTvEvent {
+    class SignalDetectEvent: public CTvEvent {
     public:
-        SignalInfoEvent() : CTvEvent(CTvEvent::TV_EVENT_SIGLE_DETECT)
+        SignalDetectEvent() : CTvEvent(CTvEvent::TV_EVENT_SIGLE_DETECT)
         {
-            mTrans_fmt = 0;
             mFmt = 0;
+            mTrans_fmt = 0;
             mStatus = 0;
             mDviFlag = 0;
         }
-        ~SignalInfoEvent() {}
-        int mTrans_fmt;
+        ~SignalDetectEvent() {}
         int mFmt;
+        int mTrans_fmt;
         int mStatus;
         int mDviFlag;
     };

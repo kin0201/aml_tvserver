@@ -1,66 +1,57 @@
 /*
-** Copyright 2008, The Android Open Source Project
-**
-** Licensed under the Apache License, Version 2.0 (the "License");
-** you may not use this file except in compliance with the License.
-** You may obtain a copy of the License at
-**
-**     http://www.apache.org/licenses/LICENSE-2.0
-**
-** Unless required by applicable law or agreed to in writing, software
-** distributed under the License is distributed on an "AS IS" BASIS,
-** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-** See the License for the specific language governing permissions and
-** limitations under the License.
-*/
-#define LOG_MOUDLE_TAG "TV"
-#define LOG_CLASS_TAG "CFile"
+ * Copyright (c) 2014 Amlogic, Inc. All rights reserved.
+ *
+ * This source code is subject to the terms and conditions defined in the
+ * file 'LICENSE' which is part of this source code package.
+ *
+ * Description: c++ file
+ */
 
-#include "CFile.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include "CTvLog.h"
+#define LOG_MOUDLE_TAG "PQ"
+#define LOG_CLASS_TAG "CPQFile"
+//#define LOG_NDEBUG 0
 
-CFile::CFile()
+#include "CPQFile.h"
+
+CPQFile::CPQFile()
 {
     mPath[0] = '\0';
     mFd = -1;
 }
 
-CFile::~CFile()
-{
-    closeFile();
-}
-
-CFile::CFile(const char *path)
+CPQFile::CPQFile(const char *path)
 {
     strcpy(mPath, path);
     mFd = -1;
 }
 
-int CFile::openFile(const char *path)
+CPQFile::~CPQFile()
 {
-    LOGD("%s: open %s\n", __FUNCTION__, path);
+    PQ_CloseFile();
+}
+
+int CPQFile::PQ_OpenFile(const char *path)
+{
+    LOGD("openFile = %s", path);
     if (mFd < 0) {
         const char *openPath = mPath;
         if (path != NULL)
             strcpy(mPath, path);
 
         if (strlen(openPath) <= 0) {
-            LOGE("openPath is NULL, path:%s\n", path);
+            LOGE("openFile openPath is NULL, path:%s", path);
             return -1;
         }
         mFd = open(openPath, O_RDWR);
         if (mFd < 0) {
-            LOGE("open file(%s) fail!\n", openPath);
+            LOGE("open file(%s) fail", openPath);
             return -1;
         }
     }
-
     return mFd;
 }
 
-int CFile::closeFile()
+int CPQFile::PQ_CloseFile()
 {
     if (mFd > 0) {
         close(mFd);
@@ -69,7 +60,7 @@ int CFile::closeFile()
     return 0;
 }
 
-int CFile::writeFile(const unsigned char *pData, int uLen)
+int CPQFile::PQ_WriteFile(const unsigned char *pData, int uLen)
 {
     int ret = -1;
     if (mFd > 0)
@@ -78,7 +69,7 @@ int CFile::writeFile(const unsigned char *pData, int uLen)
     return ret;
 }
 
-int CFile::readFile(void *pBuf, int uLen)
+int CPQFile::PQ_ReadFile(void *pBuf, int uLen)
 {
     int ret = 0;
     if (mFd > 0) {
@@ -87,7 +78,7 @@ int CFile::readFile(void *pBuf, int uLen)
     return ret;
 }
 
-int CFile::copyTo(const char *dstPath)
+int CPQFile::PQ_CopyFile(const char *dstPath)
 {
     if (strlen(mPath) <= 0)
         return -1;
@@ -108,14 +99,14 @@ int CFile::copyTo(const char *dstPath)
     char *ptr;
     int ret = 0;
     while ((bytes_read = read(mFd, buffer, BUFFER_SIZE))) {
-        /* fatal error happen */
+        /* read error */
         if ((bytes_read == -1) && (errno != EINTR)) {
             ret = -1;
             break;
         } else if (bytes_read > 0) {
             ptr = buffer;
             while ((bytes_write = write(dstFd, ptr, bytes_read))) {
-                /* fatal error happen */
+                /* failed to write halfway */
                 if ((bytes_write == -1) && (errno != EINTR)) {
                     ret = -1;
                     break;
@@ -125,13 +116,13 @@ int CFile::copyTo(const char *dstPath)
                     ret = 0;
                     break;
                 }
-                /* write not finish, continue */
+                /* write continue */
                 else if (bytes_write > 0) {
                     ptr += bytes_write;
                     bytes_read -= bytes_write;
                 }
             }
-            /* write error */
+            /* failed to write at first */
             if (bytes_write == -1) {
                 ret = -1;
                 break;
@@ -143,8 +134,21 @@ int CFile::copyTo(const char *dstPath)
     return ret;
 }
 
+bool CPQFile::PQ_IsFileExist(const char *file_name)
+{
+    struct stat tmp_st;
+    int ret = -1;
 
-int CFile::delFile(const char *path)
+    ret = stat(file_name, &tmp_st);
+    if (ret != 0 ) {
+       LOGE("%s don't exist!\n",file_name);
+       return false;
+    } else {
+       return true;
+    }
+}
+
+int CPQFile::PQ_DeleteFile(const char *path)
 {
     if (strlen(path) <= 0) return -1;
     if (unlink(path) != 0) {
@@ -154,7 +158,7 @@ int CFile::delFile(const char *path)
     return 0;
 }
 
-int CFile::delFile()
+int CPQFile::PQ_DeleteFile()
 {
     if (strlen(mPath) <= 0) return -1;
     if (unlink(mPath) != 0) {
@@ -164,57 +168,53 @@ int CFile::delFile()
     return 0;
 }
 
-
-int  CFile::getFileAttrValue(const char *path)
+int CPQFile::PQ_GetFileAttrValue(const char *path)
 {
     int value;
 
     int fd = open(path, O_RDONLY);
     if (fd <= 0) {
-        LOGE("open (%s)ERROR!! error = -%s- \n", path, strerror(errno));
+        LOGE("open  (%s)ERROR!!error = -%s- \n", path, strerror ( errno ));
     }
-    char tmp[8];
-    read(fd, tmp, sizeof(tmp));
+    char s[8];
+    read(fd, s, sizeof(s));
     close(fd);
-    value = atoi(tmp);
+    value = atoi(s);
     return value;
 }
 
-int  CFile::setFileAttrValue(const char *path, int value)
+int CPQFile::PQ_SetFileAttrValue(const char *path, int value)
 {
-    FILE *fp = fopen(path, "w");
+    FILE *fp = fopen ( path, "w" );
 
-    if (fp == NULL) {
-        LOGE("Open %s error(%s)!\n", path, strerror(errno));
+    if ( fp == NULL ) {
+        LOGE ( "Open %s error(%s)!\n", path, strerror ( errno ) );
         return -1;
     }
-    fprintf(fp, "%d", value);
-    fclose(fp);
+    fprintf ( fp, "%d", value );
+    fclose ( fp );
     return 0;
 }
 
-int CFile::getFileAttrStr(const char *path, char *str)
+int CPQFile::PQ_GetFileAttrStr(__unused const char *path , __unused char *str)
 {
-    int fd = open(path, O_RDONLY);
-    if (fd <= 0) {
-        LOGE("open (%s)ERROR!! error = -%s- \n", path, strerror(errno));
-    }
-    char tmp[BUFFER_SIZE] = {0};
-    read(fd, tmp, sizeof(tmp));
-    close(fd);
-    str = tmp;
     return 0;
 }
 
-int CFile::setFileAttrStr(const char *path, const char *str)
+int CPQFile::PQ_SetFileAttrStr(const char *path, const char *str)
 {
-    FILE *fp = fopen(path, "w");
+    FILE *fp = fopen ( path, "w" );
 
-    if (fp == NULL) {
-        LOGE("Open %s error(%s)!\n", path, strerror(errno));
+    if ( fp == NULL ) {
+        LOGE ( "Open %s error(%s)!\n", path, strerror ( errno ) );
         return -1;
     }
-    fprintf(fp, "%s", str);
-    fclose(fp);
+    fprintf ( fp, "%s", str );
+    fclose ( fp );
     return 0;
 }
+
+int CPQFile::PQ_GetFileFd()
+{
+    return mFd;
+};

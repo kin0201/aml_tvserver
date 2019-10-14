@@ -7,53 +7,62 @@
  * Description: c++ file
  */
 
-#define LOG_MOUDLE_TAG "TV"
-#define LOG_CLASS_TAG "ConfigFile"
+#define LOG_TAG "SystemControl"
+#define LOG_CLASS_TAG "CConfigFile"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include "CPQLog.h"
+#include "CConfigFile.h"
 
-#include "ConfigFile.h"
-#include "CTvLog.h"
+CConfigFile *CConfigFile::mInstance = NULL;
+CConfigFile *CConfigFile::GetInstance()
+{
+    if (NULL == mInstance) {
+        mInstance = new CConfigFile();
+    }
 
-CIniFile::CIniFile()
+    return mInstance;
+}
+
+CConfigFile::CConfigFile()
 {
     mpFirstSection = NULL;
     mpFileName[0] = '\0';
-    m_pIniFile = NULL;
+    mpConfigFile = NULL;
     mpFirstLine = NULL;
 }
 
-CIniFile::~CIniFile()
+CConfigFile::~CConfigFile()
 {
+    LOGD("%\n", __FUNCTION__);
     FreeAllMem();
 }
 
-int CIniFile::LoadFromFile(const char *filename)
+int CConfigFile::LoadFromFile(const char *filename)
 {
-    char   lineStr[MAX_INI_FILE_LINE_LEN];
+    char lineStr[MAX_CONFIG_FILE_LINE_LEN];
     LINE *pCurLINE = NULL;
     SECTION *pCurSection = NULL;
 
     FreeAllMem();
 
     if (filename == NULL) {
+        LOGE("%s: config file path is null!\n");
         return -1;
     }
 
     LOGD("LoadFromFile name = %s", filename);
-    strncpy(mpFileName, filename, sizeof(mpFileName)-1);
-    if ((m_pIniFile = fopen (mpFileName, "r")) == NULL) {
-        LOGE("open %s fail: %s", mpFileName, strerror(errno));
+    strcpy(mpFileName, filename);
+    if ((mpConfigFile = fopen (mpFileName, "r")) == NULL) {
         return -1;
     }
 
-    while (fgets (lineStr, MAX_INI_FILE_LINE_LEN, m_pIniFile) != NULL) {
+    while (fgets (lineStr, MAX_CONFIG_FILE_LINE_LEN, mpConfigFile) != NULL) {
         allTrim(lineStr);
 
         LINE *pLINE = new LINE();
@@ -103,12 +112,12 @@ int CIniFile::LoadFromFile(const char *filename)
         }
     }
 
-    fclose (m_pIniFile);
-    m_pIniFile = NULL;
+    fclose (mpConfigFile);
+    mpConfigFile = NULL;
     return 0;
 }
 
-int CIniFile::SaveToFile(const char *filename)
+int CConfigFile::SaveToFile(const char *filename)
 {
     const char *filepath = NULL;
     FILE *pFile = NULL;
@@ -123,9 +132,10 @@ int CIniFile::SaveToFile(const char *filename)
     } else {
         filepath = filename;
     }
+    //LOGD("Save to file name = %s", file);
 
     if ((pFile = fopen (filepath, "wb")) == NULL) {
-        LOGE("%s: open %s error(%s)", __FUNCTION__, filepath, strerror(errno));
+        LOGD("Save to file open error = %s", filepath);
         return -1;
     }
 
@@ -140,7 +150,7 @@ int CIniFile::SaveToFile(const char *filename)
     return 0;
 }
 
-int CIniFile::SetString(const char *section, const char *key, const char *value)
+int CConfigFile::SetString(const char *section, const char *key, const char *value)
 {
     SECTION *pNewSec = NULL;
     LINE *pNewSecLine = NULL;
@@ -198,7 +208,7 @@ int CIniFile::SetString(const char *section, const char *key, const char *value)
     return 0;
 }
 
-int CIniFile::SetInt(const char *section, const char *key, int value)
+int CConfigFile::SetInt(const char *section, const char *key, int value)
 {
     char tmp[64];
     sprintf(tmp, "%d", value);
@@ -206,17 +216,20 @@ int CIniFile::SetInt(const char *section, const char *key, int value)
     return 0;
 }
 
-const char *CIniFile::GetString(const char *section, const char *key, const char *def_value)
+const char *CConfigFile::GetString(const char *section, const char *key, const char *def_value)
 {
     SECTION *pSec = getSection(section);
-    if (pSec == NULL) return def_value;
+    if (pSec == NULL) {
+        return def_value;
+    }
     LINE *pLine = getKeyLineAtSec(pSec, key);
-    if (pLine == NULL) return def_value;
-
+    if (pLine == NULL) {
+        return def_value;
+    }
     return pLine->pValueStart;
 }
 
-int CIniFile::GetInt(const char *section, const char *key, int def_value)
+int CConfigFile::GetInt(const char *section, const char *key, int def_value)
 {
     const char *num = GetString(section, key, NULL);
     if (num != NULL) {
@@ -225,7 +238,7 @@ int CIniFile::GetInt(const char *section, const char *key, int def_value)
     return def_value;
 }
 
-int CIniFile::SetFloat(const char *section, const char *key, float value)
+int CConfigFile::SetFloat(const char *section, const char *key, float value)
 {
     char tmp[64];
     sprintf(tmp, "%.2f", value);
@@ -233,7 +246,7 @@ int CIniFile::SetFloat(const char *section, const char *key, float value)
     return 0;
 }
 
-float CIniFile::GetFloat(const char *section, const char *key, float def_value)
+float CConfigFile::GetFloat(const char *section, const char *key, float def_value)
 {
     const char *num = GetString(section, key, NULL);
     if (num != NULL) {
@@ -242,7 +255,7 @@ float CIniFile::GetFloat(const char *section, const char *key, float def_value)
     return def_value;
 }
 
-LINE_TYPE CIniFile::getLineType(char *Str)
+LINE_TYPE CConfigFile::getLineType(char *Str)
 {
     LINE_TYPE type = LINE_TYPE_COMMENT;
     if (strchr(Str, '#') != NULL) {
@@ -259,7 +272,7 @@ LINE_TYPE CIniFile::getLineType(char *Str)
     return type;
 }
 
-void CIniFile::FreeAllMem()
+void CConfigFile::FreeAllMem()
 {
     //line
     LINE *pCurLine = NULL;
@@ -281,7 +294,7 @@ void CIniFile::FreeAllMem()
     mpFirstSection = NULL;
 }
 
-int CIniFile::InsertSection(SECTION *pSec)
+int CConfigFile::InsertSection(SECTION *pSec)
 {
     //insert it to sections list ,as first section
     pSec->pNext = mpFirstSection;
@@ -292,7 +305,7 @@ int CIniFile::InsertSection(SECTION *pSec)
     return 0;
 }
 
-int CIniFile::InsertKeyLine(SECTION *pSec, LINE *line)
+int CConfigFile::InsertKeyLine(SECTION *pSec, LINE *line)
 {
     LINE *line1 = pSec->pLine;
     LINE *line2 = line1->pNext;
@@ -301,30 +314,30 @@ int CIniFile::InsertKeyLine(SECTION *pSec, LINE *line)
     return 0;
 }
 
-SECTION *CIniFile::getSection(const char *section)
+SECTION *CConfigFile::getSection(const char *section)
 {
     //section
     for (SECTION *psec = mpFirstSection; psec != NULL; psec = psec->pNext) {
         if (strncmp((psec->pLine->Text) + 1, section, strlen(section)) == 0)
             return psec;
     }
-    LOGE("not find section: %s", section);
     return NULL;
 }
 
-LINE *CIniFile::getKeyLineAtSec(SECTION *pSec, const char *key)
+LINE *CConfigFile::getKeyLineAtSec(SECTION *pSec, const char *key)
 {
     //line
     for (LINE *pline = pSec->pLine->pNext; (pline != NULL && pline->type != LINE_TYPE_SECTION); pline = pline->pNext) {
         if (pline->type == LINE_TYPE_KEY) {
-            if (strncmp(pline->Text, key, strlen(key)) == 0)
+            if (strncmp(pline->Text, key, strlen(key)) == 0) {
                 return pline;
+            }
         }
     }
     return NULL;
 }
 
-void CIniFile::allTrim(char *Str)
+void CConfigFile::allTrim(char *Str)
 {
     char *pStr;
     pStr = strchr (Str, '\n');
@@ -351,4 +364,3 @@ void CIniFile::allTrim(char *Str)
     }
     return;
 }
-

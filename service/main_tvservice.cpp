@@ -5,7 +5,6 @@
 #include "TvService.h"
 
 int main(int argc, char **argv) {
-    printf("new tvservice!\n");
     TvService *mpTvService = TvService::GetInstance();
     mpTvService->TvServiceHandleMessage();
 }

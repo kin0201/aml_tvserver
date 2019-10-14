@@ -1,3 +1,6 @@
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "TvTest"
+
 #include <syslog.h>
 #include <signal.h>
 #include <stdio.h>
@@ -7,8 +10,47 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <TvClient.h>
+#include "CTvClientLog.h"
 
-TvClient *mpTvClient;
+class TvTest: public TvClient::TvClientIObserver {
+public:
+    TvTest()
+    {
+        mpTvClient = new TvClient();
+        mpTvClient->setTvClientObserver(this);
+    }
+
+    ~TvTest()
+    {
+
+    }
+
+    void onTvClientEvent(CTvEvent &event)
+    {
+        int eventType = event.getEventType();
+        TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
+        int source = sourceConnectEvent->mSourceInput;
+        int connectStatus = sourceConnectEvent->connectionState;
+        LOGD("%s: eventType: %d, source: %d, connectStatus: %d\n", __FUNCTION__, eventType, source, connectStatus);
+        return;
+    }
+
+    int SendCmd(const char *data) {
+        LOGD("%s: cmd is %s.\n", __FUNCTION__, data);
+        if (strcmp(data, "start") == 0) {
+            mpTvClient->StartTv(SOURCE_HDMI1);
+        } else if (strcmp(data, "stop") == 0) {
+            mpTvClient->StopTv(SOURCE_HDMI1);
+        } else {
+            LOGE("invalid cmd!\n");
+        }
+
+        return 0;
+    }
+
+    TvClient *mpTvClient;
+};
+
 static int SetOsdBlankStatus(const char *path, int cmd)
 {
     int fd;
@@ -25,69 +67,42 @@ static int SetOsdBlankStatus(const char *path, int cmd)
     return -1;
 }
 
-static int AddVdinVideoPath()
-{
-    int fd;
-    char cmd[64] = {"add tvpath vdin0 amlvideo2.0 deinterlace amvideo"};
-    fd = open("/sys/class/vfm/map", O_CREAT|O_RDWR | O_TRUNC, 0777);
-
-    if (fd >= 0) {
-        write(fd, cmd, strlen(cmd));
-        close(fd);
-        return 0;
-    } else {
-        return -1;
-    }
-}
-
 static int DisplayInit()
 {
-    AddVdinVideoPath();
     SetOsdBlankStatus("/sys/class/graphics/fb0/osd_display_debug", 1);
     SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 1);
     return 0;
 
 }
 
-static void SendCmd(const char *data) {
-    printf("SendCmd: cmd is %s.\n", data);
-    if (strcmp(data, "start") == 0) {
-        mpTvClient->StartTv();
-    } else if (strcmp(data, "stop") == 0) {
-        mpTvClient->StopTv();
-    } else {
-        printf("invalid cmd!\n");
-    }
-}
-
 int main(int argc, char **argv) {
     unsigned char read_buf[256];
     memset(read_buf, 0, sizeof(read_buf));
 
-    mpTvClient = new TvClient();
+    TvTest *test = new TvTest();
     char Command[1];
     int run = 1;
     DisplayInit();
 
-    printf("#### please select cmd####\n");
-    printf("#### select s to start####\n");
-    printf("#### select q to stop####\n");
-    printf("##########################\n");
+    LOGD("#### please select cmd####\n");
+    LOGD("#### select s to start####\n");
+    LOGD("#### select q to stop####\n");
+    LOGD("##########################\n");
     while (run) {
         scanf("%s", Command);
         switch (Command[0]) {
           case 'q': {
-            SendCmd("stop");
+            test->SendCmd("stop");
             SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
             run = 0;
             break;
           }
           case 's': {
-              SendCmd("start");
+              test->SendCmd("start");
               break;
           }
           default: {
-              SendCmd("start");
+              test->SendCmd("start");
               break;
           }
         }
