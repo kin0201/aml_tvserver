@@ -5,7 +5,11 @@
 #include "CHDMIRxManager.h"
 
 
-#define CONFIG_FILE_PATH_DEF    "/ventor/etc/tvconfig/tvconfig.conf"
+#define CONFIG_FILE_PATH_DEF     "/ventor/etc/tvconfig/tvconfig.conf"
+
+#define HDMI_EDID14_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_14.bin"
+#define HDMI_EDID20_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_20.bin"
+
 class CTv : public CTvDevicesPollDetect::ISourceConnectObserver {
 public:
     class TvIObserver {
@@ -23,7 +27,7 @@ public:
     int SetCurrenSourceInfo(tvin_info_t sig_info);
     tvin_info_t GetCurrentSourceInfo(void);
     int UpdateEDID(tv_source_input_t source, char *data);
-    int getEDIDData(char *data);
+    int getEDIDData(tv_source_input_t source, char *data);
 
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();

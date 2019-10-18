@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
-#define LOG_PQ_TAG "SSMAction"
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "SSMAction"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,12 +68,12 @@ void SSMAction::init()
     if (m_dev_fd < 0) {
         LOGE("%s, Open %s failed! error: %s.\n", __FUNCTION__, SSM_DATA_PATH, strerror(errno));
     } else {
-        LOGD("%s, Open %s success!", __FUNCTION__, SSM_DATA_PATH);
+        LOGD("%s, Open %s success!\n", __FUNCTION__, SSM_DATA_PATH);
     }
     //ssm check
     if (mSSMHandler != NULL) {
         SSM_status_t SSM_status = (SSM_status_t)GetSSMStatus();
-        LOGD ("%s, Verify SSMHeader, status= %d\n", __FUNCTION__, SSM_status);
+        LOGD ("%s, Verify SSMHeader, status= %d.\n", __FUNCTION__, SSM_status);
         if (DeviceMarkCheck() < 0 || SSM_status == SSM_HEADER_INVALID) {
             if (mpObserver != NULL) {
                 mpObserver->resetAllUserSettingParam();
@@ -688,7 +688,8 @@ int SSMAction::ReadDataFromFile(const char *file_name, int offset, int nsize, un
         return -1;
     }
 
-    device_fd = open(file_name, O_RDONLY);
+    //device_fd = open(file_name, O_RDONLY);
+    device_fd = open(file_name, O_RDWR | O_SYNC | O_CREAT, S_IRUSR | S_IWUSR);
     if (device_fd < 0) {
         LOGE("open file \"%s\" error(%s).\n", file_name, strerror(errno));
         return -1;

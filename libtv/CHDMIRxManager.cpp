@@ -75,13 +75,21 @@ int CHDMIRxManager::HdmiRxEdidUpdate(char *data)
         return -1;
     }
 
+    unsigned char loadData[LOAD_EDID_DATA_SIZE];
+    memset(loadData, 0, sizeof(loadData));
+    loadData[0] = 'E';
+    loadData[1] = 'D';
+    loadData[2] = 'I';
+    loadData[3] = 'D';
+    memcpy(loadData + 4, data, REAL_EDID_DATA_SIZE);
+
     int dev_fd = open(HDMI_EDID_DEV_PATH, O_RDWR);
     if (dev_fd < 0) {
         LOGE("open edid file ERROR(%s)!!\n", strerror(errno));
         return -1;
     }
 
-    if (write(dev_fd, data, SSM_HDMI_EDID_SIZE) < 0) {
+    if (write(dev_fd, data, LOAD_EDID_DATA_SIZE) < 0) {
         close(dev_fd);
         dev_fd = -1;
         LOGE("write edid file ERROR(%s)!!\n", strerror(errno));

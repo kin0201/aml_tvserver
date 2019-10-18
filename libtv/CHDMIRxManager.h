@@ -27,7 +27,8 @@
 #define HDMI_CEC_PORT_MAP         "/sys/module/tvin_hdmirx/parameters/port_map"
 #define HDMI_EDID_DEV_PATH        "/sys/class/hdmirx/hdmirx0/edid"
 
-#define SSM_HDMI_EDID_SIZE        (256)
+#define REAL_EDID_DATA_SIZE        (256)
+#define LOAD_EDID_DATA_SIZE        (REAL_EDID_DATA_SIZE + 4)
 
 typedef enum tv_hdmi_hdcp_version_e {
     HDMI_HDCP_VER_14 = 0,

@@ -14,8 +14,8 @@
 #include "SSMHandler.h"
 #include "PQSettingCfg.h"
 
-#define SSM_DATA_PATH             "/mnt/vendor/param/pq/ssm_data"
-#define SSM_RGBOGO_FILE_PATH      "/dev/block/cri_data"
+#define SSM_DATA_PATH             "/vendor/etc/tvconfig/pq/ssm_data"
+#define SSM_RGBOGO_FILE_PATH      "/vendor/etc/tvconfig/pq/cri_data"
 #define SSM_RGBOGO_FILE_OFFSET    (0)
 
 #define SSM_CR_RGBOGO_LEN                           (256)

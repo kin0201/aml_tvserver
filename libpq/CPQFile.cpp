@@ -32,19 +32,19 @@ CPQFile::~CPQFile()
 
 int CPQFile::PQ_OpenFile(const char *path)
 {
-    LOGD("openFile = %s", path);
+    LOGD("openFile = %s.\n", path);
     if (mFd < 0) {
         const char *openPath = mPath;
         if (path != NULL)
             strcpy(mPath, path);
 
         if (strlen(openPath) <= 0) {
-            LOGE("openFile openPath is NULL, path:%s", path);
+            LOGE("openFile openPath is NULL, path:%s.\n", path);
             return -1;
         }
         mFd = open(openPath, O_RDWR);
         if (mFd < 0) {
-            LOGE("open file(%s) fail", openPath);
+            LOGE("open file(%s) fail.\n", openPath);
             return -1;
         }
     }
@@ -85,13 +85,13 @@ int CPQFile::PQ_CopyFile(const char *dstPath)
     int dstFd;
     if (mFd == -1) {
         if ((mFd = open(mPath, O_RDONLY)) == -1) {
-            LOGE("Open %s Error:%s/n", mPath, strerror(errno));
+            LOGE("Open %s Error:%s.\n", mPath, strerror(errno));
             return -1;
         }
     }
 
     if ((dstFd = open(dstPath, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
-        LOGE("Open %s Error:%s/n", dstPath, strerror(errno));
+        LOGE("Open %s Error:%s.\n", dstPath, strerror(errno));
     }
 
     int bytes_read, bytes_write;
@@ -152,7 +152,7 @@ int CPQFile::PQ_DeleteFile(const char *path)
 {
     if (strlen(path) <= 0) return -1;
     if (unlink(path) != 0) {
-        LOGE("delete file(%s) err=%s", path, strerror(errno));
+        LOGE("delete file(%s) err=%s.\n", path, strerror(errno));
         return -1;
     }
     return 0;
@@ -162,7 +162,7 @@ int CPQFile::PQ_DeleteFile()
 {
     if (strlen(mPath) <= 0) return -1;
     if (unlink(mPath) != 0) {
-        LOGE("delete file(%s) err=%s", mPath, strerror(errno));
+        LOGE("delete file(%s) err=%s.\n", mPath, strerror(errno));
         return -1;
     }
     return 0;
@@ -174,7 +174,7 @@ int CPQFile::PQ_GetFileAttrValue(const char *path)
 
     int fd = open(path, O_RDONLY);
     if (fd <= 0) {
-        LOGE("open  (%s)ERROR!!error = -%s- \n", path, strerror ( errno ));
+        LOGE("open  (%s)ERROR!!error = %s.\n", path, strerror ( errno ));
     }
     char s[8];
     read(fd, s, sizeof(s));

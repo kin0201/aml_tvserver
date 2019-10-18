@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "CTv.h"
+#include "tvutils.h"
 #include "TvConfigManager.h"
 #include "CTvLog.h"
 #include "CPQControl.h"
@@ -168,11 +169,17 @@ int CTv::setTvObserver ( TvIObserver *ob )
 
 int CTv::UpdateEDID(tv_source_input_t source, char *data)
 {
-    return mpHDMIRxManager->HdmiRxEdidUpdate(data);
+    char edidData[REAL_EDID_DATA_SIZE];
+    memcpy(edidData, data, REAL_EDID_DATA_SIZE);
+    return mpHDMIRxManager->HdmiRxEdidUpdate(edidData);
 }
 
-int CTv::getEDIDData(char *data)
+int CTv::getEDIDData(tv_source_input_t source, char *data)
 {
+    char edidData[REAL_EDID_DATA_SIZE];
+    memset(edidData, 0, REAL_EDID_DATA_SIZE);
+    tvReadSysfs(HDMI_EDID14_FILE_PATH, edidData);
+    memcpy(data, edidData, REAL_EDID_DATA_SIZE);
     return 0;
 }
 
@@ -229,6 +236,8 @@ void CTv::onSigToNoSig()
 
 int CTv::sendTvEvent(CTvEvent &event)
 {
+    LOGD("%s\n", __FUNCTION__);
+
     if (mpObserver != NULL) {
         mpObserver->onTvEvent(event);
     }

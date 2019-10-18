@@ -75,7 +75,7 @@ DBusConnection *TvClient::ClientBusInit()
 
 int TvClient::SendMethodCall(char *CmdString)
 {
-    LOGD("TvClient: SendMethodCall\n");
+    LOGD("%s.\n", __FUNCTION__);
 
     DBusMessage *msg;
     DBusMessageIter arg;
@@ -161,81 +161,6 @@ int TvClient::HandSourceConnectEvent(DBusMessageIter messageIter)
     return 0;
 }
 
-int TvClient::SendCmdWithVoidParam(int cmd)
-{
-    LOGD("TvClient: SendCmdWithVoidParam\n");
-
-    DBusMessage *msg;
-    DBusMessageIter arg;
-    DBusPendingCall *pending;
-    int ReturnVal = 0;
-
-    msg = dbus_message_new_method_call("aml.tv.service", "/aml/tv", "aml.tv", "cmd");
-    if (msg == NULL) {
-        LOGE("TvClient: no memory\n");
-        return RET_FAILED;
-    }
-
-    if (!dbus_message_append_args(msg, DBUS_TYPE_INT32, &cmd, DBUS_TYPE_INVALID)) {
-        LOGE("TvClient: add args failed!\n");
-        dbus_message_unref(msg);
-        return RET_FAILED;
-    }
-
-    if (!dbus_connection_send_with_reply (mpDBusConnection, msg, &pending, -1)) {
-        LOGE("TvClient: no memeory!");
-        dbus_message_unref(msg);
-        return RET_FAILED;
-    }
-
-    if (pending == NULL) {
-        LOGE("TvClient: Pending is NULL, may be disconnect...\n");
-        dbus_message_unref(msg);
-        return RET_FAILED;
-    }
-
-    dbus_connection_flush(mpDBusConnection);
-    dbus_message_unref(msg);
-
-    dbus_pending_call_block (pending);
-    msg = dbus_pending_call_steal_reply (pending);
-    if (msg == NULL) {
-        LOGE("TvClient: reply is null. error\n");
-        return RET_FAILED;
-    }
-
-    dbus_pending_call_unref(pending);
-
-    if (!dbus_message_iter_init(msg, &arg)) {
-        LOGE("TvClient: no argument, error\n");
-    }
-
-    if (dbus_message_iter_get_arg_type(&arg) != DBUS_TYPE_INT32) {
-        LOGE("TvClient: paramter type error\n");
-    }
-
-    dbus_message_iter_get_basic(&arg, &ReturnVal);
-    LOGD("%s: ret = %d\n", __FUNCTION__, ReturnVal);
-    dbus_message_unref(msg);
-
-    return RET_SUCCESS;
-}
-
-int TvClient::SendCmdWithIntArrayParam(int cmd, int *values)
-{
-    return 0;
-}
-
-int TvClient::sendCmdWithFloatArrayParam(int cmd, float *values)
-{
-    return 0;
-}
-
-int TvClient::SendCmdWithStringArrayParam(int cmd, char *values)
-{
-    return 0;
-}
-
 int TvClient::HandSignalDetectEvent(DBusMessageIter messageIter)
 {
     dbus_int32_t signalFormat, transFormat, signalStatus, dviFlag;
@@ -286,10 +211,10 @@ void *TvClient::HandleTvServiceMessage(void *args)
                     dbus_message_iter_get_basic(&arg, &eventType);
                     switch (eventType) {
                     case EVENT_SIGLE_DETECT:
-                        HandSourceConnectEvent(arg);
+                        HandSignalDetectEvent(arg);
                         break;
                     case EVENT_SOURCE_CONNECT:
-                        HandSignalDetectEvent(arg);
+                        HandSourceConnectEvent(arg);
                         break;
                     default:
                         LOGE("TvClient: invalid event type!\n");
@@ -344,21 +269,33 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
 }
 
 int TvClient::StartTv(tv_source_input_t source) {
-    return SendMethodCall("start");
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32];
+    sprintf(buf, "source.start.%d", source);
+    return SendMethodCall(buf);
 }
 
 int TvClient::StopTv(tv_source_input_t source) {
-    return SendMethodCall("stop");
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32];
+    sprintf(buf, "source.stop.%d", source);
+    return SendMethodCall(buf);
 }
 
 int TvClient::SetEdidData(tv_source_input_t source, char *dataBuf)
 {
-    return 0;
+    LOGD("%s\n", __FUNCTION__);
+    char buf[512];
+    sprintf(buf, "edid.set.%d.%s", source, dataBuf);
+    return SendMethodCall(buf);
 }
 
 int TvClient::GetEdidData(tv_source_input_t source, char *dataBuf)
 {
-    return 0;
+    LOGD("%s\n", __FUNCTION__);
+    char buf[512];
+    sprintf(buf, "edid.get.%d.%s", source, dataBuf);
+    return SendMethodCall(buf);
 }
 
 /*#ifdef __cplusplus

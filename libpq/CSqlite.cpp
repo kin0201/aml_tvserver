@@ -223,14 +223,14 @@ int CSqlite::select(const char *sql, CSqlite::Cursor &c)
     int col, row;
     char **pResult = NULL;
     char *errmsg;
-    assert(mHandle && sql);
+    //assert(mHandle && sql);
 
     if (strncmp(sql, "select", 6)) {
         pthread_mutex_unlock(&SqliteMutex);
         return -1;
     }
     if (sqlite3_get_table(mHandle, sql, &pResult, &row, &col, &errmsg) != SQLITE_OK) {
-        LOGE("errmsg=%s", errmsg);
+        LOGE("errmsg=%s.\n", errmsg);
         if (pResult != NULL)
             sqlite3_free_table(pResult);
         pthread_mutex_unlock(&SqliteMutex);

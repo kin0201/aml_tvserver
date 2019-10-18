@@ -7,7 +7,7 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
+#define LOG_MOUDLE_TAG "PQ"
 #define LOG_CLASS_TAG "CDynamicBackLight"
 
 #include "CDynamicBackLight.h"
@@ -21,7 +21,6 @@ CDynamicBackLight::CDynamicBackLight()
     mGD_mvreflsh = 9;
     GD_LUT_MODE = 1;
     GD_ThTF = 0;
-    mArithmeticPauseTime = -1;
 }
 
 CDynamicBackLight::~CDynamicBackLight()
@@ -36,10 +35,10 @@ int CDynamicBackLight::startDected(void)
 
     ret = pthread_create(&thread_id, NULL, dynamicBacklightThread, (void *)this);
     if (ret != 0) {
-        LOGD("create DynamicBackLight thread fail\n");
+        LOGD("create DynamicBackLight thread fail.\n");
         ret = -1;
     } else {
-        LOGE("DynamicBackLight thread id (%lu) done\n", thread_id);
+        LOGE("DynamicBackLight thread id (%lu) done.\n", thread_id);
         ret = 0;
     }
 
@@ -148,7 +147,7 @@ void *CDynamicBackLight::dynamicBacklightThread(void* data)
 void *CDynamicBackLight::threadLoop(void)
 {
     if (mpObserver != NULL) {
-        LOGD ("%s: mpObserver is null", __FUNCTION__);
+        LOGD ("%s: mpObserver is null.\n", __FUNCTION__);
         return NULL;
     } else {
         dynamic_backlight_Param_t DynamicBacklightParam;
@@ -168,12 +167,6 @@ void *CDynamicBackLight::threadLoop(void)
         }
 
         while (1) {
-            if (mArithmeticPauseTime != -1) {
-                usleep(mArithmeticPauseTime);
-                LOGD ("Pasuse %d usecs", mArithmeticPauseTime);
-                mArithmeticPauseTime = -1;
-            }
-
             mpObserver->GetDynamicBacklighParam(&DynamicBacklightParam);
             //LOGD("hist = %d, mode = %d\n", DynamicBacklightParam.hist.ave, DynamicBacklightParam.CurDynamicBacklightMode);
 

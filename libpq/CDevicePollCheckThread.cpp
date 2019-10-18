@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
-#define LOG_CLASS_TAG "CDevicePollCheck"
+#define LOG_MOUDLE_TAG "PQ"
+#define LOG_CLASS_TAG "CDevicePollCheckThread"
 
 #include "CDevicePollCheckThread.h"
 #include <pthread.h>

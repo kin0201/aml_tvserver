@@ -7,12 +7,11 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
+#define LOG_MOUDLE_TAG "PQ"
 #define LOG_CLASS_TAG "CConfigFile"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
@@ -56,7 +55,7 @@ int CConfigFile::LoadFromFile(const char *filename)
         return -1;
     }
 
-    LOGD("LoadFromFile name = %s", filename);
+    LOGD("LoadFromFile name = %s\n", filename);
     strcpy(mpFileName, filename);
     if ((mpConfigFile = fopen (mpFileName, "r")) == NULL) {
         return -1;

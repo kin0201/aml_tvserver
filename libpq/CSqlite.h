@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sqlite3.h>
-#include <assert.h>
+//#include <assert.h>
 #include <pthread.h>
 #include "CPQLog.h"
 

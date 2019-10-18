@@ -24,7 +24,7 @@
 #include <memory>
 #include "CPQLog.h"
 
-#define SSM_HANDLER_PATH             "/mnt/vendor/param/pq/SSMHandler"
+#define SSM_HANDLER_PATH             "/vendor/etc/tvconfig/pq/SSMHandler"
 
 class SSMHandler
 {

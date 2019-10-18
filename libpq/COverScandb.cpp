@@ -27,7 +27,7 @@ COverScandb::~COverScandb()
 
 int COverScandb::openOverScanDB(const char *db_path)
 {
-    LOGD("%s: path = %s", __FUNCTION__, db_path);
+    LOGD("%s: path = %s.\n", __FUNCTION__, db_path);
     int rval;
 
     if (access(db_path, 0) < 0) {
@@ -132,7 +132,7 @@ int COverScandb::PQ_GetOverscanParams(source_input_param_t source_input_param, v
     if (c.getCount() <= 0) {
         fmt = TVIN_SIG_FMT_NULL;
         c.close();
-        LOGD ("%s - Load default", __FUNCTION__);
+        LOGD ("%s - Load default.\n", __FUNCTION__);
 
         getSqlParams(__FUNCTION__, sqlmaster, "select hs, he, vs, ve from %s where "
                                               "TVIN_PORT = %d and "
@@ -167,7 +167,7 @@ int COverScandb::PQ_SetOverscanParams(source_input_param_t source_input_param , 
     if (c.getCount() <= 0) {
         fmt = TVIN_SIG_FMT_NULL;
         c.close();
-        LOGE ("%s - Load default", __FUNCTION__);
+        LOGE ("%s - Load default.\n", __FUNCTION__);
 
         getSqlParams(__FUNCTION__, sqlmaster,
                     "select * from OVERSCAN where TVIN_PORT = %d and TVIN_SIG_FMT = %d and TVIN_TRANS_FMT = %d;",

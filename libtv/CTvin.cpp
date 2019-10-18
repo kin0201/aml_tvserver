@@ -116,7 +116,7 @@ int CTvin::VDIN_OpenPort ( tvin_port_t port )
     vdinParam.index = 0;
     int rt = VDIN_DeviceIOCtl ( TVIN_IOC_OPEN, &vdinParam );
     if ( rt < 0 ) {
-        LOGE("Vdin open port, error(%s)!", strerror(errno));
+        LOGE("Vdin open port, error(%s)!\n", strerror(errno));
     }
 
     return rt;
@@ -153,7 +153,7 @@ int CTvin::VDIN_StopDec()
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_STOP_DEC );
     if (ret < 0) {
-        LOGE("Vdin stop decode, error(%s)", strerror ( errno ));
+        LOGE("Vdin stop decode, error(%s).\n", strerror ( errno ));
     }
     return ret;
 }
@@ -171,7 +171,7 @@ int CTvin::VDIN_SetVdinParam (tvin_parm_s *vdinParam)
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_S_PARM, vdinParam );
     if ( ret < 0 ) {
-        LOGE ( "Vdin set signal param, error(%s)\n", strerror ( errno ) );
+        LOGE ( "Vdin set signal param, error(%s).\n", strerror ( errno ) );
     }
 
     return ret;
@@ -181,7 +181,7 @@ int CTvin::VDIN_GetVdinParam(tvin_parm_s *vdinParam)
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_G_PARM, vdinParam );
     if ( ret < 0 ) {
-        LOGE ( "Vdin get signal param, error(%s)\n", strerror ( errno ) );
+        LOGE ( "Vdin get signal param, error(%s).\n", strerror ( errno ) );
     }
 
     return ret;

@@ -48,7 +48,6 @@ public:
 private:
     int mPreBacklightValue;
     int mGD_mvreflsh;
-    int mArithmeticPauseTime;
     int GD_LUT_MODE;
     int GD_ThTF;
     int backLightScale(int, int);

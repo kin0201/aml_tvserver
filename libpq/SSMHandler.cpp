@@ -7,8 +7,8 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
-#define LOG_PQ_TAG "SSMHandler"
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "SSMHandler"
 
 #include "SSMHandler.h"
 

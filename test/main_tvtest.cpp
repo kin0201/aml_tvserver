@@ -28,10 +28,27 @@ public:
     void onTvClientEvent(CTvEvent &event)
     {
         int eventType = event.getEventType();
-        TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
-        int source = sourceConnectEvent->mSourceInput;
-        int connectStatus = sourceConnectEvent->connectionState;
-        LOGD("%s: eventType: %d, source: %d, connectStatus: %d\n", __FUNCTION__, eventType, source, connectStatus);
+        LOGD("%s: eventType: %d.\n", __FUNCTION__, eventType);
+        switch (eventType) {
+        case CTvEvent::TV_EVENT_SIGLE_DETECT: {
+            TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
+            LOGD("%s: signalFmt: %d, transFmt: %d, status: %d, isDVI: %d.\n", __FUNCTION__,
+                                                       signalDetectEvent->mFmt,
+                                                       signalDetectEvent->mTrans_fmt,
+                                                       signalDetectEvent->mStatus,
+                                                       signalDetectEvent->mDviFlag);
+            break;
+            }
+        case CTvEvent::TV_EVENT_SOURCE_CONNECT: {
+            TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
+            LOGD("%s: source: %d, connectStatus: %d\n", __FUNCTION__,
+                      sourceConnectEvent->mSourceInput, sourceConnectEvent->connectionState);
+            break;
+            }
+        default:
+            LOGD("invalid event!\n", __FUNCTION__);
+            break;
+        }
         return;
     }
 

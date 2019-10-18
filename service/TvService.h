@@ -25,6 +25,7 @@ private:
     virtual void onTvEvent(CTvEvent &event);
     int SendSignalForSignalDetectEvent(CTvEvent &event);
     int SendSignalForSourceConnectEvent(CTvEvent &event);
+    int ParserTvCommand(char *commandData);
 
     //static TvService *mInstance;
     CTv *mpTv;

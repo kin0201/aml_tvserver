@@ -34,10 +34,6 @@ private:
     static int HandSourceConnectEvent(DBusMessageIter messageIter);
     static int HandSignalDetectEvent(DBusMessageIter messageIter);
     int SendTvClientEvent(CTvEvent &event);
-    int SendCmdWithVoidParam(int cmd);
-    int SendCmdWithIntArrayParam(int cmd, int *values);
-    int sendCmdWithFloatArrayParam(int cmd, float *values);
-    int SendCmdWithStringArrayParam(int cmd, char *values);
 
     static TvClient *mStaticTvClient;
     DBusConnection *mpDBusConnection = NULL;

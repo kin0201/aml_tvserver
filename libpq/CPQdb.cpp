@@ -39,7 +39,7 @@ CPQdb::~CPQdb()
 
 int CPQdb::openPqDB(const char *db_path)
 {
-    LOGD("openPqDB path = %s", db_path);
+    LOGD("openPqDB path = %s.\n", db_path);
     int rval;
 
     if (access(db_path, 0) < 0) {
@@ -163,7 +163,7 @@ int CPQdb::getRegValuesByValue(const char *name, const char *f_name, const char 
         rval = -1;
     }
 
-    LOGD("%s, length = %d", __FUNCTION__, regs->length);
+    LOGD("%s, length = %d.\n", __FUNCTION__, regs->length);
     return rval;
 }
 
@@ -465,7 +465,7 @@ int CPQdb::getDIRegValuesByValue(const char *name, const char *f_name, const cha
         rval = -1;
     }
 
-    LOGD("%s, length = %d", __FUNCTION__, regs->length);
+    LOGD("%s, length = %d.\n", __FUNCTION__, regs->length);
     return rval;
 }
 
@@ -1908,7 +1908,7 @@ am_regs_t CPQdb::MergeSameAddrVal(am_regs_t regs)
     }
     tmp_reg.length = k;
 
-    /*LOGD("###length = %d\n", tmp_reg.length);
+    /*LOGD("###length = %d.\n", tmp_reg.length);
     for (i=0;i<tmp_reg.length;i++) {
         LOGD("###type: %u, addr: %u, mask: %u, val: %u\n", tmp_reg.am_reg[i].type, tmp_reg.am_reg[i].addr, tmp_reg.am_reg[i].mask, tmp_reg.am_reg[i].val);
     }*/

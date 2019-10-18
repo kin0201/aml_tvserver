@@ -185,7 +185,7 @@ int CPQControl::DIOpenModule(void)
     if (mDiFd < 0) {
         mDiFd = open(DI_DEV_PATH, O_RDWR);
 
-        LOGD("DI OpenModule path: %s", DI_DEV_PATH);
+        LOGD("DI OpenModule path: %s.\n", DI_DEV_PATH);
 
         if (mDiFd < 0) {
             LOGE("Open DI module, error(%s)!\n", strerror(errno));
@@ -1371,7 +1371,7 @@ int CPQControl::Cpq_SetBrightness(int value, source_input_param_t source_input_p
 
 int CPQControl::Cpq_SetVideoBrightness(int value)
 {
-    LOGD("Cpq_SetVideoBrightness brightness : %d", value);
+    LOGD("Cpq_SetVideoBrightness brightness : %d.\n", value);
     am_pic_mode_t params;
     memset(&params, 0, sizeof(params));
     if (mbCpqCfg_brightness_withOSD) {
@@ -1481,7 +1481,7 @@ int CPQControl::Cpq_SetContrast(int value, source_input_param_t source_input_par
 
 int CPQControl::Cpq_SetVideoContrast(int value)
 {
-    LOGD("Cpq_SetVideoContrast: %d", value);
+    LOGD("Cpq_SetVideoContrast: %d.\n", value);
     am_pic_mode_t params;
     memset(&params, 0, sizeof(params));
 
@@ -1702,7 +1702,7 @@ int CPQControl::Cpq_SetHue(int value, source_input_param_t source_input_param)
 int CPQControl::Cpq_SetVideoSaturationHue(int satVal, int hueVal)
 {
     signed long temp;
-    LOGD("Cpq_SetVideoSaturationHue: %d %d", satVal, hueVal);
+    LOGD("Cpq_SetVideoSaturationHue: %d %d.\n", satVal, hueVal);
     am_pic_mode_t params;
     memset(&params, 0, sizeof(params));
     video_set_saturation_hue(satVal, hueVal, &temp);

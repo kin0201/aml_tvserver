@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
@@ -46,10 +45,10 @@ int CIniFile::LoadFromFile(const char *filename)
         return -1;
     }
 
-    LOGD("LoadFromFile name = %s", filename);
+    LOGD("LoadFromFile name = %s\n", filename);
     strncpy(mpFileName, filename, sizeof(mpFileName)-1);
     if ((m_pIniFile = fopen (mpFileName, "r")) == NULL) {
-        LOGE("open %s fail: %s", mpFileName, strerror(errno));
+        LOGE("open %s fail: %s\n", mpFileName, strerror(errno));
         return -1;
     }
 

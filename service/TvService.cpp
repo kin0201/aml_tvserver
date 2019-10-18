@@ -77,7 +77,7 @@ int TvService::TvServiceHandleMessage()
 {
     DBusMessage *msg;
     DBusError err;
-    char *str;
+    char *commandData;
 
     dbus_error_init(&err);
 
@@ -96,18 +96,14 @@ int TvService::TvServiceHandleMessage()
             DBusMessageIter r_arg;
             int ReturnVal = 0;
 
-            dbus_message_get_args(msg, &err, DBUS_TYPE_STRING, &str, DBUS_TYPE_INVALID);
+            dbus_message_get_args(msg, &err, DBUS_TYPE_STRING, &commandData, DBUS_TYPE_INVALID);
             if (dbus_error_is_set(&err)) {
                 LOGE("%s: recieve message failed!\n", __FUNCTION__);
                 dbus_error_free(&err);
                 ReturnVal = -1;
             } else {
-                LOGD("%s: recieve message: %s\n", __FUNCTION__, str);
-                if (strcmp(str, "start") == 0) {
-                    ReturnVal = mpTv->StartTv(SOURCE_HDMI1);
-                } else {
-                    ReturnVal = mpTv->StopTv(SOURCE_HDMI1);
-                }
+                LOGD("%s: recieve message: %s\n", __FUNCTION__, commandData);
+                ReturnVal = ParserTvCommand(commandData);
             }
 
             rp = dbus_message_new_method_return(msg);
@@ -204,6 +200,50 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
     dbus_message_unref(msg);
 
     return 0;
+}
+
+int TvService::ParserTvCommand(char *commandData)
+{
+    int ret = 0;
+    const char *delim = ".";
+    char *temp = strtok(commandData, delim);
+    LOGD("%s: cmdType = %s\n", __FUNCTION__, temp);
+    if (strcmp(temp, "source") == 0) {
+        LOGD("%s: source cmd!\n", __FUNCTION__);
+        temp = strtok(NULL, delim);
+        if (strcmp(temp, "start") == 0) {
+            temp = strtok(NULL, delim);
+            tv_source_input_t startSource = (tv_source_input_t)atoi(temp);
+            ret = mpTv->StartTv(startSource);
+        } else if (strcmp(temp, "stop") == 0){
+            temp = strtok(NULL, delim);
+            tv_source_input_t stopSource = (tv_source_input_t)atoi(temp);
+            ret = mpTv->StopTv(stopSource);
+        } else {
+            LOGD("%s: invalid sourec cmd!\n", __FUNCTION__);
+        }
+    } else if (strcmp(temp, "edid") == 0) {
+        LOGD("%s: EDID cmd!\n", __FUNCTION__);
+        temp = strtok(NULL, delim);
+        if (strcmp(temp, "set") == 0) {
+            temp = strtok(NULL, delim);
+            tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
+            temp = strtok(NULL, delim);
+            ret = mpTv->UpdateEDID(setSource, temp);
+        } else if (strcmp(temp, "get") == 0) {
+            temp = strtok(NULL, delim);
+            tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
+            temp = strtok(NULL, delim);
+            ret = mpTv->getEDIDData(getSource, temp);
+        } else {
+            LOGD("%s: invalid cmd!\n", __FUNCTION__);
+            ret = 0;
+        }
+    } else {
+        LOGD("%s: invalie cmdType!\n", __FUNCTION__);
+    }
+
+    return ret;
 }
 
 #ifdef __cplusplus

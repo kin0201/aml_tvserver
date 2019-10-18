@@ -7,7 +7,7 @@
  * Description: c++ file
  */
 
-#define LOG_TAG "SystemControl"
+#define LOG_MOUDLE_TAG "TV"
 #define LOG_CLASS_TAG "CEpool"
 
 #include "CEpoll.h"
