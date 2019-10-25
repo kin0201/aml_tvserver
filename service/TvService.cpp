@@ -190,6 +190,7 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
     int eventType = CTvEvent::TV_EVENT_SIGLE_DETECT;
     TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
     dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &eventType);
+    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &signalDetectEvent->mSourceInput);
     dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mFmt));
     dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mTrans_fmt));
     dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mStatus));

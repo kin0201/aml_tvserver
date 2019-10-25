@@ -1,6 +1,7 @@
 #include <dbus/dbus.h>
+#include <map>
+#include <memory>
 
-#include "tvcmd.h"
 #include "common.h"
 #include "CTvEvent.h"
 
@@ -19,8 +20,7 @@ public:
 
     TvClient();
     ~TvClient();
-    TvClient *ConnectToTvClient();
-    int DisConnectToTvClient();
+    static TvClient *GetInstance();
     int setTvClientObserver(TvClientIObserver *observer);
     int StartTv(tv_source_input_t source);
     int StopTv(tv_source_input_t source);
@@ -35,9 +35,8 @@ private:
     static int HandSignalDetectEvent(DBusMessageIter messageIter);
     int SendTvClientEvent(CTvEvent &event);
 
-    static TvClient *mStaticTvClient;
     DBusConnection *mpDBusConnection = NULL;
-    TvClientIObserver *mpTvClientObserver = NULL;
+    std::map<int, TvClientIObserver *> mTvClientObserver;
 };
 #ifdef __cplusplus
 }

@@ -62,12 +62,14 @@ namespace  TvEvent {
     public:
         SignalDetectEvent() : CTvEvent(CTvEvent::TV_EVENT_SIGLE_DETECT)
         {
+            mSourceInput = 0;
             mFmt = 0;
             mTrans_fmt = 0;
             mStatus = 0;
             mDviFlag = 0;
         }
         ~SignalDetectEvent() {}
+        int mSourceInput;
         int mFmt;
         int mTrans_fmt;
         int mStatus;

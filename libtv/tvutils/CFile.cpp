@@ -94,13 +94,13 @@ int CFile::copyTo(const char *dstPath)
     int dstFd;
     if (mFd == -1) {
         if ((mFd = open(mPath, O_RDONLY)) == -1) {
-            LOGE("Open %s Error:%s/n", mPath, strerror(errno));
+            LOGE("Open %s Error:%s.\n", mPath, strerror(errno));
             return -1;
         }
     }
 
     if ((dstFd = open(dstPath, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
-        LOGE("Open %s Error:%s/n", dstPath, strerror(errno));
+        LOGE("Open %s Error:%s.\n", dstPath, strerror(errno));
     }
 
     int bytes_read, bytes_write;
@@ -148,7 +148,7 @@ int CFile::delFile(const char *path)
 {
     if (strlen(path) <= 0) return -1;
     if (unlink(path) != 0) {
-        LOGE("delete file(%s) err=%s", path, strerror(errno));
+        LOGE("delete file(%s) err=%s.\n", path, strerror(errno));
         return -1;
     }
     return 0;
@@ -158,7 +158,7 @@ int CFile::delFile()
 {
     if (strlen(mPath) <= 0) return -1;
     if (unlink(mPath) != 0) {
-        LOGE("delete file(%s) err=%s", mPath, strerror(errno));
+        LOGE("delete file(%s) err=%s.\n", mPath, strerror(errno));
         return -1;
     }
     return 0;
@@ -171,7 +171,7 @@ int  CFile::getFileAttrValue(const char *path)
 
     int fd = open(path, O_RDONLY);
     if (fd <= 0) {
-        LOGE("open (%s)ERROR!! error = -%s- \n", path, strerror(errno));
+        LOGE("open (%s)ERROR!! error = -%s.\n", path, strerror(errno));
     }
     char tmp[8];
     read(fd, tmp, sizeof(tmp));
@@ -197,7 +197,7 @@ int CFile::getFileAttrStr(const char *path, char *str)
 {
     int fd = open(path, O_RDONLY);
     if (fd <= 0) {
-        LOGE("open (%s)ERROR!! error = -%s- \n", path, strerror(errno));
+        LOGE("open (%s)ERROR!! error = -%s.\n", path, strerror(errno));
     }
     char tmp[BUFFER_SIZE] = {0};
     read(fd, tmp, sizeof(tmp));

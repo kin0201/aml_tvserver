@@ -123,7 +123,7 @@ int CConfigFile::SaveToFile(const char *filename)
 
     if (filename == NULL) {
         if (strlen(mpFileName) == 0) {
-            LOGE("error save file is null");
+            LOGE("error save file is null.\n");
             return -1;
         } else {
             filepath = mpFileName;

@@ -114,7 +114,7 @@ int CIniFile::SaveToFile(const char *filename)
 
     if (filename == NULL) {
         if (strlen(mpFileName) == 0) {
-            LOGE("error save file is null");
+            LOGE("error save file is null.\n");
             return -1;
         } else {
             filepath = mpFileName;
@@ -124,7 +124,7 @@ int CIniFile::SaveToFile(const char *filename)
     }
 
     if ((pFile = fopen (filepath, "wb")) == NULL) {
-        LOGE("%s: open %s error(%s)", __FUNCTION__, filepath, strerror(errno));
+        LOGE("%s: open %s error(%s).\n", __FUNCTION__, filepath, strerror(errno));
         return -1;
     }
 
@@ -307,7 +307,7 @@ SECTION *CIniFile::getSection(const char *section)
         if (strncmp((psec->pLine->Text) + 1, section, strlen(section)) == 0)
             return psec;
     }
-    LOGE("not find section: %s", section);
+    LOGE("not find section: %s.\n", section);
     return NULL;
 }
 

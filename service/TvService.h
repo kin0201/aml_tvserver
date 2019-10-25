@@ -12,7 +12,6 @@
 
 #include <dbus/dbus.h>
 #include "CTv.h"
-#include "tvcmd.h"
 
 class TvService: public CTv::TvIObserver {
 public:
@@ -27,7 +26,6 @@ private:
     int SendSignalForSourceConnectEvent(CTvEvent &event);
     int ParserTvCommand(char *commandData);
 
-    //static TvService *mInstance;
     CTv *mpTv;
     DBusConnection *mpTvServiceConnection;
 

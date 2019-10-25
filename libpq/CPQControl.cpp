@@ -2061,7 +2061,7 @@ int CPQControl::Cpq_LoadGamma(vpp_gamma_curve_t gamma_curve)
     ret |= mPQdb->PQ_GetGammaSpecialTable(gamma_curve, "Blue", &gamma_b);
 
     if (ret < 0) {
-        LOGE("%s, PQ_GetGammaSpecialTable failed!", __FUNCTION__);
+        LOGE("%s, PQ_GetGammaSpecialTable failed!\n", __FUNCTION__);
     } else {
         Cpq_SetGammaTbl_R((unsigned short *) gamma_r.data);
         Cpq_SetGammaTbl_G((unsigned short *) gamma_g.data);
@@ -3493,7 +3493,7 @@ int CPQControl::SetColorBaseMode(vpp_color_basemode_t basemode, int isSave)
     LOGD("%s: mode is %d\n", __FUNCTION__, basemode);
     int ret = Cpq_SetColorBaseMode(basemode, mCurentSourceInputInfo);
     if (ret < 0) {
-        LOGE("Cpq_SetColorBaseMode Failed!!!");
+        LOGE("Cpq_SetColorBaseMode Failed!\n");
     } else {
         if (isSave == 1) {
             ret = SaveColorBaseMode(basemode);

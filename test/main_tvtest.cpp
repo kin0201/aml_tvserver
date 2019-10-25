@@ -16,7 +16,7 @@ class TvTest: public TvClient::TvClientIObserver {
 public:
     TvTest()
     {
-        mpTvClient = new TvClient();
+        mpTvClient = TvClient::GetInstance();
         mpTvClient->setTvClientObserver(this);
     }
 
@@ -32,7 +32,8 @@ public:
         switch (eventType) {
         case CTvEvent::TV_EVENT_SIGLE_DETECT: {
             TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
-            LOGD("%s: signalFmt: %d, transFmt: %d, status: %d, isDVI: %d.\n", __FUNCTION__,
+            LOGD("%s: source: %d, signalFmt: %d, transFmt: %d, status: %d, isDVI: %d.\n", __FUNCTION__,
+                                                       signalDetectEvent->mSourceInput,
                                                        signalDetectEvent->mFmt,
                                                        signalDetectEvent->mTrans_fmt,
                                                        signalDetectEvent->mStatus,

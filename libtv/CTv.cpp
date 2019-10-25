@@ -191,6 +191,7 @@ void CTv::onSigToStable()
 
     //send signal to apk
     TvEvent::SignalDetectEvent event;
+    event.mSourceInput = mCurrentSource;
     event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
     event.mStatus = mCurrentSignalInfo.status;
@@ -212,6 +213,7 @@ void CTv::onSigToUnSupport()
 
     mpTvin->Tvin_StopDecoder();
     TvEvent::SignalDetectEvent event;
+    event.mSourceInput = mCurrentSource;
     event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
     event.mStatus = mCurrentSignalInfo.status;
@@ -226,6 +228,7 @@ void CTv::onSigToNoSig()
 
     mpTvin->Tvin_StopDecoder();
     TvEvent::SignalDetectEvent event;
+    event.mSourceInput = mCurrentSource;
     event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
     event.mStatus = mCurrentSignalInfo.status;
