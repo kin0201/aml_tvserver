@@ -23,14 +23,14 @@ int _log_print(const char *moudle_tag, const char *level_tag, const char *class_
     clock_gettime(CLOCK_MONOTONIC, &time);  //the nses from 1970 to current
     tm nowTime;
     localtime_r(&time.tv_sec, &nowTime);
-    sprintf(timeBuf, "%04d-%02d-%02d %02d:%02d:%02d:%03d", nowTime.tm_year + 1900, nowTime.tm_mon+1, nowTime.tm_mday,
+    sprintf(timeBuf, "%04d-%02d-%02d %02d:%02d:%02d:%03ld", nowTime.tm_year + 1900, nowTime.tm_mon+1, nowTime.tm_mday,
             nowTime.tm_hour, nowTime.tm_min, nowTime.tm_sec, time.tv_nsec/1000000);
 
     va_list ap;
     va_start(ap, fmt);
     vsnprintf(buf, DEFAULT_LOG_BUFFER_LEN, fmt, ap);
 
-    return printf("%s %ld %ld %s %s [%s]: %s", timeBuf,
+    return printf("%s %d %ld %s %s [%s]: %s", timeBuf,
                                                 getpid(),
                                                 syscall(SYS_gettid),
                                                 level_tag,
