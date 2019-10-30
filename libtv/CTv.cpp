@@ -55,6 +55,9 @@ int CTv::StartTv(tv_source_input_t source)
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     ret = mpTvin->Tvin_OpenPort(source_port);
     mCurrentSource = source;
+#ifdef HAVE_AUDIO
+    CTvAudio::getInstance()->create_audio_patch(mapSourcetoAudiotupe(source));
+#endif
     return ret;
 }
 
@@ -72,7 +75,9 @@ int CTv::StopTv(tv_source_input_t source)
     tempSignalInfo.fps = 60;
     tempSignalInfo.is_dvi = 0;
     SetCurrenSourceInfo(tempSignalInfo);
-
+#ifdef HAVE_AUDIO
+    CTvAudio::getInstance()->release_audio_patch();
+#endif
     mpTvin->Tvin_StopDecoder();
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     return mpTvin->Tvin_ClosePort(source_port);
@@ -248,3 +253,33 @@ int CTv::sendTvEvent(CTvEvent &event)
 
     return 0;
 }
+
+#ifdef HAVE_AUDIO
+int CTv::mapSourcetoAudiotupe(tv_source_input_t dest_source)
+{
+    int ret = -1;
+    switch (dest_source) {
+        case SOURCE_TV:
+        case SOURCE_DTV:
+            ret = AUDIO_DEVICE_IN_TV_TUNER;
+            break;
+        case SOURCE_AV1:
+        case SOURCE_AV2:
+            ret = AUDIO_DEVICE_IN_LINE;
+            break;
+        case SOURCE_HDMI1:
+        case SOURCE_HDMI2:
+        case SOURCE_HDMI3:
+        case SOURCE_HDMI4:
+            ret = AUDIO_DEVICE_IN_HDMI;
+            break;
+        case SOURCE_SPDIF:
+            ret = AUDIO_DEVICE_IN_SPDIF;
+            break;
+        default:
+            ret = AUDIO_DEVICE_IN_LINE;
+            break;
+    }
+    return ret;
+}
+#endif

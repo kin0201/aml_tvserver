@@ -3,6 +3,9 @@
 #include "CTvDevicesPollDetect.h"
 #include "CTvEvent.h"
 #include "CHDMIRxManager.h"
+#ifdef HAVE_AUDIO
+#include "CTvAudio.h"
+#endif
 
 
 #define CONFIG_FILE_PATH_DEF     "/ventor/etc/tvconfig/tvconfig.conf"
@@ -38,6 +41,9 @@ private:
     void onSigToUnSupport();
     void onSigToNoSig();
     int  sendTvEvent(CTvEvent &event);
+#ifdef HAVE_AUDIO
+    int mapSourcetoAudiotupe(tv_source_input_t dest_source);
+#endif
 
     CTvin *mpTvin;
     CHDMIRxManager *mpHDMIRxManager;
