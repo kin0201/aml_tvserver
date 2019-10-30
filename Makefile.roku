@@ -85,7 +85,7 @@ INCLUDES += \
 	-I$(LOCAL_PATH)/libtv \
 	-I$(LOCAL_PATH)/libtv/tvutils \
 	-I$(LOCAL_PATH)/libpq \
-	-I$(ROKU_3PARTY_INCLUDE_DIRS)
+	-I$(ROKU_3PARTY_INCLUDE_DIRS)/../usr/include
 
 ALL_SRCS = $(pq_SRCS) $(tv_SRCS) $(tvclient_SRCS) $(tvservice_SRCS) $(tvtest_SRCS)
 
