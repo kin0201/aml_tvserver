@@ -258,7 +258,7 @@ public:
     int Tvin_CheckVideoPathComplete(tv_path_type_t path_type);
     int Tvin_AddVideoPath(int selPath);
     int Tvin_RemoveVideoPath(tv_path_type_t pathtype);
-
+    void Tvin_LoadSourceInputToPortMap(void);
     tv_source_input_type_t Tvin_SourcePortToSourceInputType(tvin_port_t source_port);
     tv_source_input_type_t Tvin_SourceInputToSourceInputType(tv_source_input_t source_input);
     tvin_port_t Tvin_GetSourcePortBySourceType(tv_source_input_type_t source_type);
@@ -286,8 +286,6 @@ private:
     int AFE_OpenModule(void);
     int AFE_CloseModule(void );
     int AFE_DeviceIOCtl(int request, ...);
-
-    void Tvin_LoadSourceInputToPortMap(void);
 
 private:
     static CTvin *mInstance;

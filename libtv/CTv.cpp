@@ -13,10 +13,11 @@
 CTv::CTv()
 {
     mpObserver = NULL;
+    LoadConfigFile(CONFIG_FILE_PATH_DEF);
     mpTvin = CTvin::getInstance();
     mpTvin->Tvin_AddVideoPath(TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
+    mpTvin->Tvin_LoadSourceInputToPortMap();
     mpHDMIRxManager = new CHDMIRxManager();
-    LoadConfigFile(CONFIG_FILE_PATH_DEF);
     tvin_info_t signalInfo;
     signalInfo.trans_fmt = TVIN_TFMT_2D;
     signalInfo.fmt = TVIN_SIG_FMT_NULL;

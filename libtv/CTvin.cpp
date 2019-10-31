@@ -40,24 +40,10 @@ CTvin *CTvin::getInstance()
 CTvin::CTvin()
 {
     mDecoderStarted = false;
-    //Tvin_LoadSourceInputToPortMap();
-    mSourceInputToPortMap[SOURCE_TV] = TVIN_PORT_CVBS3;
-    mSourceInputToPortMap[SOURCE_AV1] = TVIN_PORT_CVBS1;
-    mSourceInputToPortMap[SOURCE_AV2] = TVIN_PORT_CVBS2;
-    mSourceInputToPortMap[SOURCE_YPBPR1] = TVIN_PORT_COMP0;
-    mSourceInputToPortMap[SOURCE_YPBPR2] = TVIN_PORT_COMP1;
-    mSourceInputToPortMap[SOURCE_HDMI1] = TVIN_PORT_HDMI0;
-    mSourceInputToPortMap[SOURCE_HDMI2] = TVIN_PORT_HDMI2;
-    mSourceInputToPortMap[SOURCE_HDMI3] = TVIN_PORT_HDMI1;
-    mSourceInputToPortMap[SOURCE_HDMI4] = TVIN_PORT_HDMI3;
-    mSourceInputToPortMap[SOURCE_VGA] = TVIN_PORT_VGA0;
-    mSourceInputToPortMap[SOURCE_MPEG] = TVIN_PORT_MPEG0;
-    mSourceInputToPortMap[SOURCE_DTV] = TVIN_PORT_DTV;
-    mSourceInputToPortMap[SOURCE_IPTV] = TVIN_PORT_BT656;
-    mSourceInputToPortMap[SOURCE_SPDIF] = TVIN_PORT_CVBS3;
     mVdin0DevFd = VDIN_OpenModule();
     mAfeDevFd = AFE_OpenModule();
     memset(&mTvinParam, 0, sizeof(tvin_parm_t));
+    memset(mSourceInputToPortMap, SOURCE_INVALID, SOURCE_MAX);
 }
 
 CTvin::~CTvin()
