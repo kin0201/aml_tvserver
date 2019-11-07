@@ -152,3 +152,4 @@ install:
 	cp $(OUT_ROOT)/libtv.so  $(DESTDIR)/usr/lib/
 	mkdir -p $(DESTDIR)/usr/bin
 	cp $(OUT_ROOT)/tvservice  $(DESTDIR)/usr/bin/
+	cp $(OUT_ROOT)/tvtest  $(DESTDIR)/usr/bin/
