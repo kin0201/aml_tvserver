@@ -9,6 +9,7 @@
 #include "TvService.h"
 #include "common.h"
 #include "CTvLog.h"
+#include "CPQControl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +29,7 @@ TvService::TvService() {
     if (mpTvServiceConnection != NULL) {
         mpTv = new CTv();
         mpTv->setTvObserver(this);
+        mpPQcontrol = CPQControl::GetInstance();
     } else {
         LOGE("connect to d-bus failed!\n");
     }
@@ -206,18 +208,18 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
 int TvService::ParserTvCommand(char *commandData)
 {
     int ret = 0;
-    const char *delim = ".";
-    char *temp = strtok(commandData, delim);
+    const char *delimitation = ".";
+    char *temp = strtok(commandData, delimitation);
     LOGD("%s: cmdType = %s\n", __FUNCTION__, temp);
     if (strcmp(temp, "source") == 0) {
         LOGD("%s: source cmd!\n", __FUNCTION__);
-        temp = strtok(NULL, delim);
+        temp = strtok(NULL, delimitation);
         if (strcmp(temp, "start") == 0) {
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             tv_source_input_t startSource = (tv_source_input_t)atoi(temp);
             ret = mpTv->StartTv(startSource);
         } else if (strcmp(temp, "stop") == 0){
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             tv_source_input_t stopSource = (tv_source_input_t)atoi(temp);
             ret = mpTv->StopTv(stopSource);
         } else {
@@ -225,17 +227,34 @@ int TvService::ParserTvCommand(char *commandData)
         }
     } else if (strcmp(temp, "edid") == 0) {
         LOGD("%s: EDID cmd!\n", __FUNCTION__);
-        temp = strtok(NULL, delim);
+        temp = strtok(NULL, delimitation);
         if (strcmp(temp, "set") == 0) {
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             ret = mpTv->UpdateEDID(setSource, temp);
         } else if (strcmp(temp, "get") == 0) {
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
-            temp = strtok(NULL, delim);
+            temp = strtok(NULL, delimitation);
             ret = mpTv->getEDIDData(getSource, temp);
+        } else {
+            LOGD("%s: invalid cmd!\n", __FUNCTION__);
+            ret = 0;
+        }
+    } else if (strcmp(temp, "pq") == 0){
+        LOGD("%s: PQ cmd!\n", __FUNCTION__);
+        temp = strtok(NULL, delimitation);
+        if (strcmp(temp, "set") == 0) {
+            temp = strtok(NULL, delimitation);
+            int moudleID = atoi(temp);
+            temp = strtok(NULL, delimitation);
+            int value = atoi(temp);
+            ret = mpPQcontrol->ParserSetCmd(moudleID, value);
+        } else if (strcmp(temp, "get") == 0) {
+            temp = strtok(NULL, delimitation);
+            int moudleID = atoi(temp);
+            ret = mpPQcontrol->ParserGetCmd(moudleID);
         } else {
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
             ret = 0;

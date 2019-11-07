@@ -26,6 +26,25 @@ public:
     int StopTv(tv_source_input_t source);
     int SetEdidData(tv_source_input_t source, char *dataBuf);
     int GetEdidData(tv_source_input_t source,char *dataBuf);
+    int SetPictureMode(int pictureMode);
+    int GetPictureMode();
+    int SetBacklight(int backlightValue);
+    int GetBacklight();
+    int SetBrightness(int brightnessValue);
+    int GetBrightness();
+    int SetContrast(int contrastValue);
+    int GetContrast();
+    int SetSharpness(int sharpnessValue);
+    int GetSharpness();
+    int SetSaturation(int saturationValue);
+    int GetSaturation();
+    int SetHue(int hueValue);
+    int GetHue();
+    int SetColorTemperature(int colorTemperatureValue);
+    int GetColorTemperature();
+    int SetAspectRatio(int aspectRatioValue);
+    int GetAspectRatio();
+
 private:
     DBusConnection *ClientBusInit();
     int SendMethodCall(char *CmdString);

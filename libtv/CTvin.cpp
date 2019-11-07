@@ -43,7 +43,7 @@ CTvin::CTvin()
     mVdin0DevFd = VDIN_OpenModule();
     mAfeDevFd = AFE_OpenModule();
     memset(&mTvinParam, 0, sizeof(tvin_parm_t));
-    memset(mSourceInputToPortMap, SOURCE_INVALID, SOURCE_MAX);
+    memset(mSourceInputToPortMap, SOURCE_INVALID, sizeof(mSourceInputToPortMap));
 }
 
 CTvin::~CTvin()

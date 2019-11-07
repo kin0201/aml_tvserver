@@ -9,6 +9,7 @@
 
 #include "TvClient.h"
 #include "CTvClientLog.h"
+#include "tvcmd.h"
 
 const int RET_SUCCESS = 0;
 const int RET_FAILED  = -1;
@@ -133,7 +134,7 @@ int TvClient::SendMethodCall(char *CmdString)
     LOGE("TvClient: ret = %d\n",ReturnVal);
     dbus_message_unref(msg);
 
-    return RET_SUCCESS;
+    return ReturnVal;
 }
 
 int TvClient::SendTvClientEvent(CTvEvent &event)
@@ -289,14 +290,14 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
 
 int TvClient::StartTv(tv_source_input_t source) {
     LOGD("%s\n", __FUNCTION__);
-    char buf[32];
+    char buf[32] = {0};
     sprintf(buf, "source.start.%d", source);
     return SendMethodCall(buf);
 }
 
 int TvClient::StopTv(tv_source_input_t source) {
     LOGD("%s\n", __FUNCTION__);
-    char buf[32];
+    char buf[32] = {0};
     sprintf(buf, "source.stop.%d", source);
     return SendMethodCall(buf);
 }
@@ -304,7 +305,7 @@ int TvClient::StopTv(tv_source_input_t source) {
 int TvClient::SetEdidData(tv_source_input_t source, char *dataBuf)
 {
     LOGD("%s\n", __FUNCTION__);
-    char buf[512];
+    char buf[512] = {0};
     sprintf(buf, "edid.set.%d.%s", source, dataBuf);
     return SendMethodCall(buf);
 }
@@ -312,7 +313,151 @@ int TvClient::SetEdidData(tv_source_input_t source, char *dataBuf)
 int TvClient::GetEdidData(tv_source_input_t source, char *dataBuf)
 {
     LOGD("%s\n", __FUNCTION__);
-    char buf[512];
+    char buf[512] = {0};
     sprintf(buf, "edid.get.%d.%s", source, dataBuf);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetPictureMode(int pictureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_PICTURE_MODE, pictureMode);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetPictureMode()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_PICTURE_MODE);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetBacklight(int backlightValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_BACKLIGHT, backlightValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetBacklight()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_BACKLIGHT);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetBrightness(int brightnessValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_BRIGHTNESS, brightnessValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetBrightness()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_BRIGHTNESS);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetContrast(int contrastValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_CONTRAST, contrastValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetContrast()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_CONTRAST);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetSharpness(int sharpnessValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_SHARPNESS, sharpnessValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetSharpness()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_SHARPNESS);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetSaturation(int saturationValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_SATUATION, saturationValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetSaturation()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_SATUATION);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetHue(int hueValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_HUE, hueValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetHue()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_HUE);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetColorTemperature(int colorTemperatureValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_COLOR_TEMPERATURE_MODE, colorTemperatureValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetColorTemperature()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_COLOR_TEMPERATURE_MODE);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetAspectRatio(int aspectRatioValue)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.set.%d.%d", PQ_SET_ASPECT_RATIO, aspectRatioValue);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetAspectRatio()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pq.get.%d", PQ_GET_ASPECT_RATIO);
     return SendMethodCall(buf);
 }

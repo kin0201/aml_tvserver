@@ -23,6 +23,7 @@
 #include <dlfcn.h>
 
 #include "CPQControl.h"
+#include "tvcmd.h"
 
 #define PI 3.14159265358979
 CPQControl *CPQControl::mInstance = NULL;
@@ -597,7 +598,7 @@ int CPQControl::Cpq_SetDIModuleParam(source_input_param_t source_input_param)
     return ret;
 }
 
-int CPQControl::SetPQMode(int pq_mode, int is_save , int is_autoswitch)
+int CPQControl::SetPQMode(int pq_mode, int is_save)
 {
     LOGD("%s, source: %d, pq_mode: %d\n", __FUNCTION__, mCurentSourceInputInfo.source_input, pq_mode);
     int ret = -1;
@@ -607,11 +608,7 @@ int CPQControl::SetPQMode(int pq_mode, int is_save , int is_autoswitch)
         LOGD("Same PQ mode,no need set again!\n");
         ret = 0;
     } else {
-        if (is_autoswitch) {
-            ret = Cpq_SetPQMode((vpp_picture_mode_t)pq_mode, mCurentSourceInputInfo);
-        } else {
-            ret = Cpq_SetPQMode((vpp_picture_mode_t)pq_mode, mCurentSourceInputInfo);
-        }
+        ret = Cpq_SetPQMode((vpp_picture_mode_t)pq_mode, mCurentSourceInputInfo);
     }
 
     if ((ret == 0) && (is_save == 1)) {
@@ -4246,6 +4243,87 @@ int CPQControl::SetDtvKitSourceEnable(bool isEnable)
 {
     mbDtvKitEnable = isEnable;
     return 0;
+}
+
+int CPQControl::ParserSetCmd(int moudleId, int setValue)
+{
+    int ret = 0;
+    if ((moudleId < PQ_MOUDLE_CMD_START) || (moudleId > PQ_MOUDLE_CMD_MAX)) {
+        LOGE("%s: invalid PQ cmd!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        switch (moudleId) {
+        case PQ_SET_PICTURE_MODE:
+            ret = SetPQMode(setValue, 0);
+            break;
+        case PQ_SET_BRIGHTNESS:
+            ret = SetBrightness(setValue, 0);
+            break;
+        case PQ_SET_CONTRAST:
+            ret = SetContrast(setValue, 0);
+            break;
+        case PQ_SET_SATUATION:
+            ret = SetSaturation(setValue, 0);
+            break;
+        case PQ_SET_HUE:
+            ret = SetHue(setValue, 0);
+            break;
+        case PQ_SET_SHARPNESS:
+            ret = SetSharpness(setValue, 0, 0);
+            break;
+        case PQ_SET_ASPECT_RATIO:
+            ret = SetDisplayMode((vpp_display_mode_t)setValue, 0);
+            break;
+        case PQ_SET_COLOR_TEMPERATURE_MODE:
+            ret = SetColorTemperature(setValue, 0);
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ret;
+}
+
+int CPQControl::ParserGetCmd(int moudleId)
+{
+    LOGD("%s: get %d value.\n", __FUNCTION__, moudleId);
+    int ret = 0;
+    if ((moudleId < PQ_MOUDLE_CMD_START) || (moudleId > PQ_MOUDLE_CMD_MAX)) {
+        LOGE("%s: invalid PQ cmd!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        switch (moudleId) {
+        case PQ_GET_PICTURE_MODE:
+            ret = GetPQMode();
+            break;
+        case PQ_GET_BRIGHTNESS:
+            ret = GetBrightness();
+            break;
+        case PQ_GET_CONTRAST:
+            ret = GetContrast();
+            break;
+        case PQ_GET_SATUATION:
+            ret = GetSaturation();
+            break;
+        case PQ_GET_HUE:
+            ret = GetHue();
+            break;
+        case PQ_GET_SHARPNESS:
+            ret = GetSharpness();
+            break;
+        case PQ_GET_ASPECT_RATIO:
+            ret = GetDisplayMode();
+            break;
+        case PQ_GET_COLOR_TEMPERATURE_MODE:
+            ret = GetColorTemperature();
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ret;
 }
 
 void CPQControl::resetAllUserSettingParam()

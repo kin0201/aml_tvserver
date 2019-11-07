@@ -12,6 +12,7 @@
 
 #include <dbus/dbus.h>
 #include "CTv.h"
+#include "CPQControl.h"
 
 class TvService: public CTv::TvIObserver {
 public:
@@ -27,6 +28,7 @@ private:
     int ParserTvCommand(char *commandData);
 
     CTv *mpTv;
+    CPQControl *mpPQcontrol;
     DBusConnection *mpTvServiceConnection;
 
 };

@@ -140,7 +140,7 @@ public:
     int ResetLastPQSettingsSourceType(void);
     int BacklightInit(void);
     //PQ mode
-    int SetPQMode(int pq_mode, int is_save, int is_autoswitch);
+    int SetPQMode(int pq_mode, int is_save);
     int GetPQMode(void);
     int SavePQMode(int pq_mode);
     int Cpq_SetPQMode(vpp_picture_mode_t pq_mode, source_input_param_t source_input_param);
@@ -328,6 +328,9 @@ public:
     tvpq_databaseinfo_t GetDBVersionInfo(db_name_t name);
     int SetCurrentHdrInfo (int hdrInfo);
     int SetDtvKitSourceEnable(bool isEnable);
+
+    int ParserSetCmd(int moudleId, int setValue);
+    int ParserGetCmd(int moudleId);
 
 private:
     int VPPOpenModule(void);
