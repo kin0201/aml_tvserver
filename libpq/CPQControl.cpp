@@ -4279,7 +4279,7 @@ int CPQControl::ParserSetCmd(int moudleId, int setValue)
             ret = SetColorTemperature(setValue, 0);
             break;
         case PQ_SET_BACKLIGHT:
-            ret = SetBacklight(setValue, 0);
+            ret = SetBacklight(setValue, 1);
             break;
         default:
             break;

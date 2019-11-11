@@ -146,7 +146,7 @@ void *CDynamicBackLight::dynamicBacklightThread(void* data)
 
 void *CDynamicBackLight::threadLoop(void)
 {
-    if (mpObserver != NULL) {
+    if (mpObserver == NULL) {
         LOGD ("%s: mpObserver is null.\n", __FUNCTION__);
         return NULL;
     } else {
