@@ -4247,6 +4247,7 @@ int CPQControl::SetDtvKitSourceEnable(bool isEnable)
 
 int CPQControl::ParserSetCmd(int moudleId, int setValue)
 {
+    LOGD("%s: set %d to %d.\n", __FUNCTION__, moudleId, setValue);
     int ret = 0;
     if ((moudleId < PQ_MOUDLE_CMD_START) || (moudleId > PQ_MOUDLE_CMD_MAX)) {
         LOGE("%s: invalid PQ cmd!\n", __FUNCTION__);
@@ -4276,6 +4277,9 @@ int CPQControl::ParserSetCmd(int moudleId, int setValue)
             break;
         case PQ_SET_COLOR_TEMPERATURE_MODE:
             ret = SetColorTemperature(setValue, 0);
+            break;
+        case PQ_SET_BACKLIGHT:
+            ret = SetBacklight(setValue, 0);
             break;
         default:
             break;
@@ -4317,6 +4321,9 @@ int CPQControl::ParserGetCmd(int moudleId)
             break;
         case PQ_GET_COLOR_TEMPERATURE_MODE:
             ret = GetColorTemperature();
+            break;
+        case PQ_GET_BACKLIGHT:
+            ret = GetBacklight();
             break;
         default:
             break;

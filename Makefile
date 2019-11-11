@@ -102,7 +102,7 @@ libtv.so: $(tv_SRCS) libpq.so
 
 tvservice: $(tvservice_SRCS) libtv.so libpq.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) \
-	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils \
+	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils -I$(LOCAL_PATH)/libpq \
 	-L$(LOCAL_PATH) -ltv -L$(LOCAL_PATH) -lpq -o $@ $^ $(LDLIBS)
 
 tvtest: $(tvtest_SRCS) libtvclient.so
