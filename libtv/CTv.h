@@ -20,6 +20,14 @@
 
 #define HDMI_EDID14_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_14.bin"
 #define HDMI_EDID20_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_20.bin"
+#define VIDEO_DISABLE_VIDEO      "/sys/class/video/disable_video"
+
+typedef enum video_layer_status_e {
+    VIDEO_LAYER_STATUS_ENABLE,
+    VIDEO_LAYER_STATUS_DISABLE,
+    VIDEO_LAYER_STATUS_ENABLE_AND_CLEAN,
+    VIDEO_LAYER_STATUS_MAX,
+} videolayer_status_t;
 
 class CTv : public CTvDevicesPollDetect::ISourceConnectObserver {
 public:
@@ -48,7 +56,8 @@ private:
     void onSigToUnstable();
     void onSigToUnSupport();
     void onSigToNoSig();
-    int  sendTvEvent(CTvEvent &event);
+    int sendTvEvent(CTvEvent &event);
+    int setVideoLayerStatus(videolayer_status_t status);
 #ifdef HAVE_AUDIO
     int mapSourcetoAudiotupe(tv_source_input_t dest_source);
 #endif
