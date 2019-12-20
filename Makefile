@@ -8,8 +8,8 @@ DBUS_HEADER_DIR = $(STAGING_DIR)/usr/include/dbus-1.0
 LOCAL_PATH = $(shell pwd)
 LDFLAGS += -lstdc++ -lpthread -lz -ldl -lrt -L$(DBUS_LIB_DIR) -ldbus-1
 CFLAGS += -Wall -Wno-unknown-pragmas -Wno-format \
-          -O3 -fexceptions -fnon-call-exceptions -D_GNU_SOURCE -I$(DBUS_HEADER_DIR) \
-		  -I$(DBUS_LIB_DIR)/dbus-1.0/include
+          -O3 -fexceptions -fnon-call-exceptions -D_GNU_SOURCE -DHAVE_AUDIO -I$(DBUS_HEADER_DIR) \
+		  -I$(DBUS_LIB_DIR)/dbus-1.0/include -I$(STAGING_DIR)/usr/include
 
 ################################################################################
 # libpq.so - src files
@@ -54,6 +54,7 @@ tv_SRCS  = \
 	$(LOCAL_PATH)/libtv/CTv.cpp \
 	$(LOCAL_PATH)/libtv/CTvin.cpp \
 	$(LOCAL_PATH)/libtv/CTvDevicesPollDetect.cpp \
+	$(LOCAL_PATH)/libtv/CTvAudio.cpp \
 	$(NULL)
 
 ################################################################################
@@ -98,12 +99,12 @@ libpq.so: $(pq_SRCS)
 
 libtv.so: $(tv_SRCS) libpq.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(tvclient_HEADERS) -I$(LOCAL_PATH)/libpq \
-	-I$(LOCAL_PATH)/libtv/tvutils -L$(LOCAL_PATH) -lpq -o $@ $^ $(LDLIBS)
+	-I$(LOCAL_PATH)/libtv/tvutils -L$(LOCAL_PATH) -lpq -laudio_client -o $@ $^ $(LDLIBS)
 
 tvservice: $(tvservice_SRCS) libtv.so libpq.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) \
 	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils -I$(LOCAL_PATH)/libpq \
-	-L$(LOCAL_PATH) -ltv -L$(LOCAL_PATH) -lpq -o $@ $^ $(LDLIBS)
+	-L$(LOCAL_PATH) -ltv -L$(LOCAL_PATH) -lpq -laudio_client -o $@ $^ $(LDLIBS)
 
 tvtest: $(tvtest_SRCS) libtvclient.so
 	$(CC) $(CFLAGS) -I$(tvclient_HEADERS) -L$(LOCAL_PATH) \

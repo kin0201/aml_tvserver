@@ -100,7 +100,7 @@ int TvService::TvServiceHandleMessage()
             continue;
         }
 
-        LOGD("%s: path: %s\n", __FUNCTION__, dbus_message_get_path (msg));
+        //LOGD("%s: path: %s\n", __FUNCTION__, dbus_message_get_path (msg));
         if (dbus_message_is_method_call(msg, "aml.tv", "cmd")) {
             DBusMessage *rp;
             DBusMessageIter r_arg;
@@ -129,9 +129,9 @@ int TvService::TvServiceHandleMessage()
             }
             dbus_connection_flush(mpTvServiceConnection);
             dbus_message_unref(rp);
-        } else {
+        } /*else {
             LOGE("%s: Not TV client method call!\n", __FUNCTION__);
-        }
+        }*/
         dbus_message_unref(msg);
     }
     //dbus_bus_remove_match();

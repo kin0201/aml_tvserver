@@ -6,6 +6,9 @@
  *
  * Description:
  */
+#ifndef TVCLIENT_H
+#define TVCLIENT_H
+
 #include <dbus/dbus.h>
 #include <map>
 #include <memory>
@@ -67,4 +70,5 @@ private:
 };
 #ifdef __cplusplus
 }
+#endif
 #endif
