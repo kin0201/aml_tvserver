@@ -22,6 +22,7 @@
 
 class TvTest: public TvClient::TvClientIObserver {
 public:
+    tv_source_input_t CurrentSource;
     TvTest()
     {
         mpTvClient = TvClient::GetInstance();
@@ -32,7 +33,6 @@ public:
     {
 
     }
-
     void onTvClientEvent(CTvEvent &event)
     {
         int eventType = event.getEventType();
@@ -64,9 +64,9 @@ public:
     int SendCmd(const char *data) {
         LOGD("%s: cmd is %s.\n", __FUNCTION__, data);
         if (strcmp(data, "start") == 0) {
-            mpTvClient->StartTv(SOURCE_HDMI1);
+            mpTvClient->StartTv(CurrentSource);
         } else if (strcmp(data, "stop") == 0) {
-            mpTvClient->StopTv(SOURCE_HDMI1);
+            mpTvClient->StopTv(CurrentSource);
         } else {
             LOGE("invalid cmd!\n");
         }
@@ -109,9 +109,10 @@ int main(int argc, char **argv) {
     char Command[1];
     int run = 1;
     DisplayInit();
+    test->CurrentSource=SOURCE_HDMI1;
 
     LOGD("#### please select cmd####\n");
-    LOGD("#### select s to start####\n");
+    LOGD("#### select 1/2/3 to start####\n");
     LOGD("#### select q to stop####\n");
     LOGD("##########################\n");
     while (run) {
@@ -123,10 +124,28 @@ int main(int argc, char **argv) {
             run = 0;
             break;
           }
-          case 's': {
+          case '1': {
+              test->SendCmd("stop");
+              SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
+              test->CurrentSource=SOURCE_HDMI1;
               test->SendCmd("start");
               break;
           }
+         case '2': {
+              test->SendCmd("stop");
+              SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
+              test->CurrentSource=SOURCE_HDMI2;
+              test->SendCmd("start");
+              break;
+          }
+          case '3': {
+              test->SendCmd("stop");
+              SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
+              test->CurrentSource=SOURCE_HDMI3;
+              test->SendCmd("start");
+              break;
+          }
+
           default: {
               test->SendCmd("start");
               break;
