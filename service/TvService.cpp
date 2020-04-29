@@ -267,6 +267,37 @@ int TvService::ParserTvCommand(char *commandData)
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
             ret = 0;
         }
+    } else if (strcmp(temp, "pqFactory") == 0) {
+        LOGD("%s: PQ factory cmd!\n", __FUNCTION__);
+        pq_moudle_param_t pqParam;
+        memset(&pqParam, 0, sizeof(pq_moudle_param_t));
+        int paramCount = 0;
+        int paramBuf[32] = {0};
+        temp = strtok(NULL, delimitation);
+        if (strcmp(temp, "set") == 0) {
+            temp = strtok(NULL, delimitation);
+            pqParam.moudleId = atoi(temp);
+            while (temp = strtok(NULL, delimitation)) {
+                paramBuf[paramCount] = atoi(temp);
+                paramCount++;
+            }
+            pqParam.paramLength = paramCount;
+            pqParam.paramBuf = paramBuf;
+            ret = mpPQcontrol->parserFactorySetCmd(pqParam);
+        } else if (strcmp(temp, "get") == 0) {
+            temp = strtok(NULL, delimitation);
+            pqParam.moudleId = atoi(temp);
+            while (temp = strtok(NULL, delimitation)) {
+                paramBuf[paramCount] = atoi(temp);
+                paramCount++;
+            }
+            pqParam.paramLength = paramCount;
+            pqParam.paramBuf = paramBuf;
+            ret = mpPQcontrol->parserFactoryGetCmd(pqParam);
+        } else {
+            LOGD("%s: invalid cmd!\n", __FUNCTION__);
+            ret = 0;
+        }
     } else {
         LOGD("%s: invalie cmdType!\n", __FUNCTION__);
     }

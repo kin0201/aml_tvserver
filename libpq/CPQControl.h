@@ -116,6 +116,12 @@ typedef enum rgb_ogo_type_e{
     RGB_TYPE_MAX,
 } rgb_ogo_type_t;
 
+typedef struct pq_moudle_param_s {
+    int moudleId;     //moudleId according to tvcmd.h
+    int paramLength;  //length of parambuf
+    int *paramBuf;    //param for action
+} pq_moudle_param_t;
+
 class CPQControl: public CDevicePollCheckThread::IDevicePollCheckObserver,
                          public CDynamicBackLight::IDynamicBackLightObserver,
                          public SSMAction::ISSMActionObserver {
@@ -331,6 +337,8 @@ public:
 
     int ParserSetCmd(int moudleId, int setValue);
     int ParserGetCmd(int moudleId);
+    int parserFactorySetCmd(pq_moudle_param_t param);
+    int parserFactoryGetCmd(pq_moudle_param_t param);
 
 private:
     int VPPOpenModule(void);

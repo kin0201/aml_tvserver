@@ -2946,15 +2946,15 @@ int CPQControl::FactorySetColorTemp_Rgain(int source_input,int colortemp_mode, i
     memset (&rgbogo, 0, sizeof (rgbogo));
     GetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, &rgbogo);
     rgbogo.r_gain = rgain;
-    LOGD("%s, source[%d], colortemp_mode[%d], rgain[%d].", __FUNCTION__, source_input,
-         colortemp_mode, rgain);
+    LOGD("%s, source[%d], colortemp_mode[%d], rgain[%d].", __FUNCTION__, source_input, colortemp_mode, rgain);
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Rgain(int source_input __unused, int colortemp_mode, int rgain)
@@ -2988,15 +2988,15 @@ int CPQControl::FactorySetColorTemp_Ggain(int source_input, int colortemp_mode, 
     memset (&rgbogo, 0, sizeof (rgbogo));
     GetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, &rgbogo);
     rgbogo.g_gain = ggain;
-    LOGD("%s, source[%d], colortemp_mode[%d], ggain[%d].", __FUNCTION__, source_input,
-         colortemp_mode, ggain);
+    LOGD("%s, source[%d], colortemp_mode[%d], ggain[%d].", __FUNCTION__, source_input, colortemp_mode, ggain);
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Ggain(int source_input __unused, int colortemp_mode, int ggain)
@@ -3030,15 +3030,15 @@ int CPQControl::FactorySetColorTemp_Bgain(int source_input, int colortemp_mode, 
     memset (&rgbogo, 0, sizeof (rgbogo));
     GetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, &rgbogo);
     rgbogo.b_gain = bgain;
-    LOGD("%s, source[%d], colortemp_mode[%d], bgain[%d].", __FUNCTION__, source_input,
-         colortemp_mode, bgain);
+    LOGD("%s, source[%d], colortemp_mode[%d], bgain[%d].", __FUNCTION__, source_input, colortemp_mode, bgain);
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Bgain(int source_input __unused, int colortemp_mode, int bgain)
@@ -3072,15 +3072,15 @@ int CPQControl::FactorySetColorTemp_Roffset(int source_input, int colortemp_mode
     memset (&rgbogo, 0, sizeof (rgbogo));
     GetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, &rgbogo);
     rgbogo.r_post_offset = roffset;
-    LOGD("%s, source[%d], colortemp_mode[%d], r_post_offset[%d].", __FUNCTION__, source_input,
-         colortemp_mode, roffset);
+    LOGD("%s, source[%d], colortemp_mode[%d], r_post_offset[%d].", __FUNCTION__, source_input, colortemp_mode, roffset);
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Roffset(int source_input __unused, int colortemp_mode, int roffset)
@@ -3114,15 +3114,15 @@ int CPQControl::FactorySetColorTemp_Goffset(int source_input, int colortemp_mode
     memset (&rgbogo, 0, sizeof (rgbogo));
     GetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, &rgbogo);
     rgbogo.g_post_offset = goffset;
-    LOGD("%s, source[%d], colortemp_mode[%d], g_post_offset[%d].", __FUNCTION__, source_input,
-         colortemp_mode, goffset);
+    LOGD("%s, source[%d], colortemp_mode[%d], g_post_offset[%d].", __FUNCTION__, source_input, colortemp_mode, goffset);
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Goffset(int source_input __unused, int colortemp_mode, int goffset)
@@ -3161,10 +3161,11 @@ int CPQControl::FactorySetColorTemp_Boffset(int source_input, int colortemp_mode
     rgbogo.en = 1;
 
     if (Cpq_SetRGBOGO(&rgbogo) == 0) {
-        return 0;
+        return SetColorTemperatureParams((vpp_color_temperature_mode_t) colortemp_mode, rgbogo);
+    } else {
+        LOGE("%s error!\n", __FUNCTION__);
+        return -1;
     }
-
-    return -1;
 }
 
 int CPQControl::FactorySaveColorTemp_Boffset(int source_input __unused, int colortemp_mode, int boffset)
@@ -4331,6 +4332,99 @@ int CPQControl::ParserGetCmd(int moudleId)
     }
 
     return ret;
+}
+
+int CPQControl::parserFactorySetCmd(pq_moudle_param_t param)
+{
+    int ret = 0, moudleId = param.moudleId;
+    if ((moudleId < PQ_FACTORY_CMD_START) || (moudleId > PQ_FACTORY_CMD_MAX)) {
+        LOGE("%s: invalid cmd!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        int paramData[32] = {0};
+        int i = 0;
+        for (i=0;i<param.paramLength;i++) {
+            paramData[i] = param.paramBuf[i];
+        }
+
+        switch (moudleId) {
+        case PQ_FACTORY_SET_WB_RED_GAIN:
+            ret = FactorySetColorTemp_Rgain(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_WB_GREE_GAIN:
+            ret = FactorySetColorTemp_Ggain(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_WB_BLUE_GAIN:
+            ret = FactorySetColorTemp_Bgain(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_WB_RED_POSTOFFSET:
+            ret = FactorySetColorTemp_Roffset(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_WB_GREE_POSTOFFSET:
+            ret = FactorySetColorTemp_Goffset(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_WB_BLUE_POSTOFFSET:
+            ret = FactorySetColorTemp_Boffset(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_RGB_PATTERN:
+            ret = SetRGBPattern(paramData[0], paramData[1], paramData[2]);
+            break;
+        case PQ_FACTORY_SET_GRAY_PATTERN:
+            ret = SetGrayPattern(paramData[0]);
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ret;
+}
+
+int CPQControl::parserFactoryGetCmd(pq_moudle_param_t param)
+{
+    int ret = 0, moudleId = param.moudleId;
+    if ((moudleId < PQ_FACTORY_CMD_START) || (moudleId > PQ_FACTORY_CMD_MAX)) {
+        LOGE("%s: invalid cmd!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        int paramData[32] = {0};
+        int i = 0;
+        for (i=0;i<param.paramLength;i++) {
+            paramData[i] = param.paramBuf[i];
+        }
+
+        switch (moudleId) {
+        case PQ_FACTORY_GET_WB_RED_GAIN:
+            ret = FactoryGetColorTemp_Rgain(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_WB_GREE_GAIN:
+            ret = FactoryGetColorTemp_Ggain(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_WB_BLUE_GAIN:
+            ret = FactoryGetColorTemp_Bgain(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_WB_RED_POSTOFFSET:
+            ret = FactoryGetColorTemp_Roffset(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_WB_GREE_POSTOFFSET:
+            ret = FactoryGetColorTemp_Goffset(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_WB_BLUE_POSTOFFSET:
+            ret = FactoryGetColorTemp_Boffset(paramData[0], paramData[1]);
+            break;
+        case PQ_FACTORY_GET_RGB_PATTERN:
+            ret = GetRGBPattern();
+            break;
+        case PQ_FACTORY_GET_GRAY_PATTERN:
+            ret = GetGrayPattern();
+            break;
+        default:
+            break;
+        }
+    }
+
+    return ret;
+
 }
 
 void CPQControl::resetAllUserSettingParam()

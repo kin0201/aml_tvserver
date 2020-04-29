@@ -55,7 +55,22 @@ public:
     int GetColorTemperature();
     int SetAspectRatio(int aspectRatioValue);
     int GetAspectRatio();
-
+    int FactorySetRGBPattern(int r, int g, int b);
+    int FactoryGetRGBPattern();
+    int FactorySetGrayPattern(int value);
+    int FactoryGetGrayPattern();
+    int FactorySetWhiteBalanceRedGain(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceRedGain(int source, int colortemptureMode);
+    int FactorySetWhiteBalanceGreenGain(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceGreenGain(int source, int colortemptureMode);
+    int FactorySetWhiteBalanceBlueGain(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceBlueGain(int source, int colortemptureMode);
+    int FactorySetWhiteBalanceRedPostOffset(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceRedPostOffset(int source, int colortemptureMode);
+    int FactorySetWhiteBalanceGreenPostOffset(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceGreenPostOffset(int source, int colortemptureMode);
+    int FactorySetWhiteBalanceBluePostOffset(int source, int colortemptureMode, int value);
+    int FactoryGetWhiteBalanceBluePostOffset(int source, int colortemptureMode);
 private:
     DBusConnection *ClientBusInit();
     int SendMethodCall(char *CmdString);

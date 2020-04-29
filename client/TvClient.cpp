@@ -469,3 +469,145 @@ int TvClient::GetAspectRatio()
     sprintf(buf, "pq.get.%d", PQ_GET_ASPECT_RATIO);
     return SendMethodCall(buf);
 }
+
+int TvClient::FactorySetRGBPattern(int r, int g, int b)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_RGB_PATTERN, r, g, b);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetRGBPattern()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d", PQ_FACTORY_GET_RGB_PATTERN);
+    return SendMethodCall(buf);
+}
+
+int TvClient::FactorySetGrayPattern(int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d", PQ_FACTORY_SET_GRAY_PATTERN, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetGrayPattern()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d", PQ_FACTORY_GET_GRAY_PATTERN);
+    return SendMethodCall(buf);
+}
+
+int TvClient::FactorySetWhiteBalanceRedGain(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_RED_GAIN, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+}
+
+int TvClient::FactoryGetWhiteBalanceRedGain(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_RED_GAIN, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactorySetWhiteBalanceGreenGain(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_GREE_GAIN, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetWhiteBalanceGreenGain(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_GREE_GAIN, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactorySetWhiteBalanceBlueGain(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_BLUE_GAIN, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetWhiteBalanceBlueGain(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_BLUE_GAIN, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactorySetWhiteBalanceRedPostOffset(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_RED_POSTOFFSET, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetWhiteBalanceRedPostOffset(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_RED_POSTOFFSET, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactorySetWhiteBalanceGreenPostOffset(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_GREE_POSTOFFSET, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetWhiteBalanceGreenPostOffset(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_GREE_POSTOFFSET, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactorySetWhiteBalanceBluePostOffset(int source, int colortemptureMode, int value)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.set.%d.%d.%d.%d", PQ_FACTORY_SET_WB_BLUE_POSTOFFSET, source, colortemptureMode, value);
+    return SendMethodCall(buf);
+
+}
+
+int TvClient::FactoryGetWhiteBalanceBluePostOffset(int source, int colortemptureMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "pqFactory.get.%d.%d.%d", PQ_FACTORY_GET_WB_BLUE_POSTOFFSET, source, colortemptureMode);
+    return SendMethodCall(buf);
+
+}
+
