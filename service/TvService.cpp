@@ -246,6 +246,12 @@ int TvService::ParserTvCommand(char *commandData)
             tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
             temp = strtok(NULL, delimitation);
             ret = mpTv->getEDIDData(getSource, temp);
+        } else if (strcmp(temp, "preset") == 0) {
+            temp = strtok(NULL, delimitation);
+            tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
+            temp = strtok(NULL, delimitation);
+            int edidVer = atoi(temp);
+            ret = mpTv->PresetEdidVer(setSource, edidVer);
         } else {
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
             ret = 0;

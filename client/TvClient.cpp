@@ -248,7 +248,7 @@ void *TvClient::HandleTvServiceMessage(void *args)
                 }
             }
         } else {
-            LOGD("TvClient: Not TV service signal call!\n");
+            //LOGD("TvClient: Not TV service signal call!\n");
         }
         dbus_message_unref(msg);
     }
@@ -307,6 +307,14 @@ int TvClient::StopTv(tv_source_input_t source) {
     LOGD("%s\n", __FUNCTION__);
     char buf[32] = {0};
     sprintf(buf, "source.stop.%d", source);
+    return SendMethodCall(buf);
+}
+
+int TvClient::PresetEdidVer(tv_source_input_t source, int edidVer)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[512] = {0};
+    sprintf(buf, "edid.set.%d.%d", source, edidVer);
     return SendMethodCall(buf);
 }
 

@@ -182,6 +182,16 @@ int CTv::setTvObserver ( TvIObserver *ob )
     return 0;
 }
 
+int CTv::PresetEdidVer(tv_source_input_t source, int edidVer)
+{
+    char edidData[REAL_EDID_DATA_SIZE];
+    if (edidVer == 20)
+        tvReadSysfs(HDMI_EDID20_FILE_PATH, edidData);
+    else
+        tvReadSysfs(HDMI_EDID14_FILE_PATH, edidData);
+    return mpHDMIRxManager->HdmiRxEdidUpdate(edidData);
+}
+
 int CTv::UpdateEDID(tv_source_input_t source, char *data)
 {
     char edidData[REAL_EDID_DATA_SIZE];

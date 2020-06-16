@@ -45,6 +45,7 @@ public:
     int SwitchSource(tv_source_input_t dest_source);
     int SetCurrenSourceInfo(tvin_info_t sig_info);
     tvin_info_t GetCurrentSourceInfo(void);
+    int PresetEdidVer(tv_source_input_t source, int edidVer);
     int UpdateEDID(tv_source_input_t source, char *data);
     int getEDIDData(tv_source_input_t source, char *data);
 

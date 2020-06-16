@@ -20,9 +20,40 @@
 #include <TvClient.h>
 #include "CTvClientLog.h"
 
+static int WriteSysfs(const char *path, const char *cmd)
+{
+    int fd;
+    fd = open(path, O_CREAT|O_RDWR | O_TRUNC, 0777);
+
+    if (fd >= 0) {
+        write(fd, cmd, strlen(cmd));
+        close(fd);
+        return 0;
+    }
+
+    return -1;
+}
+
+static int WriteSysfs(const char *path, int value)
+{
+    int fd;
+    char  bcmd[16];
+    fd = open(path, O_CREAT|O_RDWR | O_TRUNC, 0777);
+
+    if (fd >= 0) {
+        sprintf(bcmd,"%d",value);
+        write(fd,bcmd,strlen(bcmd));
+        close(fd);
+        return 0;
+    }
+
+    return -1;
+}
+
 class TvTest: public TvClient::TvClientIObserver {
 public:
     tv_source_input_t CurrentSource;
+    int EdidVer;
     TvTest()
     {
         mpTvClient = TvClient::GetInstance();
@@ -46,6 +77,7 @@ public:
                                                        signalDetectEvent->mTrans_fmt,
                                                        signalDetectEvent->mStatus,
                                                        signalDetectEvent->mDviFlag);
+            WriteSysfs("/sys/class/video/disable_video", 0);
             break;
             }
         case CTvEvent::TV_EVENT_SOURCE_CONNECT: {
@@ -64,6 +96,7 @@ public:
     int SendCmd(const char *data) {
         LOGD("%s: cmd is %s.\n", __FUNCTION__, data);
         if (strcmp(data, "start") == 0) {
+            mpTvClient->PresetEdidVer(CurrentSource, EdidVer);
             mpTvClient->StartTv(CurrentSource);
         } else if (strcmp(data, "stop") == 0) {
             mpTvClient->StopTv(CurrentSource);
@@ -79,18 +112,7 @@ public:
 
 static int SetOsdBlankStatus(const char *path, int cmd)
 {
-    int fd;
-    char  bcmd[16];
-    fd = open(path, O_CREAT|O_RDWR | O_TRUNC, 0777);
-
-    if (fd >= 0) {
-        sprintf(bcmd,"%d",cmd);
-        write(fd,bcmd,strlen(bcmd));
-        close(fd);
-        return 0;
-    }
-
-    return -1;
+    return WriteSysfs(path, cmd);
 }
 
 static int DisplayInit()
@@ -109,10 +131,17 @@ int main(int argc, char **argv) {
     char Command[1];
     int run = 1;
     DisplayInit();
+
     test->CurrentSource=SOURCE_HDMI1;
+    WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x1");
+    test->EdidVer=14;
 
     LOGD("#### please select cmd####\n");
-    LOGD("#### select 1/2/3 to start####\n");
+    LOGD("#### select 1 to hdmi 1 ####\n");
+    LOGD("#### select 2 to hdmi 2 ####\n");
+    LOGD("#### select 3 to hdmi 3 ####\n");
+    LOGD("#### select 4 to edid 1.4 (this is default) ####\n");
+    LOGD("#### select 5 to edid 2.0 ####\n");
     LOGD("#### select q to stop####\n");
     LOGD("##########################\n");
     while (run) {
@@ -145,7 +174,16 @@ int main(int argc, char **argv) {
               test->SendCmd("start");
               break;
           }
-
+          case '4': {
+              WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x1");
+              test->EdidVer = 14;
+              break;
+          }
+          case '5': {
+              WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x5");
+              test->EdidVer = 20;
+              break;
+          }
           default: {
               test->SendCmd("start");
               break;
