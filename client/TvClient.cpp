@@ -223,7 +223,7 @@ void *TvClient::HandleTvServiceMessage(void *args)
         dbus_connection_read_write(Connection, 0);
         msg = dbus_connection_pop_message(Connection);
         if (msg == NULL) {
-            sleep(1);
+            //sleep(1);
             continue;
         }
         //LOGD("path: %s\n", dbus_message_get_path (msg));
