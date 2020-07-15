@@ -50,9 +50,9 @@ int CPQdb::openPqDB(const char *db_path)
     closeDb();
     rval = openDb(db_path);
     if (rval == 0) {
-        std::string PQ_ToolVersion, PQ_DBVersion, PQ_DBGenerateTime, val;
-        if (PQ_GetPqVersion(PQ_ToolVersion, PQ_DBVersion, PQ_DBGenerateTime)) {
-            val = PQ_ToolVersion + " " + PQ_DBVersion + " " + PQ_DBGenerateTime;
+        std::string PQ_ToolVersion, PQ_DBVersion, PQ_DBGenerateTime, PQ_DBChipVersion, val;
+        if (PQ_GetPqVersion(PQ_ToolVersion, PQ_DBVersion, PQ_DBGenerateTime, PQ_DBChipVersion)) {
+            val = PQ_ToolVersion + " " + PQ_DBVersion + " " + PQ_DBGenerateTime+ " " + PQ_DBChipVersion;
         } else {
             val = "Get PQ_DB Verion failure!!!";
         }
@@ -1600,20 +1600,33 @@ int CPQdb::PQ_ResetAllOverscanParams(void)
     return rval;
 }
 
-bool CPQdb::PQ_GetPqVersion(std::string& ToolVersion, std::string& ProjectVersion, std::string& GenerateTime)
+bool CPQdb::PQ_GetPqVersion(std::string& ToolVersion, std::string& ProjectVersion, std::string& GenerateTime, std::string& ChipVersion)
 {
     bool ret = false;
     CSqlite::Cursor c;
     char sqlmaster[256];
-
-    getSqlParams(__FUNCTION__, sqlmaster,"select ToolVersion,ProjectVersion,GenerateTime from PQ_VersionTable;");
-
+    bool chipVersionExist = false;
+    if (CheckIdExistInDb("ChipVersion", "PQ_VersionTable")) {
+        chipVersionExist = true;
+        getSqlParams(__FUNCTION__, sqlmaster,
+                     "select ToolVersion,ProjectVersion,ChipVersion,GenerateTime from PQ_VersionTable;");
+    } else {
+        chipVersionExist = false;
+        getSqlParams(__FUNCTION__, sqlmaster,
+                     "select ToolVersion,ProjectVersion,GenerateTime from PQ_VersionTable;");
+    }
     int rval = this->select(sqlmaster, c);
 
     if (!rval && c.getCount() > 0) {
         ToolVersion = c.getString(0);
         ProjectVersion = c.getString(1);
-        GenerateTime = c.getString(2);
+        if (chipVersionExist) {
+            ChipVersion = c.getString(2);
+            GenerateTime = c.getString(3);
+        } else {
+            ChipVersion = std::string("");
+            GenerateTime = c.getString(2);
+        }
         ret = true;
     }
 

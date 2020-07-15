@@ -315,5 +315,6 @@ typedef struct tvpq_databaseinfo_s {
     char ToolVersion[32];
     char ProjectVersion[32];
     char GenerateTime[32];
+    char ChipVersion[32];
 }tvpq_databaseinfo_t;
 #endif

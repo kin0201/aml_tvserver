@@ -357,7 +357,7 @@ private:
     int Cpq_SetLocalContrastMode(local_contrast_mode_t mode);
     output_type_t GetTxOutPutMode(void);
     bool isCVBSParamValid(void);
-
+    bool isPqDatabaseMachChip();
     bool mInitialized;
     //cfg
     bool mbCpqCfg_seperate_db_enable;
@@ -400,5 +400,6 @@ private:
     bool mCurrentHdrStatus;
     unsigned int mHdmiHdrInfo = 0;
     bool mbDtvKitEnable;
+    bool mbDatabaseMatchChipStatus;
 };
 #endif

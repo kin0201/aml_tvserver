@@ -73,6 +73,14 @@ typedef enum ve_csc_type_e {
     VPP_MATRIX_DEFAULT_CSCTYPE       = 0xffff,
 } ve_csc_type_t;
 
+typedef enum meson_cpu_ver_e {
+    MESON_CPU_VERSION_NULL = 0,
+    MESON_CPU_VERSION_A,
+    MESON_CPU_VERSION_B,
+    MESON_CPU_VERSION_C,
+    MESON_CPU_VERSION_MAX,
+} meson_cpu_ver_t;
+
 // ***************************************************************************
 // *** struct definitions *********************************************
 // ***************************************************************************
@@ -433,6 +441,27 @@ typedef enum lc_curve_parm_num_e {
     LC_YPKBV_RATIO_NUM = 8,
 } lc_curve_parm_num_t;
 
+typedef struct pq_ctrl_s {
+    unsigned char sharpness0_en;
+    unsigned char sharpness1_en;
+    unsigned char dnlp_en;
+    unsigned char cm_en;
+    unsigned char vadj1_en;    //control video brightness contrast saturation hue
+    unsigned char vd1_ctrst_en;
+    unsigned char vadj2_en;    //control video+osd brightness contrast saturation hue
+    unsigned char post_ctrst_en;
+    unsigned char wb_en;
+    unsigned char gamma_en;
+    unsigned char lc_en;
+    unsigned char black_ext_en;
+    unsigned char chroma_cor_en;
+    unsigned char reserved;
+} pq_ctrl_t;
+
+typedef struct vpp_pq_ctrl_s {
+    unsigned int length;
+    long long ptr;        /*point to pq_ctrl_s*/
+} vpp_pq_ctrl_t;
 
 // ***************************************************************************
 // *** MACRO definitions **********

@@ -50,9 +50,11 @@ CPQControl::CPQControl()
     mPQdb = new CPQdb();
     int ret = mPQdb->openPqDB(PQ_DB_DEFAULT_PATH);
     if (ret != 0) {
+        mbDatabaseMatchChipStatus = false;
         LOGE("open pq DB failed!\n");
     } else {
         LOGD("open pq DB success!\n");
+        mbDatabaseMatchChipStatus = isPqDatabaseMachChip();
     }
     //open overscan DB
     if (mbCpqCfg_seperate_db_enable) {
@@ -1830,37 +1832,41 @@ int CPQControl::SaveSharpness(int value)
 int CPQControl::Cpq_SetSharpness(int value, source_input_param_t source_input_param)
 {
     int ret = -1;
-    am_regs_t regs;
-    memset(&regs, 0, sizeof(am_regs_t));
-    int level;
-
-    if (value >= 0 && value <= 100) {
-        level = value;
-        if (mbCpqCfg_sharpness0_enable) {
-            ret = mPQdb->PQ_GetSharpness0Params(source_input_param, level, &regs);
-            if (ret == 0) {
-                ret = Cpq_LoadRegs(regs);
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
+    } else {
+        am_regs_t regs;
+        memset(&regs, 0, sizeof(am_regs_t));
+        int level;
+        if (value >= 0 && value <= 100) {
+            level = value;
+            if (mbCpqCfg_sharpness0_enable) {
+                ret = mPQdb->PQ_GetSharpness0Params(source_input_param, level, &regs);
+                if (ret == 0) {
+                    ret = Cpq_LoadRegs(regs);
+                } else {
+                    LOGE("%s: PQ_GetSharpness0Params failed!\n", __FUNCTION__);
+                }
             } else {
-                LOGE("%s: PQ_GetSharpness0Params failed!\n", __FUNCTION__);
+                LOGD("%s: sharpness0 moudle disabled!\n", __FUNCTION__);
+                ret = 0;
             }
-        } else {
-            LOGD("%s: sharpness0 moudle disabled!\n", __FUNCTION__);
-            ret = 0;
-        }
 
-        if (mbCpqCfg_sharpness1_enable) {
-            ret = mPQdb->PQ_GetSharpness1Params(source_input_param, level, &regs);
-            if (ret == 0) {
-                ret = Cpq_LoadRegs(regs);
+            if (mbCpqCfg_sharpness1_enable) {
+                ret = mPQdb->PQ_GetSharpness1Params(source_input_param, level, &regs);
+                if (ret == 0) {
+                    ret = Cpq_LoadRegs(regs);
+                } else {
+                    LOGE("%s: PQ_GetSharpness1Params failed!\n", __FUNCTION__);
+                }
             } else {
-                LOGE("%s: PQ_GetSharpness1Params failed!\n", __FUNCTION__);
+                LOGD("%s: sharpness1 moudle disabled!\n", __FUNCTION__);
+                ret = 0;
             }
-        } else {
-            LOGD("%s: sharpness1 moudle disabled!\n", __FUNCTION__);
-            ret = 0;
+        }else {
+            LOGE("%s: invalid value!\n", __FUNCTION__);
         }
-    }else {
-        LOGE("%s: invalid value!\n", __FUNCTION__);
     }
 
     return ret;
@@ -1868,15 +1874,20 @@ int CPQControl::Cpq_SetSharpness(int value, source_input_param_t source_input_pa
 
 int CPQControl::Cpq_SetSharpness0FixedParam(source_input_param_t source_input_param)
 {
-    am_regs_t regs;
-    memset(&regs, 0, sizeof(am_regs_t));
     int ret = -1;
 
-    ret = mPQdb->PQ_GetSharpness0FixedParams(source_input_param, &regs);
-    if (ret < 0) {
-        LOGE("%s: PQ_GetSharpness0FixedParams failed!\n", __FUNCTION__);
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
     } else {
-        ret = Cpq_LoadRegs(regs);
+        am_regs_t regs;
+        memset(&regs, 0, sizeof(am_regs_t));
+        ret = mPQdb->PQ_GetSharpness0FixedParams(source_input_param, &regs);
+        if (ret < 0) {
+            LOGE("%s: PQ_GetSharpness0FixedParams failed!\n", __FUNCTION__);
+        } else {
+            ret = Cpq_LoadRegs(regs);
+        }
     }
 
     if (ret < 0) {
@@ -1884,33 +1895,43 @@ int CPQControl::Cpq_SetSharpness0FixedParam(source_input_param_t source_input_pa
     } else {
         LOGD("%s success!\n", __FUNCTION__);
     }
-
     return ret;
 }
 
 int CPQControl::Cpq_SetSharpness0VariableParam(source_input_param_t source_input_param)
 {
-    int ret = mPQdb->PQ_SetSharpness0VariableParams(source_input_param);
+    int ret = -1;
+
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
+    } else {
+        ret = mPQdb->PQ_SetSharpness0VariableParams(source_input_param);
+    }
+
     if (ret < 0) {
         LOGE("%s failed!\n", __FUNCTION__);
     } else {
         LOGD("%s success!\n", __FUNCTION__);
     }
-
     return ret;
 }
 
 int CPQControl::Cpq_SetSharpness1FixedParam(source_input_param_t source_input_param)
 {
-    am_regs_t regs;
-    memset(&regs, 0, sizeof(am_regs_t));
     int ret = -1;
-
-    ret = mPQdb->PQ_GetSharpness1FixedParams(source_input_param, &regs);
-    if (ret < 0) {
-        LOGE("%s: PQ_GetSharpness1FixedParams failed!\n", __FUNCTION__);
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
     } else {
-        ret = Cpq_LoadRegs(regs);
+        am_regs_t regs;
+        memset(&regs, 0, sizeof(am_regs_t));
+        ret = mPQdb->PQ_GetSharpness1FixedParams(source_input_param, &regs);
+        if (ret < 0) {
+            LOGE("%s: PQ_GetSharpness1FixedParams failed!\n", __FUNCTION__);
+        } else {
+            ret = Cpq_LoadRegs(regs);
+        }
     }
 
     if (ret < 0) {
@@ -1924,7 +1945,14 @@ int CPQControl::Cpq_SetSharpness1FixedParam(source_input_param_t source_input_pa
 
 int CPQControl::Cpq_SetSharpness1VariableParam(source_input_param_t source_input_param)
 {
-    int ret = mPQdb->PQ_SetSharpness1VariableParams(source_input_param);
+    int ret = -1;
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
+    } else {
+        ret = mPQdb->PQ_SetSharpness1VariableParams(source_input_param);
+    }
+
     if (ret < 0) {
         LOGE("%s failed!\n", __FUNCTION__);
     } else {
@@ -2645,24 +2673,30 @@ int CPQControl::SaveLocalContrastMode(local_contrast_mode_t mode)
 int CPQControl::Cpq_SetLocalContrastMode(local_contrast_mode_t mode)
 {
     int ret = -1;
-    ve_lc_curve_parm_t lc_param;
-    am_regs_t regs;
-    memset(&lc_param, 0x0, sizeof(ve_lc_curve_parm_t));
-    memset(&regs, 0x0, sizeof(am_regs_t));
 
-    ret = mPQdb->PQ_GetLocalContrastNodeParams(mCurentSourceInputInfo, mode, &lc_param);
-    if (ret == 0 ) {
-        ret = VPPDeviceIOCtl(AMVECM_IOC_S_LC_CURVE, &lc_param);
-        if (ret == 0) {
-            ret = mPQdb->PQ_GetLocalContrastRegParams(mCurentSourceInputInfo, mode, &regs);
-            if (ret == 0) {
-                ret = Cpq_LoadRegs(regs);
-            } else {
-                LOGE("%s: PQ_GetLocalContrastRegParams failed!\n", __FUNCTION__ );
-            }
-        }
+    if (!mbDatabaseMatchChipStatus) {
+        LOGD("%s: DB don't match chip!\n", __FUNCTION__);
+        ret = 0;
     } else {
-        LOGE("%s: PQ_GetLocalContrastNodeParams failed!\n", __FUNCTION__ );
+        ve_lc_curve_parm_t lc_param;
+        am_regs_t regs;
+        memset(&lc_param, 0x0, sizeof(ve_lc_curve_parm_t));
+        memset(&regs, 0x0, sizeof(am_regs_t));
+
+        ret = mPQdb->PQ_GetLocalContrastNodeParams(mCurentSourceInputInfo, mode, &lc_param);
+        if (ret == 0 ) {
+            ret = VPPDeviceIOCtl(AMVECM_IOC_S_LC_CURVE, &lc_param);
+            if (ret == 0) {
+                ret = mPQdb->PQ_GetLocalContrastRegParams(mCurentSourceInputInfo, mode, &regs);
+                if (ret == 0) {
+                    ret = Cpq_LoadRegs(regs);
+                } else {
+                    LOGE("%s: PQ_GetLocalContrastRegParams failed!\n", __FUNCTION__ );
+                }
+            }
+        } else {
+            LOGE("%s: PQ_GetLocalContrastNodeParams failed!\n", __FUNCTION__ );
+        }
     }
 
     return ret;
@@ -4210,18 +4244,18 @@ int CPQControl::GetHDRMode()
 
 tvpq_databaseinfo_t CPQControl::GetDBVersionInfo(db_name_t name) {
     bool val = false;
-    std::string tmpToolVersion, tmpProjectVersion, tmpGenerateTime;
+    std::string tmpToolVersion, tmpProjectVersion, tmpGenerateTime, ChipVersion;
     tvpq_databaseinfo_t pqdatabaseinfo_t;
     memset(&pqdatabaseinfo_t, 0, sizeof(pqdatabaseinfo_t));
     switch (name) {
         case DB_NAME_PQ:
-            val = mPQdb->PQ_GetPqVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime);
+            val = mPQdb->PQ_GetPqVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime, ChipVersion);
             break;
         case DB_NAME_OVERSCAN:
-            val = mpOverScandb->GetOverScanDbVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime);
+            val = mpOverScandb->GetOverScanDbVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime, ChipVersion);
             break;
         default:
-            val = mPQdb->PQ_GetPqVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime);
+            val = mPQdb->PQ_GetPqVersion(tmpToolVersion, tmpProjectVersion, tmpGenerateTime, ChipVersion);
             break;
     }
 
@@ -4229,6 +4263,7 @@ tvpq_databaseinfo_t CPQControl::GetDBVersionInfo(db_name_t name) {
         strcpy(pqdatabaseinfo_t.ToolVersion, tmpToolVersion.c_str());
         strcpy(pqdatabaseinfo_t.ProjectVersion, tmpProjectVersion.c_str());
         strcpy(pqdatabaseinfo_t.GenerateTime, tmpGenerateTime.c_str());
+        strcpy(pqdatabaseinfo_t.ChipVersion, ChipVersion.c_str());
     }
 
     return pqdatabaseinfo_t;
@@ -4651,3 +4686,45 @@ bool CPQControl::isCVBSParamValid(void)
     }
     return ret;
 }
+
+bool CPQControl::isPqDatabaseMachChip()
+{
+    bool matchStatus = false;
+    meson_cpu_ver_e chipVersion = MESON_CPU_VERSION_NULL;
+    tvpq_databaseinfo_t dbInfo = GetDBVersionInfo(DB_NAME_PQ);
+    if (strlen(dbInfo.ChipVersion) == 0) {
+        LOGD("%s: ChipVersion is null!\n", __FUNCTION__);
+        chipVersion = MESON_CPU_VERSION_NULL;
+    } else {
+        std::string TempStr = std::string(dbInfo.ChipVersion);
+        int flagPosition = TempStr.find("_");
+        std::string versionStr = TempStr.substr(flagPosition+1, 1);
+        LOGD("%s: versionStr is %s!\n", __FUNCTION__, versionStr.c_str());
+        if (versionStr == "A") {
+            chipVersion = MESON_CPU_VERSION_A;
+        } else if (versionStr ==  "B") {
+            chipVersion = MESON_CPU_VERSION_B;
+        } else if (versionStr == "C") {
+            chipVersion = MESON_CPU_VERSION_C;
+        } else {
+            chipVersion = MESON_CPU_VERSION_NULL;
+        }
+    }
+
+    if (chipVersion == MESON_CPU_VERSION_NULL) {
+        LOGD("%s: database don't have chipversion!\n", __FUNCTION__);
+        matchStatus = true;
+    } else {
+        int ret = VPPDeviceIOCtl(AMVECM_IOC_S_MESON_CPU_VER, &chipVersion);
+        if (ret < 0) {
+            LOGD("%s: database don't match chip!\n", __FUNCTION__);
+            matchStatus = false;
+        } else {
+            LOGD("%s: database is match chip!\n", __FUNCTION__);
+            matchStatus = true;
+        }
+    }
+
+    return matchStatus;
+}
+

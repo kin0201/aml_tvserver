@@ -38,9 +38,9 @@ int COverScandb::openOverScanDB(const char *db_path)
     closeDb();
     rval = openDb(db_path);
     if (rval == 0) {
-        std::string OverScanDBToolVersion, OverScanDBVersion, OverScanDBGenerateTime, val;
-        if (GetOverScanDbVersion(OverScanDBToolVersion, OverScanDBVersion, OverScanDBGenerateTime)) {
-            val = OverScanDBToolVersion + " " + OverScanDBVersion + " " + OverScanDBGenerateTime;
+        std::string OverScanDBToolVersion, OverScanDBVersion, OverScanDBGenerateTime, OverScanDBChipVersion, val;
+        if (GetOverScanDbVersion(OverScanDBToolVersion, OverScanDBVersion, OverScanDBGenerateTime, OverScanDBChipVersion)) {
+            val = OverScanDBToolVersion + " " + OverScanDBVersion + " " + OverScanDBGenerateTime+ " " + OverScanDBChipVersion;
         } else {
             val = "Get OverScan_DB Verion failure!!!";
         }
@@ -50,21 +50,35 @@ int COverScandb::openOverScanDB(const char *db_path)
     return rval;
 }
 
-bool COverScandb::GetOverScanDbVersion(std::string& ToolVersion, std::string& ProjectVersion, std::string& GenerateTime)
+bool COverScandb::GetOverScanDbVersion(std::string& ToolVersion, std::string& ProjectVersion, std::string& GenerateTime, std::string& ChipVersion)
 {
     bool ret = false;
     CSqlite::Cursor c;
     char sqlmaster[256];
 
-    getSqlParams(__FUNCTION__, sqlmaster,
-                 "select ToolVersion,ProjectVersion,GenerateTime from PQ_VersionTable;");
+    bool chipVersionExist = false;
+    if (CheckIdExistInDb("ChipVersion", "PQ_VersionTable")) {
+       chipVersionExist = true;
+       getSqlParams(__FUNCTION__, sqlmaster,
+                  "select ToolVersion,ProjectVersion,ChipVersion,GenerateTime from PQ_VersionTable;");
+    } else {
+       chipVersionExist = false;
+       getSqlParams(__FUNCTION__, sqlmaster,
+                  "select ToolVersion,ProjectVersion,GenerateTime from PQ_VersionTable;");
+    }
 
     int rval = this->select(sqlmaster, c);
 
     if (!rval && c.getCount() > 0) {
         ToolVersion =  c.getString(0);
         ProjectVersion = c.getString(1);
-        GenerateTime = c.getString(2);
+        if (chipVersionExist) {
+            ChipVersion = c.getString(2);
+            GenerateTime = c.getString(3);
+        } else {
+            ChipVersion = std::string("");
+            GenerateTime = c.getString(2);
+        }
         ret = true;
     }
 
@@ -302,5 +316,35 @@ int COverScandb::PQ_ResetAllPQModeParams(void)
     }
 
     return rval;
+}
+
+bool COverScandb::CheckIdExistInDb(const char *Id, const char *TableName)
+{
+    bool ret = false;
+    char sqlmaster[256];
+    CSqlite::Cursor tempCursor;
+
+    getSqlParams(__FUNCTION__, sqlmaster,
+                 "select sql from sqlite_master where type = 'table' and tbl_name = '%s';", TableName);
+
+    int retVal = this->select(sqlmaster, tempCursor);
+    if ((retVal == 0) && (tempCursor.moveToFirst())) {
+        if (strstr(tempCursor.getString(0).c_str(), Id) != NULL) {
+            ret = true;
+        } else {
+            ret = false;
+        }
+    } else {
+        LOGE("%s: error!\n", __FUNCTION__);
+        ret = false;
+    }
+
+    /*if (ret) {
+        SYS_LOGE("%s: %s exist in %s!\n", __FUNCTION__, Id, TableName);
+    } else {
+        SYS_LOGE("%s: %s don't exist in %s!\n", __FUNCTION__, Id, TableName);
+    }*/
+
+    return ret;
 }
 

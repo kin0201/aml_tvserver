@@ -103,5 +103,12 @@
 /*Local contrast command list*/
 #define AMVECM_IOC_S_LC_CURVE      _IOW(AMVECM_IOC_MAGIC, 0x62, struct ve_lc_curve_parm_s)
 
+//moudle control for amvecm
+#define AMVECM_IOC_S_PQ_CTRL       _IOW(AMVECM_IOC_MAGIC, 0x69, struct vpp_pq_ctrl_s)
+#define AMVECM_IOC_G_PQ_CTRL       _IOR(AMVECM_IOC_MAGIC, 0x6a, struct vpp_pq_ctrl_s)
+
+/*cpu version ioc*/
+#define AMVECM_IOC_S_MESON_CPU_VER _IOW(AMVECM_IOC_MAGIC, 0x6b, enum meson_cpu_ver_e)
+
 #endif /* __AMVECM_H */
 
