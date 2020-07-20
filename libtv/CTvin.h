@@ -42,14 +42,47 @@ typedef enum tvin_sig_status_e {
     TVIN_SIG_STATUS_STABLE,   // stable - physically good signal & supported
 } tvin_sig_status_t;
 
+typedef enum tvin_aspect_ratio_e {
+    TVIN_ASPECT_NULL = 0,
+    TVIN_ASPECT_1x1,
+    TVIN_ASPECT_4x3_FULL,
+    TVIN_ASPECT_14x9_FULL,
+    TVIN_ASPECT_14x9_LB_CENTER,
+    TVIN_ASPECT_14x9_LB_TOP,
+    TVIN_ASPECT_16x9_FULL,
+    TVIN_ASPECT_16x9_LB_CENTER,
+    TVIN_ASPECT_16x9_LB_TOP,
+    TVIN_ASPECT_MAX,
+} tvin_aspect_ratio_t;
+
 typedef struct tvin_info_s {
-    enum tvin_trans_fmt    trans_fmt;
-    enum tvin_sig_fmt_e    fmt;
-    volatile enum tvin_sig_status_e status;
-    enum tvin_color_fmt_e  cfmt;
-    unsigned int           fps;
-    unsigned int           is_dvi;
-    unsigned int           hdr_info;
+    tvin_trans_fmt_t    trans_fmt;
+    tvin_sig_fmt_t    fmt;
+    tvin_sig_status_t status;
+    tvin_color_fmt_t  cfmt;
+    unsigned int      fps;
+    unsigned int      is_dvi;
+    /*
+     * bit 30: is_dv
+     * bit 29: present_flag
+     * bit 28-26: video_format
+     *  "component", "PAL", "NTSC", "SECAM", "MAC", "unspecified"
+     * bit 25: range "limited", "full_range"
+     * bit 24: color_description_present_flag
+     * bit 23-16: color_primaries
+     *  "unknown", "bt709", "undef", "bt601", "bt470m", "bt470bg",
+     *  "smpte170m", "smpte240m", "film", "bt2020"
+     * bit 15-8: transfer_characteristic
+     *  "unknown", "bt709", "undef", "bt601", "bt470m", "bt470bg",
+     *  "smpte170m", "smpte240m", "linear", "log100", "log316",
+     *  "iec61966-2-4", "bt1361e", "iec61966-2-1", "bt2020-10",
+     *  "bt2020-12", "smpte-st-2084", "smpte-st-428"
+     * bit 7-0: matrix_coefficient
+     *  "GBR", "bt709", "undef", "bt601", "fcc", "bt470bg",
+     *  "smpte170m", "smpte240m", "YCgCo", "bt2020nc", "bt2020c"
+     */
+    unsigned int hdr_info;
+    tvin_aspect_ratio_t aspect_ratio;
 } tvin_info_t;
 
 typedef struct tvin_parm_s {
@@ -87,6 +120,19 @@ typedef enum tvin_color_range_e {
     TVIN_COLOR_RANGE_FULL,
     TVIN_COLOR_RANGE_LIMIT,
 } tvin_color_range_t;
+
+typedef enum tvin_cn_type_e {
+    GRAPHICS,
+    PHOTO,
+    CINEMA,
+    GAME,
+} tvin_cn_type_t;
+
+typedef struct tvin_latency_s {
+    bool allm_mode;
+    bool it_content;
+    tvin_cn_type_e cn_type;
+} tvin_latency_t;
 
 // ***************************************************************************
 // *** AFE module definition/enum/struct *************************************
@@ -167,6 +213,26 @@ typedef enum tvafe_cvbs_video_e {
     TVAFE_CVBS_VIDEO_HV_LOCKED,
 } tvafe_cvbs_video_t;
 
+typedef enum tvin_sig_change_flag_e {
+     TVIN_SIG_CHG_NONE = 0,
+     TVIN_SIG_CHG_SDR2HDR = 0x01,
+     TVIN_SIG_CHG_HDR2SDR = 0x02,
+     TVIN_SIG_CHG_DV2NO = 0x04,
+     TVIN_SIG_CHG_NO2DV = 0x08,
+     TVIN_SIG_CHG_COLOR_FMT = 0x10,
+     TVIN_SIG_CHG_RANGE = 0x20, /*color range:full or limit*/
+     TVIN_SIG_CHG_BIT = 0x40, /*color bit deepth: 8,10,12 ...*/
+     TVIN_SIG_CHG_VS_FRQ = 0x80,
+     TVIN_SIG_CHG_DV_ALLM = 0x100,/*allm info*/
+     TVIN_SIG_CHG_AFD   = 0x200,/*aspect ratio*/
+     TVIN_SIG_CHG_STS = 0x80000000, /*sm state change*/
+} tvin_sig_change_flag_t;
+
+typedef struct vdin_event_info_s {
+	/*enum tvin_sg_chg_flg*/
+	unsigned int event_sts;
+} vdin_event_info_t;
+
 // ***************************************************************************
 // *** function type definition **********************************************
 // ***************************************************************************
@@ -217,6 +283,8 @@ enum {
 #define TVIN_IOC_SET_COLOR_RANGE	_IOW(TVIN_IOC_MAGIC, 0X4a, enum tvin_color_range_e)
 #define TVIN_IOC_GAME_MODE          _IOW(TVIN_IOC_MAGIC, 0x4b, unsigned int)
 #define TVIN_IOC_SET_AUTO_RATIO_EN  _IOW(TVIN_IOC_MAGIC, 0x4c, unsigned int)
+#define TVIN_IOC_GET_LATENCY_MODE   _IOR(TVIN_IOC_MAGIC, 0X4d, struct tvin_latency_s)
+#define TVIN_IOC_G_EVENT_INFO       _IOW(TVIN_IOC_MAGIC, 0x0a, struct vdin_event_info_s)
 
 //TVAFE
 #define TVIN_IOC_S_AFE_ADC_CAL      _IOW(TVIN_IOC_MAGIC, 0x11, struct tvafe_adc_cal_s)
@@ -253,6 +321,7 @@ public:
     int Tvin_StartDecoder(tvin_info_t info);
     int Tvin_StopDecoder(void);
     int Tvin_SwitchSnow(bool enable);
+    int Tvin_GetSignalEventInfo(vdin_event_info_s *SignalEventInfo);
     int Tvin_GetSignalInfo(tvin_info_s *SignalInfo);
     int Tvin_GetVdinDeviceFd(void);
     int Tvin_CheckVideoPathComplete(tv_path_type_t path_type);
@@ -275,6 +344,7 @@ private:
     int VDIN_ClosePort();
     int VDIN_StartDec(tvin_parm_s *vdinParam);
     int VDIN_StopDec(void);
+    int VDIN_GetSignalEventInfo(vdin_event_info_s *SignalEventInfo);
     int VDIN_GetSignalInfo(tvin_info_s *SignalInfo);
     int VDIN_AddPath(const char *videopath );
     int VDIN_RemovePath(tv_path_type_t pathtype);

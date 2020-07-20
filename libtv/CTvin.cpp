@@ -144,6 +144,16 @@ int CTvin::VDIN_StopDec()
     return ret;
 }
 
+int CTvin::VDIN_GetSignalEventInfo(struct vdin_event_info_s *SignalEventInfo)
+{
+    int ret = VDIN_DeviceIOCtl(TVIN_IOC_G_EVENT_INFO, SignalEventInfo);
+    if (ret < 0) {
+        LOGE("%s error(%s), ret = %d.\n", __FUNCTION__, strerror(errno), ret);
+    }
+
+    return ret;
+}
+
 int CTvin::VDIN_GetSignalInfo ( struct tvin_info_s *SignalInfo )
 {
     int ret = VDIN_DeviceIOCtl ( TVIN_IOC_G_SIG_INFO, SignalInfo );
@@ -480,9 +490,28 @@ int CTvin::Tvin_SwitchSnow(bool enable)
     return ret;
 }
 
+int CTvin::Tvin_GetSignalEventInfo(vdin_event_info_s *SignalEventInfo)
+{
+    int ret = -1;
+    if (SignalEventInfo == NULL) {
+        LOGE("Tvin_GetSignalEventInfo: SignalEventInfo is NULL.\n");
+    } else {
+        ret = VDIN_GetSignalEventInfo(SignalEventInfo);
+    }
+
+    return ret;
+}
+
 int CTvin::Tvin_GetSignalInfo(tvin_info_s *SignalInfo)
 {
-    return VDIN_GetSignalInfo(SignalInfo);
+    int ret = -1;
+    if (SignalInfo == NULL) {
+        LOGE("Tvin_GetSignalInfo: SignalInfo is NULL.\n");
+    } else {
+        ret = VDIN_GetSignalInfo(SignalInfo);
+    }
+
+    return ret;
 }
 
 int CTvin::Tvin_GetVdinDeviceFd(void)

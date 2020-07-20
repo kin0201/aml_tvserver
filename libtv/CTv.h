@@ -53,6 +53,7 @@ public:
     virtual void onVdinSignalChange();
 
 private:
+    void onSigStatusChange(void);
     void onSigToStable();
     void onSigToUnstable();
     void onSigToUnSupport();

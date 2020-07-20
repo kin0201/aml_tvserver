@@ -221,32 +221,6 @@ typedef enum Dynamic_backlight_status_e
     DYNAMIC_BACKLIGHT_HIGH = 2,
 } Dynamic_backlight_status_t;
 
-typedef enum tvin_aspect_ratio_e {
-    TVIN_ASPECT_NULL = 0,
-    TVIN_ASPECT_1x1,
-    TVIN_ASPECT_4x3,
-    TVIN_ASPECT_16x9,
-    TVIN_ASPECT_14x9,
-    TVIN_ASPECT_MAX,
-} tvin_aspect_ratio_t;
-
-typedef enum color_fmt_e {
-    RGB444 = 0,
-    YUV422, // 1
-    YUV444, // 2
-    YUYV422,// 3
-    YVYU422,// 4
-    UYVY422,// 5
-    VYUY422,// 6
-    NV12,   // 7
-    NV21,   // 8
-    BGGR,   // 9  raw data
-    RGGB,   // 10 raw data
-    GBRG,   // 11 raw data
-    GRBG,   // 12 raw data
-    COLOR_FMT_MAX,
-} color_fmt_t;
-
 typedef enum local_contrast_mode_e
 {
     LOCAL_CONTRAST_MODE_OFF = 0,

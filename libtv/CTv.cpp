@@ -34,6 +34,7 @@ CTv::CTv()
     signalInfo.hdr_info= 0;
     signalInfo.fps = 60;
     signalInfo.is_dvi = 0;
+    signalInfo.aspect_ratio = TVIN_ASPECT_NULL;
     SetCurrenSourceInfo(signalInfo);
     mTvDevicesPollDetect.setObserver(this);
     mTvDevicesPollDetect.startDetect();
@@ -83,6 +84,7 @@ int CTv::StopTv(tv_source_input_t source)
     tempSignalInfo.hdr_info= 0;
     tempSignalInfo.fps = 60;
     tempSignalInfo.is_dvi = 0;
+    tempSignalInfo.aspect_ratio = TVIN_ASPECT_NULL;
     SetCurrenSourceInfo(tempSignalInfo);
 #ifdef HAVE_AUDIO
     CTvAudio::getInstance()->release_audio_patch();
@@ -114,7 +116,91 @@ void CTv::onSourceConnect(int source, int connect_status)
     sendTvEvent(event);
 }
 
-void CTv::onVdinSignalChange(void)
+void CTv::onVdinSignalChange()
+{
+    vdin_event_info_s SignalEventInfo;
+    memset(&SignalEventInfo, 0, sizeof(vdin_event_info_s));
+    int ret  = mpTvin->Tvin_GetSignalEventInfo(&SignalEventInfo);
+    if (ret < 0) {
+        LOGD("Get vidn event error!\n");
+    } else {
+        tv_source_input_type_t source_type = mpTvin->Tvin_SourceInputToSourceInputType(mCurrentSource);
+        tvin_sig_change_flag_t vdinEventType = (tvin_sig_change_flag_t)SignalEventInfo.event_sts;
+        switch (vdinEventType) {
+        case TVIN_SIG_CHG_SDR2HDR:
+        case TVIN_SIG_CHG_HDR2SDR:
+        case TVIN_SIG_CHG_DV2NO:
+        case TVIN_SIG_CHG_NO2DV: {
+            LOGD("%s: hdr info change!\n", __FUNCTION__);
+            tvin_info_t vdinSignalInfo;
+            memset(&vdinSignalInfo, 0, sizeof(tvin_info_t));
+            ret = mpTvin->Tvin_GetSignalInfo(&vdinSignalInfo);
+            if (ret < 0) {
+                LOGD("%s: Get vidn event error!\n", __FUNCTION__);
+            } else {
+                if ((mCurrentSignalInfo.status == TVIN_SIG_STATUS_STABLE) && (mCurrentSignalInfo.hdr_info != vdinSignalInfo.hdr_info)) {
+                    if (source_type == SOURCE_TYPE_HDMI) {
+                        //tvSetCurrentHdrInfo(vdinSignalInfo.hdr_info);
+                    }
+                    mCurrentSignalInfo.hdr_info = vdinSignalInfo.hdr_info;
+                } else {
+                    LOGD("%s: hdmi signal don't stable!\n", __FUNCTION__);
+                }
+            }
+            break;
+        }
+        case TVIN_SIG_CHG_COLOR_FMT:
+            LOGD("%s: no need do any thing for colorFmt change!\n", __FUNCTION__);
+            break;
+        case TVIN_SIG_CHG_RANGE:
+            LOGD("%s: no need do any thing for colorRange change!\n", __FUNCTION__);
+            break;
+        case TVIN_SIG_CHG_BIT:
+            LOGD("%s: no need do any thing for color bit deepth change!\n", __FUNCTION__);
+            break;
+        case TVIN_SIG_CHG_VS_FRQ:
+            LOGD("%s: no need do any thing for VS_FRQ change!\n", __FUNCTION__);
+            break;
+        case TVIN_SIG_CHG_STS:
+            LOGD("%s: vdin signal status change!\n", __FUNCTION__);
+            onSigStatusChange();
+            break;
+        case TVIN_SIG_CHG_AFD: {
+            LOGD("%s: AFD info change!\n", __FUNCTION__);
+            if (source_type == SOURCE_TYPE_HDMI) {
+                tvin_info_t newSignalInfo;
+                memset(&newSignalInfo, 0, sizeof(tvin_info_t));
+                int ret = mpTvin->Tvin_GetSignalInfo(&newSignalInfo);
+                if (ret < 0) {
+                    LOGD("%s: Get Signal Info error!\n", __FUNCTION__);
+                } else {
+                    if ((newSignalInfo.status == TVIN_SIG_STATUS_STABLE)
+                        && (mCurrentSignalInfo.aspect_ratio != newSignalInfo.aspect_ratio)) {
+                        mCurrentSignalInfo.aspect_ratio = newSignalInfo.aspect_ratio;
+                        //tvSetCurrentAspectRatioInfo(newSignalInfo.aspect_ratio);
+                    } else {
+                        LOGD("%s: signal not stable or same AFD info!\n", __FUNCTION__);
+                    }
+                }
+            }
+            break;
+        }
+        case TVIN_SIG_CHG_DV_ALLM:
+            LOGD("%s: allm info change!\n", __FUNCTION__);
+            if (source_type == SOURCE_TYPE_HDMI) {
+                //setPictureModeBySignal(PQ_MODE_SWITCH_TYPE_AUTO);
+            } else {
+                LOGD("%s: not hdmi source!\n", __FUNCTION__);
+            }
+            break;
+        default:
+            LOGD("%s: invalid vdin event!\n", __FUNCTION__);
+            break;
+        }
+    }
+}
+
+void CTv::onSigStatusChange(void)
 {
     LOGD("%s\n", __FUNCTION__);
     tvin_info_s tempSignalInfo;
@@ -151,6 +237,7 @@ int CTv::SetCurrenSourceInfo(tvin_info_t sig_info)
     mCurrentSignalInfo.hdr_info= sig_info.hdr_info;
     mCurrentSignalInfo.fps = sig_info.fps;
     mCurrentSignalInfo.is_dvi = sig_info.is_dvi;
+    mCurrentSignalInfo.aspect_ratio = sig_info.aspect_ratio;
 
     if ((mCurrentSource == SOURCE_MPEG)
         || (mCurrentSource != SOURCE_MPEG && mCurrentSignalInfo.status == TVIN_SIG_STATUS_STABLE)) {
