@@ -32,4 +32,6 @@ tvserver-install:
 
 tvserver-clean:
 	$(MAKE) -f Makefile.roku -C $(TVSERVER_PROJDIR) $(TVSERVER_MAKE_OPTIONS) clean || true
+
+tvserver-distclean:
 	$(MAKE) -f Makefile.roku -C $(TVSERVER_PROJDIR) $(TVSERVER_MAKE_OPTIONS) DESTDIR=$(ROKU_STAGING_DIR)/$(TVSERVER_DESTDIR) distclean || true
