@@ -7,27 +7,19 @@
 OUT_ROOT ?= dist
 
 DEPENDS := audio_client
-DEPENDS := $(addsuffix /build, $(addprefix $(ROKU_PORT_DIR)/dist/build/, $(DEPENDS)))
+DEPENDS := $(addsuffix /build, $(addprefix $(OUT_ROOT)/../../, $(DEPENDS)))
 override LDFLAGS += $(addprefix -L, $(DEPENDS))
 
-LOCAL_PATH = $(AML_COMMON_DIR)/tvserver
+LOCAL_PATH = .
 AUDIO_HAL_DIR = $(AML_COMMON_DIR)/audio_hal
 CUTILS_DIR = $(AML_COMMON_DIR)/cutils
+TVSERVER_DIR = $(AML_COMMON_DIR)/tvserver
 
 CFLAGS += -Wall -D_GNU_SOURCE -DHAVE_AUDIO
 
 ################################################################################
 # libpq.so - src files
 ################################################################################
-CSV_RET=$(shell ($(LOCAL_PATH)/libpq/csvAnalyze.sh > /dev/zero;echo $$?))
-ifeq ($(CSV_RET), 1)
-  $(error "Csv file or common.h file is not exist!!!!")
-else ifeq ($(CSV_RET), 2)
-  $(error "Csv file's Id must be integer")
-else ifeq ($(CSV_RET), 3)
-  $(error "Csv file's Size must be integer or defined in common.h")
-endif
-
 pq_SRCS = \
 	$(LOCAL_PATH)/libpq/CPQdb.cpp \
 	$(LOCAL_PATH)/libpq/COverScandb.cpp \
@@ -105,13 +97,13 @@ include $(ROKU_PORT_COMMON_DIR)/build/define_target.mk
 comma = ,
 $(eval $(call DEFINE_TARGET,libpq.so,$(pq_SRCS),,$(LDFLAGS) -lstdc++ -lpthread -lz -ldl -lrt -lm -lsqlite3 -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
 $(eval $(call DEFINE_TARGET,libtvclient.so,$(tvclient_SRCS),,$(LDFLAGS) -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
-$(eval $(call DEFINE_TARGET,libtv.so,$(tv_SRCS),$(OUT_ROOT)/libpq.so,$(LDFLAGS) -L$(OUT_ROOT) -lpq -laudio_client -lLogging -lInterProcess -lBase -lexpat -lboost_system -lboost_filesystem -lstdc++ -lpthread -lz -ldl -lrt -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
-$(eval $(call DEFINE_TARGET,tvservice,$(tvservice_SRCS),$(OUT_ROOT)/libpq.so $(OUT_ROOT)/libtv.so,$(LDFLAGS) -L$(OUT_ROOT) -lpq -ltv -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -lsqlite3 -laudio_client -lLogging -lInterProcess -lBase -lexpat -lboost_system -lboost_filesystem -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
-$(eval $(call DEFINE_TARGET,tvtest,$(tvtest_SRCS),$(OUT_ROOT)/libtvclient.so,$(LDFLAGS) -L$(OUT_ROOT) -ltvclient -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
+$(eval $(call DEFINE_TARGET,libtv.so,$(tv_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -lpq -laudio_client -lexpat -lboost_system -lboost_filesystem -lstdc++ -lpthread -lz -ldl -lrt -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
+$(eval $(call DEFINE_TARGET,tvservice,$(tvservice_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -lpq -ltv -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -lsqlite3 -laudio_client -lexpat -lboost_system -lboost_filesystem -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
+$(eval $(call DEFINE_TARGET,tvtest,$(tvtest_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -ltvclient -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
 
 # ---------------------------------------------------------------------
 #  Build rules
-all: $(VENDOR_ALL_TARGETS)
+all: $(VENDOR_ALL_TARGETS) $(NATIVE_ALL_TARGETS)
 # Compile .c file.
 # Simultaneously create .d file (see http://make.mad-scientist.net/papers/advanced-auto-dependency-generation).
 $(OUT_ROOT)/%.o: %.c $(OUT_ROOT)/%.d
@@ -134,16 +126,25 @@ include $(wildcard $(patsubst %,$(OUT_ROOT)/%.d,$(basename $(tv_SRCS))))
 include $(wildcard $(patsubst %,$(OUT_ROOT)/%.d,$(basename $(tvservice_SRCS))))
 include $(wildcard $(patsubst %,$(OUT_ROOT)/%.d,$(basename $(tvtest_SRCS))))
 
+configure:
+	CSV_RET=$(shell ($(LOCAL_PATH)/libpq/csvAnalyze.sh > /dev/zero;echo $$?))
+	ifeq ($(CSV_RET), 1)
+	  $(error "Csv file or common.h file is not exist!!!!")
+	else ifeq ($(CSV_RET), 2)
+	  $(error "Csv file's Id must be integer")
+	else ifeq ($(CSV_RET), 3)
+	  $(error "Csv file's Size must be integer or defined in common.h")
+	endif
 clean:
 	-rm -rf $(OUT_ROOT) $(CLEAN_FILES)
 	mkdir -p $(OUT_ROOT)
 
 distclean:
-	-rm   $(DESTDIR)/lib/libpq.so
-	-rm   $(DESTDIR)/lib/libtvclient.so
-	-rm   $(DESTDIR)/lib/libtv.so
-	-rm   $(DESTDIR)/bin/tvservice
-	-rm   $(DESTDIR)/bin/tvtest
+	-rm -rf $(DESTDIR)/usr/lib/libpq.so
+	-rm -rf $(DESTDIR)/usr/lib/libtvclient.so
+	-rm -rf $(DESTDIR)/usr/lib/libtv.so
+	-rm -rf $(DESTDIR)/usr/bin/tvservice
+	-rm -rf $(DESTDIR)/usr/bin/tvtest
 
 install:
 	mkdir -p $(DESTDIR)/usr/lib
