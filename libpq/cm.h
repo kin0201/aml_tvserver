@@ -247,13 +247,15 @@ typedef struct ve_pq_table_s {
 } ve_pq_table_t;
 
 typedef struct am_pic_mode_s {
-	int flag;
-	int brightness;
-	int brightness2;
-	int saturation_hue;
-	int saturation_hue_post;
-	int contrast;
-	int contrast2;
+    int flag;
+    int brightness;
+    int brightness2;
+    int saturation_hue;
+    int saturation_hue_post;
+    int contrast;
+    int contrast2;
+    int vadj1_en;  /*vadj1 enable: 1 enable  0 disable*/
+    int vadj2_en;
 }am_pic_mode_t;
 
 #endif  // _TVOUT_CM_H

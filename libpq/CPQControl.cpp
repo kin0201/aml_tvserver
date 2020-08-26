@@ -317,8 +317,15 @@ int CPQControl::LoadPQSettings()
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_ALL_PQ_MOUDLE_ENABLE, "enable");
     if (strcmp(config_value, "disable") == 0) {
         LOGD("All PQ moudle disabled!\n");
-        ve_pq_moudle_state_t state = VE_PQ_MOUDLE_OFF;
-        ret = VPPDeviceIOCtl(AMVECM_IOC_S_PQ_STATUE, &state);
+        pq_ctrl_t pqControlVal;
+        memset(&pqControlVal, 0, sizeof(pq_ctrl_t));
+        vpp_pq_ctrl_t amvecmConfigVal;
+        amvecmConfigVal.length = 14;//this is the count of pq_ctrl_s option
+        amvecmConfigVal.ptr = (long long)&pqControlVal;
+        ret = VPPDeviceIOCtl(AMVECM_IOC_S_PQ_CTRL, &amvecmConfigVal);
+        if (ret < 0) {
+            LOGE("%s error: %s!\n", __FUNCTION__, strerror(errno));
+        }
     } else {
         LOGD("source_input: %d, sig_fmt: 0x%x(%d), trans_fmt: 0x%x\n", mCurentSourceInputInfo.source_input,
                  mCurentSourceInputInfo.sig_fmt, mCurentSourceInputInfo.sig_fmt, mCurentSourceInputInfo.trans_fmt);
@@ -491,18 +498,13 @@ int CPQControl::Cpq_LoadBasicRegs(source_input_param_t source_input_param)
         LOGD("%s: Sharpness1 moudle disabled!\n", __FUNCTION__);
     }
 
-    if (mbCpqCfg_brightness_contrast_enable) {
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
         ret |= Cpq_SetBrightnessBasicParam(source_input_param);
         ret |= Cpq_SetContrastBasicParam(source_input_param);
-    } else {
-        LOGD("%s: brightness and contrast moudle disabled!\n", __FUNCTION__);
-    }
-
-    if (mbCpqCfg_satuation_hue_enable) {
         ret |= Cpq_SetSaturationBasicParam(source_input_param);
         ret |= Cpq_SetHueBasicParam(source_input_param);
     } else {
-        LOGD("%s: satuation and hue moudle disabled!\n", __FUNCTION__);
+        LOGD("%s: brightness contrast saturation hue moudle disabled!\n", __FUNCTION__);
     }
 
     return ret;
@@ -691,27 +693,34 @@ int CPQControl::Cpq_SetPQMode(vpp_picture_mode_t pq_mode, source_input_param_t s
 int CPQControl::SetPQParams(vpp_pq_para_t pq_para, source_input_param_t source_input_param)
 {
     int ret = 0;
-    int hue_level = 0, hue = 50, saturation = 50;
-    if (((source_input_param.source_input == SOURCE_TV) ||
-          (source_input_param.source_input == SOURCE_AV1) ||
-          (source_input_param.source_input == SOURCE_AV2)) &&
-        ((source_input_param.sig_fmt == TVIN_SIG_FMT_CVBS_NTSC_M) ||
-         (source_input_param.sig_fmt == TVIN_SIG_FMT_CVBS_NTSC_443))) {
-        hue_level = 100 - pq_para.hue;
-    } else {
-        hue_level = 50;
-    }
 
-    ret = mPQdb->PQ_GetHueParams(source_input_param, hue_level, &hue);
-    if (ret == 0) {
-        ret = mPQdb->PQ_GetSaturationParams(source_input_param, pq_para.saturation, &saturation);
-        if (ret == 0) {
-            ret = Cpq_SetVideoSaturationHue(saturation, hue);
+
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
+        int hue_level = 0, hue = 50, saturation = 50;
+        if (((source_input_param.source_input == SOURCE_TV) ||
+              (source_input_param.source_input == SOURCE_AV1) ||
+              (source_input_param.source_input == SOURCE_AV2)) &&
+            ((source_input_param.sig_fmt == TVIN_SIG_FMT_CVBS_NTSC_M) ||
+             (source_input_param.sig_fmt == TVIN_SIG_FMT_CVBS_NTSC_443))) {
+            hue_level = 100 - pq_para.hue;
         } else {
-            LOGE("%s: PQ_GetSaturationParams failed!\n", __FUNCTION__);
+            hue_level = 50;
+        }
+
+        ret = mPQdb->PQ_GetHueParams(source_input_param, hue_level, &hue);
+        if (ret == 0) {
+            ret = mPQdb->PQ_GetSaturationParams(source_input_param, pq_para.saturation, &saturation);
+            if (ret == 0) {
+                ret = Cpq_SetVideoSaturationHue(saturation, hue);
+            } else {
+                LOGE("%s: PQ_GetSaturationParams failed!\n", __FUNCTION__);
+            }
+        } else {
+            LOGE("%s: PQ_GetHueParams failed!\n", __FUNCTION__);
         }
     } else {
-        LOGE("%s: PQ_GetHueParams failed!\n", __FUNCTION__);
+        LOGD("%s: brightness contrast saturation hue moudle disabled!\n", __FUNCTION__);
+        ret = 0;
     }
 
     ret |= Cpq_SetSharpness(pq_para.sharpness, source_input_param);
@@ -1350,7 +1359,7 @@ int CPQControl::Cpq_SetBrightness(int value, source_input_param_t source_input_p
     int ret = -1;
     int params;
     int level;
-    if (mbCpqCfg_brightness_contrast_enable) {
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
         if (value >= 0 && value <= 100) {
             level = value;
             if (mPQdb->PQ_GetBrightnessParams(source_input_param, level, &params) == 0) {
@@ -1362,7 +1371,7 @@ int CPQControl::Cpq_SetBrightness(int value, source_input_param_t source_input_p
             }
         }
     } else {
-        LOGD("%s: brightness and contrast moudle disabled!\n", __FUNCTION__);
+        LOGD("%s: brightness contrast saturation hue moudle disabled!\n", __FUNCTION__);
         ret = 0;
     }
     return ret;
@@ -1373,12 +1382,14 @@ int CPQControl::Cpq_SetVideoBrightness(int value)
     LOGD("Cpq_SetVideoBrightness brightness : %d.\n", value);
     am_pic_mode_t params;
     memset(&params, 0, sizeof(params));
-    if (mbCpqCfg_brightness_withOSD) {
-        params.flag |= (0x1<<1);
-        params.brightness2 = value;
-    } else {
+    if (mbCpqCfg_amvecm_basic_enable) {
         params.flag |= 0x1;
         params.brightness = value;
+    }
+
+    if (mbCpqCfg_amvecm_basic_withOSD_enable) {
+        params.flag |= (0x1<<1);
+        params.brightness2 = value;
     }
 
     int ret = VPPDeviceIOCtl(AMVECM_IOC_S_PIC_MODE, &params);
@@ -1459,7 +1470,7 @@ int CPQControl::Cpq_SetContrast(int value, source_input_param_t source_input_par
     int ret = -1;
     int params;
     int level;
-    if (mbCpqCfg_brightness_contrast_enable) {
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
         if (value >= 0 && value <= 100) {
             level = value;
             if (mPQdb->PQ_GetContrastParams(source_input_param, level, &params) == 0) {
@@ -1484,12 +1495,14 @@ int CPQControl::Cpq_SetVideoContrast(int value)
     am_pic_mode_t params;
     memset(&params, 0, sizeof(params));
 
-    if (mbCpqCfg_contrast_withOSD) {
-        params.flag |= (0x1<<5);
-        params.contrast2 = value;
-    } else {
+    if (mbCpqCfg_amvecm_basic_enable) {
         params.flag |= (0x1<<4);
         params.contrast = value;
+    }
+
+    if (mbCpqCfg_amvecm_basic_withOSD_enable) {
+        params.flag |= (0x1<<5);
+        params.contrast2 = value;
     }
 
     int ret = VPPDeviceIOCtl(AMVECM_IOC_S_PIC_MODE, &params);
@@ -1571,7 +1584,7 @@ int CPQControl::Cpq_SetSaturation(int value, source_input_param_t source_input_p
     int ret = -1;
     int saturation = 0, hue = 0;
     int satuation_level = 0, hue_level = 0;
-    if (mbCpqCfg_satuation_hue_enable) {
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
         if (value >= 0 && value <= 100) {
             satuation_level = value;
             if (((source_input_param.source_input == SOURCE_TV) ||
@@ -1674,7 +1687,7 @@ int CPQControl::Cpq_SetHue(int value, source_input_param_t source_input_param)
     int ret = -1;
     int hue_params = 0, saturation_params = 0;
     int hue_level = 0, saturation_level = 0;
-    if (mbCpqCfg_satuation_hue_enable) {
+    if (mbCpqCfg_amvecm_basic_enable || mbCpqCfg_amvecm_basic_withOSD_enable) {
         if (value >= 0 && value <= 100) {
             hue_level = 100 - value;
             ret = mPQdb->PQ_GetHueParams(source_input_param, hue_level, &hue_params);
@@ -1706,12 +1719,14 @@ int CPQControl::Cpq_SetVideoSaturationHue(int satVal, int hueVal)
     memset(&params, 0, sizeof(params));
     video_set_saturation_hue(satVal, hueVal, &temp);
 
-    if (mbCpqCfg_hue_withOSD) {
-        params.flag |= (0x1<<3);
-        params.saturation_hue_post = temp;
-    } else {
+    if (mbCpqCfg_amvecm_basic_enable) {
         params.flag |= (0x1<<2);
         params.saturation_hue = temp;
+    }
+
+    if (mbCpqCfg_amvecm_basic_withOSD_enable) {
+        params.flag |= (0x1<<3);
+        params.saturation_hue_post = temp;
     }
 
     int ret = VPPDeviceIOCtl(AMVECM_IOC_S_PIC_MODE, &params);
@@ -3767,47 +3782,15 @@ int CPQControl::GetEyeProtectionMode(tv_source_input_t source_input __unused)
 
 int CPQControl::SetFlagByCfg(void)
 {
+    pq_ctrl_t pqControlVal;
+    memset(&pqControlVal, 0x0, sizeof(pq_ctrl_t));
     const char *config_value;
+
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_BIG_SMALL_DB_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_seperate_db_enable = true;
     } else {
         mbCpqCfg_seperate_db_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_BRIGHTNESS_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_brightness_contrast_enable = true;
-    } else {
-        mbCpqCfg_brightness_contrast_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_SATUATION_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_satuation_hue_enable = true;
-    } else {
-        mbCpqCfg_satuation_hue_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_BLACKEXTENSION_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_blackextension_enable = true;
-    } else {
-        mbCpqCfg_blackextension_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_SHARPNESS0_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_sharpness0_enable = true;
-    } else {
-        mbCpqCfg_sharpness0_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_SHARPNESS1_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_sharpness1_enable = true;
-    } else {
-        mbCpqCfg_sharpness1_enable = false;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DI_ENABLE, "enable");
@@ -3820,29 +3803,118 @@ int CPQControl::SetFlagByCfg(void)
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_MCDI_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_mcdi_enable = true;
+        pqWriteSys(MCDI_MODULE_CONTROL_PATH, "1");
     } else {
         mbCpqCfg_mcdi_enable = false;
+        pqWriteSys(MCDI_MODULE_CONTROL_PATH, "0");
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DEBLOCK_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_deblock_enable = true;
+        pqWriteSys(DEBLOCK_MODULE_CONTROL_PATH, "13");//bit2~bit3
     } else {
         mbCpqCfg_deblock_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_NOISEREDUCTION_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_nr_enable = true;
-    } else {
-        mbCpqCfg_nr_enable = false;
+        pqWriteSys(DEBLOCK_MODULE_CONTROL_PATH, "1");
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DEMOSQUITO_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_demoSquito_enable = true;
+        pqWriteSys(DEMOSQUITO_MODULE_CONTROL_PATH, "1");//bit0
     } else {
         mbCpqCfg_demoSquito_enable = false;
+        pqWriteSys(DEMOSQUITO_MODULE_CONTROL_PATH, "0");
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_NOISEREDUCTION_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_nr_enable = true;
+        pqWriteSys(NR2_MODULE_CONTROL_PATH, "1");
+    } else {
+        mbCpqCfg_nr_enable = false;
+        pqWriteSys(NR2_MODULE_CONTROL_PATH, "0");
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_SHARPNESS0_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_sharpness0_enable = true;
+        pqControlVal.sharpness0_en = 1;
+    } else {
+        mbCpqCfg_sharpness0_enable = false;
+        pqControlVal.sharpness0_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_SHARPNESS1_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_sharpness1_enable = true;
+        pqControlVal.sharpness1_en = 1;
+    } else {
+        mbCpqCfg_sharpness1_enable = false;
+        pqControlVal.sharpness1_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DNLP_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_dnlp_enable = true;
+        pqControlVal.dnlp_en = 1;
+    } else {
+        mbCpqCfg_dnlp_enable = false;
+        pqControlVal.dnlp_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_CM2_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_cm2_enable = true;
+        pqControlVal.cm_en = 1;
+    } else {
+        mbCpqCfg_cm2_enable = false;
+        pqControlVal.cm_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_AMVECM_BASCI_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_amvecm_basic_enable = true;
+        pqControlVal.vadj1_en = 1;
+    } else {
+        mbCpqCfg_amvecm_basic_enable = false;
+        pqControlVal.vadj1_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_AMVECM_BASCI_WITHOSD_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_amvecm_basic_withOSD_enable = true;
+        pqControlVal.vadj2_en = 1;
+    } else {
+        mbCpqCfg_amvecm_basic_withOSD_enable = false;
+        pqControlVal.vadj2_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_CONTRAST_RGB_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_contrast_rgb_enable = true;
+        pqControlVal.vd1_ctrst_en = 1;
+    } else {
+        mbCpqCfg_contrast_rgb_enable = false;
+        pqControlVal.vd1_ctrst_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_CONTRAST_RGB_WITHOSD_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_contrast_rgb_withOSD_enable = true;
+        pqControlVal.post_ctrst_en = 1;
+    } else {
+        mbCpqCfg_contrast_rgb_withOSD_enable = false;
+        pqControlVal.post_ctrst_en = 0;
+    }
+
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_WHITEBALANCE_ENABLE, "enable");
+    if (strcmp(config_value, "enable") == 0) {
+        mbCpqCfg_whitebalance_enable = true;
+        pqControlVal.wb_en = 1;
+    } else {
+        mbCpqCfg_whitebalance_enable = false;
+        pqControlVal.wb_en = 0;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_GAMMA_ENABLE, "enable");
@@ -3852,25 +3924,22 @@ int CPQControl::SetFlagByCfg(void)
         mbCpqCfg_gamma_enable = false;
     }
 
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_CM2_ENABLE, "enable");
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_LOCAL_CONTRAST_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_cm2_enable = true;
+        mbCpqCfg_local_contrast_enable = true;
+        pqControlVal.lc_en = 1;
     } else {
-        mbCpqCfg_cm2_enable = false;
+        mbCpqCfg_local_contrast_enable = false;
+        pqControlVal.lc_en = 0;
     }
 
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_WHITEBALANCE_ENABLE, "enable");
+    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_BLACKEXTENSION_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_whitebalance_enable = true;
+        mbCpqCfg_blackextension_enable = true;
+        pqControlVal.black_ext_en = 1;
     } else {
-        mbCpqCfg_whitebalance_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DNLP_ENABLE, "enable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_dnlp_enable = true;
-    } else {
-        mbCpqCfg_dnlp_enable = false;
+        mbCpqCfg_blackextension_enable = false;
+        pqControlVal.lc_en = 0;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_XVYCC_ENABLE, "disable");
@@ -3880,39 +3949,11 @@ int CPQControl::SetFlagByCfg(void)
         mbCpqCfg_xvycc_enable = false;
     }
 
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_CONTRAST_WITHOSD_ENABLE, "disable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_contrast_withOSD = true;
-    } else {
-        mbCpqCfg_contrast_withOSD = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_HUE_WITHOSD_ENABLE, "disable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_hue_withOSD = true;
-    } else {
-        mbCpqCfg_hue_withOSD = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_BRIGHTNESS_WITHOSD_ENABLE, "disable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_brightness_withOSD = true;
-    } else {
-        mbCpqCfg_brightness_withOSD = false;
-    }
-
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_DISPLAY_OVERSCAN_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_display_overscan_enable = true;
     } else {
         mbCpqCfg_display_overscan_enable = false;
-    }
-
-    config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_LOCAL_CONTRAST_ENABLE, "disable");
-    if (strcmp(config_value, "enable") == 0) {
-        mbCpqCfg_local_contrast_enable = true;
-    } else {
-        mbCpqCfg_local_contrast_enable = false;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_HDMI, CFG_HDMI_OUT_WITH_FBC_ENABLE, "disable");
@@ -3928,6 +3969,16 @@ int CPQControl::SetFlagByCfg(void)
     } else {
         mbCpqCfg_pq_param_check_source_enable = false;
     }
+
+    vpp_pq_ctrl_t amvecmConfigVal;
+    amvecmConfigVal.length = 14;//this is the count of pq_ctrl_s option
+    amvecmConfigVal.ptr = (long long)&pqControlVal;
+    int ret = VPPDeviceIOCtl(AMVECM_IOC_S_PQ_CTRL, &amvecmConfigVal);
+    if (ret < 0) {
+        LOGE("%s error: %s!\n", __FUNCTION__, strerror(errno));
+    }
+
+    Cpq_SetVadjEnableStatus(pqControlVal.vadj1_en, pqControlVal.vadj2_en);
 
     return 0;
 }
@@ -4559,12 +4610,8 @@ void CPQControl::resetAllUserSettingParam()
     config_val = mPQConfigFile->GetInt(CFG_SECTION_PQ, CFG_EYEPROJECTMODE_DEF, 0);
     mSSMAction->SSMSaveEyeProtectionMode(config_val);
 
-    buf = mPQConfigFile->GetString(CFG_SECTION_HDMI, CFG_EDID_VERSION_DEF, NULL);
-    if (strcmp(buf, "edid_20") == 0) {
-        mSSMAction->SSMEdidRestoreDefault(1);
-    } else {
-        mSSMAction->SSMEdidRestoreDefault(0);
-    }
+    config_val = mPQConfigFile->GetInt(CFG_SECTION_HDMI, CFG_EDID_VERSION_DEF, 0);
+    mSSMAction->SSMEdidRestoreDefault(config_val);
 
     config_val = mPQConfigFile->GetInt(CFG_SECTION_HDMI, CFG_HDCP_SWITCHER_DEF, 0);
     mSSMAction->SSMHdcpSwitcherRestoreDefault(0);
@@ -4728,3 +4775,24 @@ bool CPQControl::isPqDatabaseMachChip()
     return matchStatus;
 }
 
+int CPQControl::Cpq_SetVadjEnableStatus(int isvadj1Enable, int isvadj2Enable)
+{
+    LOGD("%s: isvadj1Enable = %d, isvadj2Enable = %d.\n", __FUNCTION__, isvadj1Enable, isvadj2Enable);
+    int ret = -1;
+    if ((!mbCpqCfg_amvecm_basic_enable) && (!mbCpqCfg_amvecm_basic_withOSD_enable)) {
+        ret = 0;
+        LOGD("%s: all vadj module disabled.\n", __FUNCTION__);
+    } else {
+        am_pic_mode_t params;
+        memset(&params, 0, sizeof(params));
+        params.flag |= (0x1<<6);
+        params.vadj1_en = isvadj1Enable;
+        params.vadj2_en = isvadj2Enable;
+        ret = VPPDeviceIOCtl(AMVECM_IOC_S_PIC_MODE, &params);
+        if (ret < 0) {
+            LOGE("%s error: %s!\n", __FUNCTION__, strerror(errno));
+        }
+    }
+
+    return ret;
+}

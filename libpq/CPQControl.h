@@ -41,6 +41,10 @@
 #define TEST_SCREEN               "/sys/class/video/test_screen"
 #define PQ_SET_RW_INTERFACE       "/sys/class/amvecm/pq_reg_rw"
 #define SYS_DISPLAY_MODE_PATH     "/sys/class/display/mode"
+#define DEMOSQUITO_MODULE_CONTROL_PATH   "/sys/module/di/parameters/dnr_dm_en"  //demosquito control
+#define DEBLOCK_MODULE_CONTROL_PATH      "/sys/module/di/parameters/dnr_en"     //deblock control
+#define NR2_MODULE_CONTROL_PATH          "sys/module/di/parameters/nr2_en"      //noisereduction control
+#define MCDI_MODULE_CONTROL_PATH         "/sys/module/di/parameters/mcen_mode"  //mcdi control
 
 #define TVIN_IOC_MAGIC 'T'
 #define TVIN_IOC_LOAD_REG           _IOW(TVIN_IOC_MAGIC, 0x20, struct am_regs_s)
@@ -130,7 +134,6 @@ public:
     ~CPQControl();
     static CPQControl *GetInstance();
     virtual void onVframeSizeChange();
-    virtual void onHDRStatusChange();
     virtual void onTXStatusChange();
     virtual void resetAllUserSettingParam();
     virtual void Set_Backlight(int value);
@@ -358,11 +361,14 @@ private:
     output_type_t GetTxOutPutMode(void);
     bool isCVBSParamValid(void);
     bool isPqDatabaseMachChip();
+    int Cpq_SetVadjEnableStatus(int isvadj1Enable, int isvadj2Enable);
     bool mInitialized;
     //cfg
     bool mbCpqCfg_seperate_db_enable;
-    bool mbCpqCfg_brightness_contrast_enable;
-    bool mbCpqCfg_satuation_hue_enable;
+    bool mbCpqCfg_amvecm_basic_enable;
+    bool mbCpqCfg_amvecm_basic_withOSD_enable;
+    bool mbCpqCfg_contrast_rgb_enable;
+    bool mbCpqCfg_contrast_rgb_withOSD_enable;
     bool mbCpqCfg_blackextension_enable;
     bool mbCpqCfg_sharpness0_enable;
     bool mbCpqCfg_sharpness1_enable;
@@ -376,9 +382,6 @@ private:
     bool mbCpqCfg_whitebalance_enable;
     bool mbCpqCfg_dnlp_enable;
     bool mbCpqCfg_xvycc_enable;
-    bool mbCpqCfg_brightness_withOSD;
-    bool mbCpqCfg_contrast_withOSD;
-    bool mbCpqCfg_hue_withOSD;
     bool mbCpqCfg_display_overscan_enable;
     bool mbCpqCfg_local_contrast_enable;
     bool mbCpqCfg_hdmi_out_with_fbc_enable;
