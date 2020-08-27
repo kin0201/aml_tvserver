@@ -148,7 +148,6 @@ CPQControl::~CPQControl()
 
 int CPQControl::VPPOpenModule(void)
 {
-    mAmvideoFd = mCDevicePollCheckThread.HDR_fd;
     if (mAmvideoFd < 0) {
         mAmvideoFd = open(VPP_DEV_PATH, O_RDWR);
         if (mAmvideoFd < 0) {
@@ -286,15 +285,6 @@ tvin_sig_fmt_t CPQControl::getVideoResolutionToFmt()
     close(fd);
 
     return sig_fmt;
-}
-
-void CPQControl::onHDRStatusChange()
-{
-    LOGD("%s!\n", __FUNCTION__);
-    if ((mCurentSourceInputInfo.source_input >= SOURCE_HDMI1)
-      &&(mCurentSourceInputInfo.source_input <= SOURCE_HDMI4)) {
-        SetCurrentSourceInputInfo(mCurentSourceInputInfo);
-    }
 }
 
 void CPQControl::onTXStatusChange()

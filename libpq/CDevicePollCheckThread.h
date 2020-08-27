@@ -17,7 +17,6 @@
 #include <fcntl.h>
 
 #define VFRAME_MOUDLE_PATH    "/dev/amvideo_poll"
-#define HDR_MOUDLE_PATH       "/dev/amvecm"
 #define TX_MOUDLE_PATH        "/dev/display"
 
 class CDevicePollCheckThread {
@@ -31,15 +30,12 @@ public:
         IDevicePollCheckObserver() {};
         virtual ~IDevicePollCheckObserver() {};
         virtual void onVframeSizeChange() {};
-        virtual void onHDRStatusChange() {};
         virtual void onTXStatusChange() {};
     };
 
     void setObserver ( IDevicePollCheckObserver *pOb ) {
         mpObserver = pOb;
     };
-
-    int HDR_fd;
 
 private:
     static void *PqPollThread(void* data);
@@ -49,7 +45,6 @@ private:
     CEpoll       mEpoll;
     epoll_event m_event;
     CPQFile mVFrameSizeFile;
-    CPQFile mHDRStatusFile;
     CPQFile mTXStatusFile;
 };
 

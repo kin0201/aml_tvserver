@@ -27,13 +27,6 @@ CDevicePollCheckThread::CDevicePollCheckThread()
         m_event.events = EPOLLIN | EPOLLET;
         mEpoll.add(mVFrameSizeFile.PQ_GetFileFd(), &m_event);
     }
-    //HDR
-    if (mHDRStatusFile.PQ_OpenFile(HDR_MOUDLE_PATH) > 0) {
-        m_event.data.fd = mHDRStatusFile.PQ_GetFileFd();
-        m_event.events = EPOLLIN | EPOLLET;
-        mEpoll.add(mHDRStatusFile.PQ_GetFileFd(), &m_event);
-        HDR_fd = mHDRStatusFile.PQ_GetFileFd();
-    }
 
     //TX
     if (mTXStatusFile.PQ_OpenFile(TX_MOUDLE_PATH) > 0) {
@@ -88,8 +81,6 @@ void *CDevicePollCheckThread::threadLoop(void)
                 if ((mEpoll)[i].events & EPOLLIN) {
                     if (fd == mVFrameSizeFile.PQ_GetFileFd()) {//vframesize change
                         mpObserver->onVframeSizeChange();
-                    } else if (fd == mHDRStatusFile.PQ_GetFileFd()) {//HDR
-                        mpObserver->onHDRStatusChange();
                     } else if (fd == mTXStatusFile.PQ_GetFileFd()) {//TX
                         mpObserver->onTXStatusChange();
                     }
