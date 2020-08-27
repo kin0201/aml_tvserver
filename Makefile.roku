@@ -91,6 +91,7 @@ INCLUDES += \
 	$(NULL)
 
 ALL_SRCS = $(pq_SRCS) $(tv_SRCS) $(tvclient_SRCS) $(tvservice_SRCS) $(tvtest_SRCS)
+CLEAN_FILES = libpq/PQSettingCfg.h libpq/SSMHeader.cpp
 
 include $(ROKU_PORT_COMMON_DIR)/build/define_target.mk
 
@@ -135,6 +136,7 @@ configure:
 	else ifeq ($(CSV_RET), 3)
 	  $(error "Csv file's Size must be integer or defined in common.h")
 	endif
+
 clean:
 	-rm -rf $(OUT_ROOT) $(CLEAN_FILES)
 	mkdir -p $(OUT_ROOT)
