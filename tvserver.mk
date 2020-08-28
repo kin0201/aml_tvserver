@@ -23,6 +23,8 @@ TVSERVER_MAKE_OPTIONS = \
 	TV_MODEL=$(TV_MODEL)
 
 tvserver-configure:
+	$(MAKE) -f Makefile.roku -C $(TVSERVER_PROJDIR) $(TVSERVER_MAKE_OPTIONS) configure || true
+
 tvserver-build:
 	(PATH=$(CROSSTOOLS_BIN):$(PATH) \
 	$(MAKE) -f Makefile.roku -C $(TVSERVER_PROJDIR) $(TVSERVER_MAKE_OPTIONS) all)
