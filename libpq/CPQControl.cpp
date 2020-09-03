@@ -42,6 +42,20 @@ CPQControl::CPQControl()
     mAmvideoFd = -1;
     mDiFd = -1;
     mbDtvKitEnable = false;
+    //open vpp module
+    mAmvideoFd = VPPOpenModule();
+    if (mAmvideoFd < 0) {
+        LOGE("Open PQ module failed!\n");
+    } else {
+        LOGD("Open PQ module success!\n");
+    }
+    //open DI module
+    mDiFd = DIOpenModule();
+    if (mDiFd < 0) {
+        LOGE("Open DI module failed!\n");
+    } else {
+        LOGD("Open DI module success!\n");
+    }
     //Load config file
     mPQConfigFile = CConfigFile::GetInstance();
     mPQConfigFile->LoadFromFile(PQ_CONFIG_DEFAULT_PATH);
@@ -70,20 +84,6 @@ CPQControl::CPQControl()
     mSSMAction = SSMAction::getInstance();
     mSSMAction->setObserver(this);
     mSSMAction->init();
-    //open vpp module
-    mAmvideoFd = VPPOpenModule();
-    if (mAmvideoFd < 0) {
-        LOGE("Open PQ module failed!\n");
-    } else {
-        LOGD("Open PQ module success!\n");
-    }
-    //open DI module
-    mDiFd = DIOpenModule();
-    if (mDiFd < 0) {
-        LOGE("Open DI module failed!\n");
-    } else {
-        LOGD("Open DI module success!\n");
-    }
     //init source
     mCurentSourceInputInfo.source_input = SOURCE_MPEG;
     mCurentSourceInputInfo.sig_fmt = TVIN_SIG_FMT_HDMI_1920X1080P_60HZ;
