@@ -22,25 +22,21 @@ extern int _log_print(const char *moudle_tag, const char *level_tag ,const char 
 
 #ifdef LOG_MOUDLE_TAG
 
-#ifndef LOGD
+#undef LOGD
 #define LOGD(...) \
     _log_print(LOG_MOUDLE_TAG, "D", LOG_CLASS_TAG, __VA_ARGS__)
-#endif
 
-#ifndef LOGE
+#undef LOGE
 #define LOGE(...) \
     _log_print(LOG_MOUDLE_TAG, "E", LOG_CLASS_TAG, __VA_ARGS__)
-#endif
 
-#ifndef LOGV
+#undef LOGV
 #define LOGV(...) \
     _log_print(LOG_MOUDLE_TAG, "W", LOG_CLASS_TAG, __VA_ARGS__)
-#endif
 
-#ifndef LOGI
+#undef LOGI
 #define LOGI(...) \
     _log_print(LOG_MOUDLE_TAG, "I", LOG_CLASS_TAG, __VA_ARGS__)
-#endif
 
 #else
 #define LOGD(...) \

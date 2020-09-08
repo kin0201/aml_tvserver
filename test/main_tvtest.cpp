@@ -19,6 +19,8 @@
 #include <pthread.h>
 #include <TvClient.h>
 #include "CTvClientLog.h"
+#include <binder/IPCThreadState.h>
+#include <binder/ProcessState.h>
 
 static int WriteSysfs(const char *path, const char *cmd)
 {
@@ -126,6 +128,8 @@ static int DisplayInit()
 int main(int argc, char **argv) {
     unsigned char read_buf[256];
     memset(read_buf, 0, sizeof(read_buf));
+    sp<ProcessState> proc(ProcessState::self());
+    proc->startThreadPool();
 
     TvTest *test = new TvTest();
     char Command[1];

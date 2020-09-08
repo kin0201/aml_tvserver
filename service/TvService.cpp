@@ -33,109 +33,13 @@ TvService *TvService::GetInstance() {
 }
 
 TvService::TvService() {
-    mpTvServiceConnection = TvServiceBusInit();
-    if (mpTvServiceConnection != NULL) {
-        mpTv = new CTv();
-        mpTv->setTvObserver(this);
-        mpPQcontrol = CPQControl::GetInstance();
-    } else {
-        LOGE("connect to d-bus failed!\n");
-    }
+    mpTv = new CTv();
+    mpTv->setTvObserver(this);
+    mpPQcontrol = CPQControl::GetInstance();
 }
 
 TvService::~TvService() {
 
-}
-
-DBusConnection *TvService::TvServiceBusInit() {
-    DBusConnection *connection;
-    DBusError err;
-    int ret = 0;
-
-    dbus_error_init(&err);
-
-    connection = dbus_bus_get(DBUS_BUS_SESSION, &err);
-    if (dbus_error_is_set(&err)) {
-        LOGE("%s: Connection Error: %s--%s\n", __FUNCTION__, err.name, err.message);
-        dbus_error_free(&err);
-        return NULL;
-    }
-
-    ret = dbus_bus_request_name(connection, "aml.tv.service", DBUS_NAME_FLAG_REPLACE_EXISTING, &err);
-    if (dbus_error_is_set(&err)) {
-        LOGE("%s: Name Error: %s--%s\n", __FUNCTION__, err.name, err.message);
-        dbus_error_free(&err);
-        return NULL;
-    }
-
-    if (ret != DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
-        return NULL;
-
-    dbus_bus_add_match(connection, "type='signal'", &err);
-
-    dbus_connection_flush(connection);
-    if (dbus_error_is_set(&err)) {
-        LOGE("%s: add Match Error %s--%s\n", __FUNCTION__, err.name, err.message);
-        dbus_error_free(&err);
-        return connection;
-    }
-
-    return connection;
-}
-
-int TvService::TvServiceHandleMessage()
-{
-    DBusMessage *msg;
-    DBusError err;
-    char *commandData;
-
-    dbus_error_init(&err);
-
-    while (1) {
-        dbus_connection_read_write(mpTvServiceConnection, 0);
-
-        msg = dbus_connection_pop_message(mpTvServiceConnection);
-        if (msg == NULL) {
-            sleep(1);
-            continue;
-        }
-
-        //LOGD("%s: path: %s\n", __FUNCTION__, dbus_message_get_path (msg));
-        if (dbus_message_is_method_call(msg, "aml.tv", "cmd")) {
-            DBusMessage *rp;
-            DBusMessageIter r_arg;
-            int ReturnVal = 0;
-
-            dbus_message_get_args(msg, &err, DBUS_TYPE_STRING, &commandData, DBUS_TYPE_INVALID);
-            if (dbus_error_is_set(&err)) {
-                LOGE("%s: recieve message failed!\n", __FUNCTION__);
-                dbus_error_free(&err);
-                ReturnVal = -1;
-            } else {
-                LOGD("%s: recieve message: %s\n", __FUNCTION__, commandData);
-                ReturnVal = ParserTvCommand(commandData);
-            }
-
-            rp = dbus_message_new_method_return(msg);
-            dbus_message_iter_init_append(rp, &r_arg);
-            if (!dbus_message_iter_append_basic(&r_arg, DBUS_TYPE_INT32, &ReturnVal)) {
-                LOGE("%s: no memory!\n", __FUNCTION__);
-                return -1;
-            }
-
-            if (!dbus_connection_send(mpTvServiceConnection, rp, NULL)) {
-                LOGE("%s: no memory!!\n", __FUNCTION__);
-                return -1;
-            }
-            dbus_connection_flush(mpTvServiceConnection);
-            dbus_message_unref(rp);
-        } /*else {
-            LOGE("%s: Not TV client method call!\n", __FUNCTION__);
-        }*/
-        dbus_message_unref(msg);
-    }
-    //dbus_bus_remove_match();
-    return 0;
 }
 
 void TvService::onTvEvent(CTvEvent &event) {
@@ -158,66 +62,51 @@ void TvService::onTvEvent(CTvEvent &event) {
 int TvService::SendSignalForSourceConnectEvent(CTvEvent &event)
 {
     LOGD("%s\n", __FUNCTION__);
-
-    DBusMessage *msg;
-    DBusMessageIter arg;
-
-    if ((msg = dbus_message_new_signal("/aml/tv/service", "aml.tv", "test")) == NULL) {
-        LOGE("%s: message is NULL\n", __FUNCTION__);
-        return -1;
-    }
-
-    dbus_message_iter_init_append(msg, &arg);
+    Parcel send, reply;
 
     int eventType = CTvEvent::TV_EVENT_SOURCE_CONNECT;
     TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
-    LOGD("%s: source: %d, connectstatus: %d\n", __FUNCTION__, sourceConnectEvent->mSourceInput, sourceConnectEvent->connectionState);
-
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &eventType);
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(sourceConnectEvent->mSourceInput));
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(sourceConnectEvent->connectionState));
-
-    dbus_connection_send(mpTvServiceConnection, msg, NULL);
-    dbus_connection_flush(mpTvServiceConnection);
-    dbus_message_unref(msg);
-
+    if (evtCallBack != NULL) {
+        send.writeInt32(eventType);
+        send.writeInt32(sourceConnectEvent->mSourceInput);
+        send.writeInt32(sourceConnectEvent->connectionState);
+        LOGD("send source evt(%d,%d) to client.\n",
+             sourceConnectEvent->mSourceInput, sourceConnectEvent->connectionState);
+        evtCallBack->transact(EVT_SRC_CT_CB, send, &reply);
+    } else {
+        LOGD("Event callback is null.\n");
+    }
     return 0;
 }
 
 int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
 {
     LOGD("%s\n", __FUNCTION__);
+    Parcel send, reply;
 
-    DBusMessage *msg;
-    DBusMessageIter arg;
-
-    if ((msg = dbus_message_new_signal("/aml/tv/service", "aml.tv", "test")) == NULL) {
-        LOGE("%s: message is NULL\n", __FUNCTION__);
-        return -1;
-    }
-
-    dbus_message_iter_init_append(msg, &arg);
     int eventType = CTvEvent::TV_EVENT_SIGLE_DETECT;
     TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &eventType);
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &signalDetectEvent->mSourceInput);
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mFmt));
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mTrans_fmt));
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mStatus));
-    dbus_message_iter_append_basic(&arg, DBUS_TYPE_INT32, &(signalDetectEvent->mDviFlag));
-
-    dbus_connection_send(mpTvServiceConnection, msg, NULL);
-    dbus_connection_flush(mpTvServiceConnection);
-    dbus_message_unref(msg);
-
+    if (evtCallBack != NULL) {
+        send.writeInt32(eventType);
+        send.writeInt32(signalDetectEvent->mSourceInput);
+        send.writeInt32(signalDetectEvent->mFmt);
+        send.writeInt32(signalDetectEvent->mTrans_fmt);
+        send.writeInt32(signalDetectEvent->mStatus);
+        send.writeInt32(signalDetectEvent->mDviFlag);
+        evtCallBack->transact(EVT_SIG_DT_CB, send, &reply);
+    } else {
+        LOGW("Event callback is null.\n");
+    }
     return 0;
 }
 
-int TvService::ParserTvCommand(char *commandData)
+int TvService::ParserTvCommand(const char *commandData)
 {
     int ret = 0;
+    char cmdbuff[1024];
+    memcpy(cmdbuff, commandData, strlen(commandData));
     const char *delimitation = ".";
-    char *temp = strtok(commandData, delimitation);
+    char *temp = strtok(cmdbuff, delimitation);
     LOGD("%s: cmdType = %s\n", __FUNCTION__, temp);
     if (strcmp(temp, "source") == 0) {
         LOGD("%s: source cmd!\n", __FUNCTION__);
@@ -309,6 +198,31 @@ int TvService::ParserTvCommand(char *commandData)
     }
 
     return ret;
+}
+
+status_t TvService::onTransact(uint32_t code,
+                                const Parcel& data, Parcel* reply,
+                                uint32_t flags) {
+    switch (code) {
+        case CMD_TV_ACTION: {
+            const char* command = data.readCString();
+            int ret = ParserTvCommand(command);
+            reply->writeInt32(ret);
+            break;
+        }
+        case CMD_SET_TV_CB: {
+            evtCallBack = data.readStrongBinder();
+            break;
+        }
+        case CMD_CLR_TV_CB: {
+            evtCallBack = NULL;
+            break;
+        }
+        default:
+            return BBinder::onTransact(code, data, reply, flags);
+    }
+
+    return (0);
 }
 
 #ifdef __cplusplus
