@@ -3910,8 +3910,10 @@ int CPQControl::SetFlagByCfg(void)
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_GAMMA_ENABLE, "enable");
     if (strcmp(config_value, "enable") == 0) {
         mbCpqCfg_gamma_enable = true;
+        pqControlVal.gamma_en = 1;
     } else {
         mbCpqCfg_gamma_enable = false;
+        pqControlVal.gamma_en = 0;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_LOCAL_CONTRAST_ENABLE, "enable");
@@ -3929,7 +3931,7 @@ int CPQControl::SetFlagByCfg(void)
         pqControlVal.black_ext_en = 1;
     } else {
         mbCpqCfg_blackextension_enable = false;
-        pqControlVal.lc_en = 0;
+        pqControlVal.black_ext_en = 0;
     }
 
     config_value = mPQConfigFile->GetString(CFG_SECTION_PQ, CFG_XVYCC_ENABLE, "disable");
