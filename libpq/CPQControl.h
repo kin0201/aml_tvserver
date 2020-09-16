@@ -30,7 +30,7 @@
 #define DI_DEV_PATH               "/dev/di0"
 #define AFE_DEV_PATH              "/dev/tvafe0"
 #define SYS_VIDEO_FRAME_HEIGHT    "/sys/class/video/frame_height"
-
+#define SYSFS_VIDEO_EVENT_PATH    "/sys/class/video_poll/status_changed"
 #define CROP_PATH                 "/sys/class/video/crop"
 #define SCREEN_MODE_PATH          "/sys/class/video/screen_mode"
 #define NOLINER_FACTORY           "/sys/class/video/nonlinear_factor"
@@ -404,5 +404,6 @@ private:
     unsigned int mHdmiHdrInfo = 0;
     bool mbDtvKitEnable;
     bool mbDatabaseMatchChipStatus;
+    bool mbVideoIsPlaying = false;//video don't playing
 };
 #endif

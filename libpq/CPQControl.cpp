@@ -86,7 +86,7 @@ CPQControl::CPQControl()
     mSSMAction->init();
     //init source
     mCurentSourceInputInfo.source_input = SOURCE_MPEG;
-    mCurentSourceInputInfo.sig_fmt = TVIN_SIG_FMT_HDMI_1920X1080P_60HZ;
+    mCurentSourceInputInfo.sig_fmt = TVIN_SIG_FMT_NULL;
     mCurentSourceInputInfo.trans_fmt = TVIN_TFMT_2D;
     mSourceInputForSaveParam = SOURCE_MPEG;
     mCurrentHdrStatus = false;
@@ -245,14 +245,42 @@ int CPQControl::AFEDeviceIOCtl ( int request, ... )
 
 void CPQControl::onVframeSizeChange()
 {
-    source_input_param_t new_source_input_param;
-    if (((mCurentSourceInputInfo.source_input == SOURCE_DTV) ||
-        (mCurentSourceInputInfo.source_input == SOURCE_MPEG))) {
-        new_source_input_param.sig_fmt = getVideoResolutionToFmt();
-        LOGD("%s: sig_fmt = 0x%x(%d).\n", __FUNCTION__, new_source_input_param.sig_fmt, new_source_input_param.sig_fmt);
-        new_source_input_param.source_input = mCurentSourceInputInfo.source_input;
-        new_source_input_param.trans_fmt = mCurentSourceInputInfo.trans_fmt;
-        SetCurrentSourceInputInfo(new_source_input_param);
+    char temp[8];
+    memset(temp, 0, sizeof(temp));
+    int ret = pqReadSys(SYSFS_VIDEO_EVENT_PATH, temp, sizeof(temp));
+    if (ret > 0) {
+        int eventFlagValue = strtol(temp, NULL, 16);
+        LOGD("%s: event value = %d(0x%x)!\n", __FUNCTION__, eventFlagValue, eventFlagValue);
+        int frameszieEventFlag = (eventFlagValue & 0x1) >> 0;
+        int hdrTypeEventFlag = (eventFlagValue & 0x2) >> 1;
+        int videoPlayStartEventFlag = (eventFlagValue & 0x4) >> 2;
+        int videoPlayStopEventFlag = (eventFlagValue & 0x8) >> 3;
+        int videoPlayAxisEventFlag = (eventFlagValue & 0x10) >> 4;
+        /*LOGD("%s: frameszieEventFlag = %d,hdrTypeEventFlag = %d,videoPlayStartEventFlag = %d,videoPlayStopEventFlag = %d,videoPlayAxisEventFlag = %d!\n",
+               __FUNCTION__, frameszieEventFlag, hdrTypeEventFlag, videoPlayStartEventFlag, videoPlayStopEventFlag,
+               videoPlayAxisEventFlag);*/
+
+        source_input_param_t new_source_input_param;
+        if (((mCurentSourceInputInfo.source_input == SOURCE_DTV) || (mCurentSourceInputInfo.source_input == SOURCE_MPEG))
+            && (frameszieEventFlag == 1)) {
+            new_source_input_param.sig_fmt = getVideoResolutionToFmt();
+            LOGD("%s: sig_fmt = 0x%x(%d).\n", __FUNCTION__, new_source_input_param.sig_fmt, new_source_input_param.sig_fmt);
+            new_source_input_param.source_input = mCurentSourceInputInfo.source_input;
+            new_source_input_param.trans_fmt = mCurentSourceInputInfo.trans_fmt;
+            SetCurrentSourceInputInfo(new_source_input_param);
+        } else {
+            LOGD("%s: not decoder video frame Event!\n", __FUNCTION__);
+        }
+
+        if ((videoPlayStartEventFlag == 1) && (videoPlayStopEventFlag == 0)) {
+            mbVideoIsPlaying = true;
+        } else if ((videoPlayStartEventFlag == 0) && (videoPlayStopEventFlag == 1)) {
+            mbVideoIsPlaying = false;
+        } else {
+            LOGD("%s: not video Play Status Event!\n", __FUNCTION__);
+        }
+    } else {
+        LOGE("%s: read video event failed!\n", __FUNCTION__);
     }
 }
 
@@ -2598,7 +2626,7 @@ void CPQControl::GetDynamicBacklighParam(dynamic_backlight_Param_t *DynamicBackl
 int CPQControl::GetVideoPlayStatus(void)
 {
     int curVideoState = 0;
-    int offset = 0;
+    /*int offset = 0;
     char vframeMap[1024] = {0};
     char tmp[1024] = {0};
     char *findRet = NULL;
@@ -2619,6 +2647,12 @@ int CPQControl::GetVideoPlayStatus(void)
                 curVideoState = 0;
             }
         }
+    }*/
+
+    if (mbVideoIsPlaying) {
+        curVideoState = 1;//video playing
+    } else {
+        curVideoState = 0;//video stoping
     }
 
     //LOGD("%s: curVideoState = %d!\n",__FUNCTION__, curVideoState);
