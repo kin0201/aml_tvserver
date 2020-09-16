@@ -16,7 +16,6 @@
 #include "tvutils.h"
 #include "TvConfigManager.h"
 #include "CTvLog.h"
-#include "CPQControl.h"
 
 CTv::CTv()
 {
@@ -239,14 +238,14 @@ int CTv::SetCurrenSourceInfo(tvin_info_t sig_info)
     mCurrentSignalInfo.is_dvi = sig_info.is_dvi;
     mCurrentSignalInfo.aspect_ratio = sig_info.aspect_ratio;
 
-    if ((mCurrentSource == SOURCE_MPEG)
+    /*if ((mCurrentSource == SOURCE_MPEG)
         || (mCurrentSource != SOURCE_MPEG && mCurrentSignalInfo.status == TVIN_SIG_STATUS_STABLE)) {
         source_input_param_t source_input_param;
         source_input_param.source_input = mCurrentSource;
         source_input_param.sig_fmt = mCurrentSignalInfo.fmt;
         source_input_param.trans_fmt = mCurrentSignalInfo.trans_fmt;
         CPQControl::GetInstance()->SetCurrentSourceInputInfo(source_input_param);
-    }
+    }*/
 
     return 0;
 }

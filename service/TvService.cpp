@@ -17,7 +17,6 @@
 #include "TvService.h"
 #include "common.h"
 #include "CTvLog.h"
-#include "CPQControl.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,7 +34,6 @@ TvService *TvService::GetInstance() {
 TvService::TvService() {
     mpTv = new CTv();
     mpTv->setTvObserver(this);
-    mpPQcontrol = CPQControl::GetInstance();
 }
 
 TvService::~TvService() {
@@ -141,54 +139,6 @@ int TvService::ParserTvCommand(const char *commandData)
             temp = strtok(NULL, delimitation);
             int edidVer = atoi(temp);
             ret = mpTv->PresetEdidVer(setSource, edidVer);
-        } else {
-            LOGD("%s: invalid cmd!\n", __FUNCTION__);
-            ret = 0;
-        }
-    } else if (strcmp(temp, "pq") == 0){
-        LOGD("%s: PQ cmd!\n", __FUNCTION__);
-        temp = strtok(NULL, delimitation);
-        if (strcmp(temp, "set") == 0) {
-            temp = strtok(NULL, delimitation);
-            int moudleID = atoi(temp);
-            temp = strtok(NULL, delimitation);
-            int value = atoi(temp);
-            ret = mpPQcontrol->ParserSetCmd(moudleID, value);
-        } else if (strcmp(temp, "get") == 0) {
-            temp = strtok(NULL, delimitation);
-            int moudleID = atoi(temp);
-            ret = mpPQcontrol->ParserGetCmd(moudleID);
-        } else {
-            LOGD("%s: invalid cmd!\n", __FUNCTION__);
-            ret = 0;
-        }
-    } else if (strcmp(temp, "pqFactory") == 0) {
-        LOGD("%s: PQ factory cmd!\n", __FUNCTION__);
-        pq_moudle_param_t pqParam;
-        memset(&pqParam, 0, sizeof(pq_moudle_param_t));
-        int paramCount = 0;
-        int paramBuf[32] = {0};
-        temp = strtok(NULL, delimitation);
-        if (strcmp(temp, "set") == 0) {
-            temp = strtok(NULL, delimitation);
-            pqParam.moudleId = atoi(temp);
-            while (temp = strtok(NULL, delimitation)) {
-                paramBuf[paramCount] = atoi(temp);
-                paramCount++;
-            }
-            pqParam.paramLength = paramCount;
-            pqParam.paramBuf = paramBuf;
-            ret = mpPQcontrol->parserFactorySetCmd(pqParam);
-        } else if (strcmp(temp, "get") == 0) {
-            temp = strtok(NULL, delimitation);
-            pqParam.moudleId = atoi(temp);
-            while (temp = strtok(NULL, delimitation)) {
-                paramBuf[paramCount] = atoi(temp);
-                paramCount++;
-            }
-            pqParam.paramLength = paramCount;
-            pqParam.paramBuf = paramBuf;
-            ret = mpPQcontrol->parserFactoryGetCmd(pqParam);
         } else {
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
             ret = 0;

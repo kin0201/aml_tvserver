@@ -12,34 +12,6 @@ CFLAGS += -Wall -Wno-unknown-pragmas -Wno-format \
 LDFLAGS += -lbinder -llog
 
 ################################################################################
-# libpq.so - src files
-################################################################################
-CSV_RET=$(shell ($(LOCAL_PATH)/libpq/csvAnalyze.sh > /dev/zero;echo $$?))
-ifeq ($(CSV_RET), 1)
-  $(error "Csv file or common.h file is not exist!!!!")
-else ifeq ($(CSV_RET), 2)
-  $(error "Csv file's Id must be integer")
-else ifeq ($(CSV_RET), 3)
-  $(error "Csv file's Size must be integer or defined in common.h")
-endif
-
-pq_SRCS = \
-  $(LOCAL_PATH)/libpq/CPQdb.cpp \
-  $(LOCAL_PATH)/libpq/COverScandb.cpp \
-  $(LOCAL_PATH)/libpq/CPQControl.cpp  \
-  $(LOCAL_PATH)/libpq/CSqlite.cpp  \
-  $(LOCAL_PATH)/libpq/SSMAction.cpp  \
-  $(LOCAL_PATH)/libpq/SSMHandler.cpp  \
-  $(LOCAL_PATH)/libpq/SSMHeader.cpp  \
-  $(LOCAL_PATH)/libpq/CDevicePollCheckThread.cpp  \
-  $(LOCAL_PATH)/libpq/CPQColorData.cpp  \
-  $(LOCAL_PATH)/libpq/CPQLog.cpp  \
-  $(LOCAL_PATH)/libpq/CPQFile.cpp  \
-  $(LOCAL_PATH)/libpq/CEpoll.cpp \
-  $(LOCAL_PATH)/libpq/CDynamicBackLight.cpp \
-  $(LOCAL_PATH)/libpq/CConfigFile.cpp \
-  $(NULL)
-################################################################################
 # libtv.so - src files
 ################################################################################
 tv_SRCS  = \
@@ -85,7 +57,7 @@ tvtest_SRCS  = \
 
 # ---------------------------------------------------------------------
 #  Build rules
-BUILD_TARGETS = libtvclient.so libtv.so libpq.so tvservice tvtest
+BUILD_TARGETS = libtvclient.so libtv.so tvservice tvtest
 
 .PHONY: all install uninstall clean
 
@@ -93,18 +65,14 @@ libtvclient.so: $(tvclient_SRCS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(tvclient_HEADERS) \
 	-o $@ $^ $(LDLIBS)
 
-libpq.so: $(pq_SRCS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -lsqlite3 -I$(tvclient_HEADERS) \
-	-o $@ $^ $(LDLIBS)
+libtv.so: $(tv_SRCS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(tvclient_HEADERS) \
+	-I$(LOCAL_PATH)/libtv/tvutils -laudio_client -o $@ $^ $(LDLIBS)
 
-libtv.so: $(tv_SRCS) libpq.so
-	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(tvclient_HEADERS) -I$(LOCAL_PATH)/libpq \
-	-I$(LOCAL_PATH)/libtv/tvutils -L$(LOCAL_PATH) -lpq -laudio_client -o $@ $^ $(LDLIBS)
-
-tvservice: $(tvservice_SRCS) libtv.so libpq.so
+tvservice: $(tvservice_SRCS) libtv.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) \
-	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils -I$(LOCAL_PATH)/libpq \
-	-L$(LOCAL_PATH) -ltv -L$(LOCAL_PATH) -lpq -laudio_client -o $@ $^ $(LDLIBS)
+	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils \
+	-L$(LOCAL_PATH) -ltv -laudio_client -o $@ $^ $(LDLIBS)
 
 tvtest: $(tvtest_SRCS) libtvclient.so
 	$(CC) $(CFLAGS) -I$(tvclient_HEADERS) -L$(LOCAL_PATH) \
@@ -118,13 +86,11 @@ clean:
 install:
 	install -m 0644 libtvclient.so $(TARGET_DIR)/usr/lib
 	install -m 0644 libtv.so $(TARGET_DIR)/usr/lib/
-	install -m 0644 libpq.so $(TARGET_DIR)/usr/lib/
 	install -m 755 tvservice $(TARGET_DIR)/usr/bin/
 	install -m 755 tvtest $(TARGET_DIR)/usr/bin/
 
 uninstall:
 	rm -f $(TARGET_DIR)/usr/lib/libtvclient.so
 	rm -f $(TARGET_DIR)/usr/lib/libtv.so
-	rm -f $(TARGET_DIR)/usr/lib/libpq.so
 	rm -f $(TARGET_DIR)/usr/bin/tvtest
 	rm -f $(TARGET_DIR)/usr/bin/tvservice

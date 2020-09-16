@@ -13,7 +13,6 @@
 #include <binder/Binder.h>
 #include <binder/Parcel.h>
 #include "CTv.h"
-#include "CPQControl.h"
 
 using namespace android;
 
@@ -39,8 +38,6 @@ private:
     int ParserTvCommand(const char *commandData);
 
     CTv *mpTv;
-    CPQControl *mpPQcontrol;
-
     sp<IBinder> evtCallBack;
     virtual status_t onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
