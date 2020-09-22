@@ -380,6 +380,36 @@ tv_source_input_t CTvin::Tvin_PortToSourceInput ( tvin_port_t port )
     return SOURCE_MAX;
 }
 
+tvin_port_id_t CTvin::Tvin_GetHdmiPortIdBySourceInput(tv_source_input_t source_input)
+{
+    tvin_port_id_t portId = TVIN_PORT_ID_MAX;
+    if ((source_input > SOURCE_HDMI4) || (source_input < SOURCE_HDMI1)) {
+        LOGD("%s: not HDMI Source.\n", __FUNCTION__);
+    } else {
+        tvin_port_t portValue = Tvin_GetSourcePortBySourceInput(source_input);
+        switch (portValue) {
+        case TVIN_PORT_HDMI0:
+            portId = TVIN_PORT_ID_1;
+            break;
+        case TVIN_PORT_HDMI1:
+            portId = TVIN_PORT_ID_2;
+            break;
+        case TVIN_PORT_HDMI2:
+            portId = TVIN_PORT_ID_3;
+            break;
+        case TVIN_PORT_HDMI3:
+            portId = TVIN_PORT_ID_4;
+            break;
+        default:
+            portId = TVIN_PORT_ID_MAX;
+            break;
+        }
+    }
+
+    LOGD("%s: source: %d, portId: %d.\n", __FUNCTION__, source_input, portId);
+    return portId;
+}
+
 unsigned int CTvin::Tvin_TransPortStringToValue(const char *port_str)
 {
     if (strcasecmp(port_str, "TVIN_PORT_CVBS0") == 0) {

@@ -17,6 +17,7 @@
 #include "TvService.h"
 #include "common.h"
 #include "CTvLog.h"
+#include "tvcmd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -125,20 +126,33 @@ int TvService::ParserTvCommand(const char *commandData)
         temp = strtok(NULL, delimitation);
         if (strcmp(temp, "set") == 0) {
             temp = strtok(NULL, delimitation);
-            tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
+            int moudleID = atoi(temp);
             temp = strtok(NULL, delimitation);
-            ret = mpTv->UpdateEDID(setSource, temp);
+            tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
+            if (moudleID == HDMI_EDID_VER_SET) {
+                temp = strtok(NULL, delimitation);
+                tv_hdmi_edid_version_t setVersion = (tv_hdmi_edid_version_t)atoi(temp);
+                ret = mpTv->SetEdidVersion(setSource, setVersion);
+            } else if (moudleID == HDMI_EDID_DATA_SET) {
+                temp = strtok(NULL, delimitation);
+                ret = mpTv->SetEDIDData(setSource, temp);
+            } else {
+                LOGD("%s: invalid EDID set cmd!\n", __FUNCTION__);
+                ret = 0;
+            }
         } else if (strcmp(temp, "get") == 0) {
             temp = strtok(NULL, delimitation);
+            int moudleID = atoi(temp);
+            temp = strtok(NULL, delimitation);
             tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
-            temp = strtok(NULL, delimitation);
-            ret = mpTv->getEDIDData(getSource, temp);
-        } else if (strcmp(temp, "preset") == 0) {
-            temp = strtok(NULL, delimitation);
-            tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
-            temp = strtok(NULL, delimitation);
-            int edidVer = atoi(temp);
-            ret = mpTv->PresetEdidVer(setSource, edidVer);
+            if (moudleID == HDMI_EDID_VER_GET) {
+                ret = mpTv->GetEdidVersion(getSource);
+            } else if (moudleID == HDMI_EDID_DATA_GET) {
+                ret = mpTv->GetEDIDData(getSource, temp);
+            } else {
+                LOGD("%s: invalid EDID get cmd!\n", __FUNCTION__);
+                ret = 0;
+            }
         } else {
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
             ret = 0;

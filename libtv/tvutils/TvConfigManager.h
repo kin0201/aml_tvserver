@@ -16,10 +16,10 @@
 //for tv config
 #define CFG_SECTION_TV                          "TV"
 #define CFG_SECTION_ATV                         "ATV"
+#define CFG_SECTION_HDMI                        "HDMI"
 #define CFG_SECTION_SRC_INPUT                   "SourceInputMap"
 #define CFG_SECTION_SETTING                     "SETTING"
 #define CFG_SECTION_FBCUART                     "FBCUART"
-
 
 #define CGF_DEFAULT_INPUT_IDS                   "tv.source.input.ids.default"
 
@@ -104,7 +104,7 @@
 #define UBOOTENV_EDID20_PATH                    "ubootenv.var.edid_20_dir"
 #define UBOOTENV_EDID_VERSION                   "ubootenv.var.edid_select"
 #define UBOOTENV_PORT_MAP                       "ubootenv.var.port_map"
-
+#define CFG_HDMI_EDID_FILE_PATH                 "edid.file.path"
 //for tv sysfs
 #define SYS_SPDIF_MODE_DEV_PATH                 "/sys/class/audiodsp/digital_raw"
 #define SYS_VECM_DNLP_ADJ_LEVEL                 "/sys/module/am_vecm/parameters/dnlp_adj_level"

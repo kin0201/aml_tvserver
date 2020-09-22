@@ -22,9 +22,8 @@ enum tvcmd_e {
     HDMI_CONTROL_CMD_START        = 100,
     HDMI_EDID_VER_SET             = 101,
     HDMI_EDID_VER_GET             = 102,
-    HDMI_HDCP_KEY_ENABLE          = 103,
-    HDMI_COLOR_RANGE_MODE_SET     = 104,
-    HDMI_COLOR_RANGE_MODE_GET     = 105,
+    HDMI_EDID_DATA_SET            = 103,
+    HDMI_EDID_DATA_GET            = 104,
     HDMI_CONTROL_CMD_MAX          = 199,
 };
 

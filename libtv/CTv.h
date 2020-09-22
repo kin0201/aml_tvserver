@@ -16,11 +16,12 @@
 #endif
 
 
-#define CONFIG_FILE_PATH_DEF     "/vendor/etc/tvconfig/tvconfig.conf"
+#define CONFIG_FILE_PATH_DEF               "/vendor/etc/tvconfig/tvconfig.conf"
 
-#define HDMI_EDID14_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_14.bin"
-#define HDMI_EDID20_FILE_PATH    "/vendor/etc/tvconfig/hdmi/port_20.bin"
-#define VIDEO_DISABLE_VIDEO      "/sys/class/video/disable_video"
+#define VIDEO_DISABLE_VIDEO                "/sys/class/video/disable_video"
+#define DOLBY_VISION_TV_KO_PATH            "/vendor/lib/modules/dovi_tv.ko"
+#define DOLBY_VISION_STB_KO_PATH           "/vendor/lib/modules/dovi.ko"
+#define DOLBY_VISION_ENABLE_PATH           "/sys/module/amdolby_vision/parameters/dolby_vision_enable"
 
 typedef enum video_layer_status_e {
     VIDEO_LAYER_STATUS_ENABLE,
@@ -45,9 +46,11 @@ public:
     int SwitchSource(tv_source_input_t dest_source);
     int SetCurrenSourceInfo(tvin_info_t sig_info);
     tvin_info_t GetCurrentSourceInfo(void);
-    int PresetEdidVer(tv_source_input_t source, int edidVer);
-    int UpdateEDID(tv_source_input_t source, char *data);
-    int getEDIDData(tv_source_input_t source, char *data);
+    int SetEDIDData(tv_source_input_t source, char *data);
+    int GetEDIDData(tv_source_input_t source, char *data);
+    int LoadEdidData(int isNeedBlackScreen, int isDolbyVisionEnable);
+    int SetEdidVersion(tv_source_input_t source, tv_hdmi_edid_version_t edidVer);
+    int GetEdidVersion(tv_source_input_t source);
 
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();

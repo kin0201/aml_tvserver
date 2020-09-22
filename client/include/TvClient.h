@@ -48,7 +48,8 @@ public:
     int setTvClientObserver(TvClientIObserver *observer);
     int StartTv(tv_source_input_t source);
     int StopTv(tv_source_input_t source);
-    int PresetEdidVer(tv_source_input_t source, int edidVer);
+    int SetEdidVersion(tv_source_input_t source, int edidVer);
+    int GetEdidVersion(tv_source_input_t source);
     int SetEdidData(tv_source_input_t source, char *dataBuf);
     int GetEdidData(tv_source_input_t source,char *dataBuf);
 private:

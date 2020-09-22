@@ -38,18 +38,9 @@ static int WriteSysfs(const char *path, const char *cmd)
 
 static int WriteSysfs(const char *path, int value)
 {
-    int fd;
-    char  bcmd[16];
-    fd = open(path, O_CREAT|O_RDWR | O_TRUNC, 0777);
-
-    if (fd >= 0) {
-        sprintf(bcmd,"%d",value);
-        write(fd,bcmd,strlen(bcmd));
-        close(fd);
-        return 0;
-    }
-
-    return -1;
+    char cmdbuf[32] = {0};
+    sprintf(cmdbuf,"%d",value);
+    return WriteSysfs(path, cmdbuf);
 }
 
 class TvTest: public TvClient::TvClientIObserver {
@@ -98,10 +89,11 @@ public:
     int SendCmd(const char *data) {
         LOGD("%s: cmd is %s.\n", __FUNCTION__, data);
         if (strcmp(data, "start") == 0) {
-            mpTvClient->PresetEdidVer(CurrentSource, EdidVer);
             mpTvClient->StartTv(CurrentSource);
         } else if (strcmp(data, "stop") == 0) {
             mpTvClient->StopTv(CurrentSource);
+        } else if (strcmp(data, "EDID_set") == 0) {
+            mpTvClient->SetEdidVersion(CurrentSource, EdidVer);
         } else {
             LOGE("invalid cmd!\n");
         }
@@ -137,7 +129,6 @@ int main(int argc, char **argv) {
     DisplayInit();
 
     test->CurrentSource=SOURCE_HDMI1;
-    WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x1");
     test->EdidVer=14;
 
     LOGD("#### please select cmd####\n");
@@ -146,6 +137,7 @@ int main(int argc, char **argv) {
     LOGD("#### select 3 to hdmi 3 ####\n");
     LOGD("#### select 4 to edid 1.4 (this is default) ####\n");
     LOGD("#### select 5 to edid 2.0 ####\n");
+    LOGD("#### select 6 to edid auto ####\n");
     LOGD("#### select q to stop####\n");
     LOGD("##########################\n");
     while (run) {
@@ -179,13 +171,18 @@ int main(int argc, char **argv) {
               break;
           }
           case '4': {
-              WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x1");
-              test->EdidVer = 14;
+              test->EdidVer = 0;
+              test->SendCmd("EDID_set");
               break;
           }
           case '5': {
-              WriteSysfs("/sys/class/hdmirx/hdmirx0/param", "edid_mode 0x5");
-              test->EdidVer = 20;
+              test->EdidVer = 1;
+              test->SendCmd("EDID_set");
+              break;
+          }
+          case '6': {
+              test->EdidVer = 2;
+              test->SendCmd("EDID_set");
               break;
           }
           default: {

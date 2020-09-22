@@ -22,13 +22,13 @@
 #define HDMI_IOC_HDCP_GET_KSV       _IOR(HDMI_IOC_MAGIC, 0x09, struct _hdcp_ksv)
 
 
-#define CS_HDMIRX_DEV_PATH        "/dev/hdmirx0"
-#define HDMI_CEC_PORT_SEQUENCE    "/sys/class/cec/port_seq"
-#define HDMI_CEC_PORT_MAP         "/sys/module/tvin_hdmirx/parameters/port_map"
-#define HDMI_EDID_DEV_PATH        "/sys/class/hdmirx/hdmirx0/edid"
+#define CS_HDMIRX_DEV_PATH                "/dev/hdmirx0"
+#define HDMI_CEC_PORT_SEQUENCE            "/sys/class/cec/port_seq"
+#define HDMI_CEC_PORT_MAP                 "/sys/module/tvin_hdmirx/parameters/port_map"
+#define HDMI_EDID_DEV_PATH                "/sys/class/hdmirx/hdmirx0/edid"
+#define HDMI_EDID_VERSION_DEV_PATH        "/sys/class/hdmirx/hdmirx0/edid_select"
 
 #define REAL_EDID_DATA_SIZE        (256)
-#define LOAD_EDID_DATA_SIZE        (REAL_EDID_DATA_SIZE + 4)
 
 typedef enum tv_hdmi_hdcp_version_e {
     HDMI_HDCP_VER_14 = 0,
@@ -37,7 +37,9 @@ typedef enum tv_hdmi_hdcp_version_e {
 
 typedef enum tv_hdmi_edid_version_e {
     HDMI_EDID_VER_14 = 0,
-    HDMI_EDID_VER_20 ,
+    HDMI_EDID_VER_20,
+    HDMI_EDID_VER_AUTO,
+    HDMI_EDID_VER_MAX,
 } tv_hdmi_edid_version_t;
 
 typedef enum tv_hdmi_hdcpkey_enable_e {
@@ -57,7 +59,8 @@ public:
     int HDMIRxOpenMoudle(void);
     int HDMIRxCloseMoudle(void);
     int HDMIRxDeviceIOCtl(int request, ...);
-    int HdmiRxEdidUpdate(char *data);
+    int HdmiRxEdidDataSwitch(int edidCount, char *data);
+    int HdmiRxEdidVerSwitch(int verValue);
     int HdmiRxHdcpVerSwitch(tv_hdmi_hdcp_version_t version);
     int HdmiRxHdcpOnOff(tv_hdmi_hdcpkey_enable_t flag);
     int GetHdmiHdcpKeyKsvInfo(struct _hdcp_ksv *msg);

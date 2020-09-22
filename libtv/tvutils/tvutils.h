@@ -39,5 +39,6 @@ extern bool isFileExist(const char *file_name);
 extern int readSysfs(const char *path, char *value);
 extern void writeSysfs(const char *path, const char *value);
 extern int GetFileAttrIntValue(const char *fp, int flag = O_RDWR);
-
+int ReadDataFromFile(char *fileName, int offset, int nsize, char *dataBuf);
+int SaveDataToFile(char *fileName, int offset, int nsize, char *dataBuf);
 #endif  //_TV_UTILS_H_

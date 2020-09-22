@@ -86,10 +86,16 @@ exit:
 }
 
 int tvReadSysfs(const char *path, char *value) {
-    char buf[SYS_STR_LEN+1] = {0};
-    int len = readSys(path, (char*)buf, SYS_STR_LEN);
-    strcpy(value, buf);
-    return len;
+    int ret = -1;
+    if (value == NULL) {
+        LOGD("%s: buf is NULL!.\n", __FUNCTION__);
+    } else {
+        char buf[SYS_STR_LEN+1] = {0};
+        ret = readSys(path, (char*)buf, SYS_STR_LEN);
+        strcpy(value, buf);
+    }
+    LOGD("%s: fileName is: %s, readLength is %d.\n", __FUNCTION__, path, ret);
+    return ret;
 }
 
 int tvWriteSysfs(const char *path, const char *value) {
@@ -104,7 +110,7 @@ int tvWriteSysfs(const char *path, int value, int base)
     } else {
         sprintf(str_value, "%d", value);
     }
-    LOGD("tvWriteSysfs, str_value = %s", str_value);
+    LOGD("tvWriteSysfs, str_value = %s.\n", str_value);
     return writeSys(path, str_value);
 }
 
@@ -145,4 +151,64 @@ int GetFileAttrIntValue(const char *fp, int flag)
 
     close(fd);
     return -1;
+}
+
+int ReadDataFromFile(char *fileName, int offset, int nsize, char *dataBuf)
+{
+    int deviceFd = -1;
+    int ret = 0;
+
+    if ((dataBuf == NULL) || (fileName == NULL)) {
+        LOGE("%s: file_name or data_buf is NULL!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        LOGD("%s: file_name is %s, offset is %d, size is %d.!\n", __FUNCTION__, fileName, offset, nsize);
+        deviceFd = open(fileName, O_RDONLY);
+        if (deviceFd < 0) {
+            LOGE("%s: open %s error(%s).\n", __FUNCTION__, fileName, strerror(errno));
+            ret = -1;
+        } else {
+            ret = lseek(deviceFd, offset, SEEK_SET);
+            if (ret == -1) {
+                LOGE("%s: lseek file error(%s).\n", __FUNCTION__, strerror(errno));
+            } else {
+                ret = read(deviceFd, dataBuf, nsize);
+            }
+            close(deviceFd);
+            deviceFd = -1;
+        }
+    }
+
+    return ret;
+}
+
+int SaveDataToFile(char *fileName, int offset, int nsize, char *dataBuf)
+{
+    int deviceFd = -1;
+    int ret = 0;
+
+    if ((dataBuf == NULL) || (fileName == NULL)) {
+        LOGE("%s: file_name or data_buf is NULL!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        LOGD("%s: file_name is %s, offset is %d, size is %d.!\n", __FUNCTION__, fileName, offset, nsize);
+        deviceFd = open(fileName, O_RDWR | O_SYNC);
+        if (deviceFd < 0) {
+            LOGE("%s: open file %s error(%s).\n", __FUNCTION__, fileName, strerror(errno));
+            ret = -1;
+        } else {
+            ret = lseek(deviceFd, offset, SEEK_SET);
+            if (ret == -1) {
+                ret = -1;
+            } else {
+                ret = write(deviceFd, dataBuf, nsize);
+                fsync(deviceFd);
+            }
+
+            close(deviceFd);
+            deviceFd = -1;
+        }
+    }
+
+    return ret;
 }

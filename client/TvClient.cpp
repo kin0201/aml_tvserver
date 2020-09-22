@@ -153,11 +153,19 @@ int TvClient::StopTv(tv_source_input_t source) {
     return SendMethodCall(buf);
 }
 
-int TvClient::PresetEdidVer(tv_source_input_t source, int edidVer)
+int TvClient::SetEdidVersion(tv_source_input_t source, int edidVer)
 {
     LOGD("%s\n", __FUNCTION__);
     char buf[512] = {0};
-    sprintf(buf, "edid.set.%d.%d", source, edidVer);
+    sprintf(buf, "edid.set.%d.%d.%d", HDMI_EDID_VER_SET, source, edidVer);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetEdidVersion(tv_source_input_t source)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[512] = {0};
+    sprintf(buf, "edid.get.%d.%d", HDMI_EDID_VER_GET, source);
     return SendMethodCall(buf);
 }
 
@@ -165,7 +173,7 @@ int TvClient::SetEdidData(tv_source_input_t source, char *dataBuf)
 {
     LOGD("%s\n", __FUNCTION__);
     char buf[512] = {0};
-    sprintf(buf, "edid.set.%d.%s", source, dataBuf);
+    sprintf(buf, "edid.set.%d.%s", HDMI_EDID_DATA_SET, source, dataBuf);
     return SendMethodCall(buf);
 }
 
@@ -173,7 +181,7 @@ int TvClient::GetEdidData(tv_source_input_t source, char *dataBuf)
 {
     LOGD("%s\n", __FUNCTION__);
     char buf[512] = {0};
-    sprintf(buf, "edid.get.%d.%s", source, dataBuf);
+    sprintf(buf, "edid.get.%d.%d.%s", HDMI_EDID_DATA_GET, source, dataBuf);
     return SendMethodCall(buf);
 }
 

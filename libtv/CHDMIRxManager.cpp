@@ -69,36 +69,75 @@ int CHDMIRxManager::HDMIRxDeviceIOCtl(int request, ...)
     return ret;
 }
 
-int CHDMIRxManager::HdmiRxEdidUpdate(char *data)
+int CHDMIRxManager::HdmiRxEdidDataSwitch(int edidBinCount, char *data)
 {
+    int ret = -1;
     if (data == NULL) {
-        return -1;
+        LOGE("%s: edid data is null!\n", __FUNCTION__);
+        ret = -1;
+    } else {
+        int edidDataCount = edidBinCount * REAL_EDID_DATA_SIZE;
+        unsigned char loadData[edidDataCount] = {0};
+        int LoadConut = 0;
+        if (edidBinCount == 1) {
+            loadData[0] = 'E';
+            loadData[1] = 'D';
+            loadData[2] = 'I';
+            loadData[3] = 'D';
+            memcpy(loadData + 4, data, edidDataCount);
+            LoadConut = (edidDataCount + 4);
+        } else {
+            memcpy(loadData, data, edidDataCount);
+            LoadConut = edidDataCount;
+        }
+
+        int dev_fd = open(HDMI_EDID_DEV_PATH, O_RDWR);
+        if (dev_fd < 0) {
+            LOGE("open edid file ERROR(%s)!!\n", strerror(errno));
+            ret = -1;
+        } else {
+            if (write(dev_fd, data, LoadConut) < 0) {
+                LOGE("write edid file ERROR(%s)!!\n", strerror(errno));
+                ret = -1;
+            }
+
+            close(dev_fd);
+            dev_fd = -1;
+            if (edidBinCount == 1) {
+                HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+            }
+
+            ret = 0;
+        }
     }
 
-    unsigned char loadData[LOAD_EDID_DATA_SIZE];
-    memset(loadData, 0, sizeof(loadData));
-    loadData[0] = 'E';
-    loadData[1] = 'D';
-    loadData[2] = 'I';
-    loadData[3] = 'D';
-    memcpy(loadData + 4, data, REAL_EDID_DATA_SIZE);
+    return ret;
+}
 
-    int dev_fd = open(HDMI_EDID_DEV_PATH, O_RDWR);
-    if (dev_fd < 0) {
-        LOGE("open edid file ERROR(%s)!!\n", strerror(errno));
-        return -1;
+int CHDMIRxManager::HdmiRxEdidVerSwitch(int verValue)
+{
+    LOGD("%s: new all edid version: 0x%x\n", __FUNCTION__, verValue);
+
+    int ret = -1;
+    int devFd = open(HDMI_EDID_VERSION_DEV_PATH, O_RDWR);
+    if (devFd < 0) {
+        LOGE("%s: open %s ERROR(%s)!!\n", __FUNCTION__, HDMI_EDID_VERSION_DEV_PATH, strerror(errno));
+        ret = -1;
+    } else {
+        char tmp[32] = {0};
+        sprintf(tmp, "%x", verValue);
+        if (write(devFd, tmp, strlen(tmp)) < 0) {
+            LOGE("%s, write %s ERROR(%s)!!\n", __FUNCTION__, HDMI_EDID_VERSION_DEV_PATH, strerror(errno));
+            ret = -1;
+        } else {
+            ret = 0;
+        }
+        close(devFd);
+        devFd = -1;
     }
 
-    if (write(dev_fd, data, LOAD_EDID_DATA_SIZE) < 0) {
-        close(dev_fd);
-        dev_fd = -1;
-        LOGE("write edid file ERROR(%s)!!\n", strerror(errno));
-        return -1;
-    }
-
-    close(dev_fd);
-
-    return HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+    HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+    return ret;
 }
 
 int CHDMIRxManager::HdmiRxHdcpVerSwitch(tv_hdmi_hdcp_version_t version)

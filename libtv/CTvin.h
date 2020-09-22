@@ -55,6 +55,14 @@ typedef enum tvin_aspect_ratio_e {
     TVIN_ASPECT_MAX,
 } tvin_aspect_ratio_t;
 
+typedef enum tvin_port_id_e {
+    TVIN_PORT_ID_1 = 1,
+    TVIN_PORT_ID_2,
+    TVIN_PORT_ID_3,
+    TVIN_PORT_ID_4,
+    TVIN_PORT_ID_MAX,
+} tvin_port_id_t;
+
 typedef struct tvin_info_s {
     tvin_trans_fmt_t    trans_fmt;
     tvin_sig_fmt_t    fmt;
@@ -334,6 +342,7 @@ public:
     tvin_port_t Tvin_GetSourcePortBySourceInput(tv_source_input_t source_input);
     unsigned int Tvin_TransPortStringToValue(const char *port_str);
     tv_source_input_t Tvin_PortToSourceInput(tvin_port_t port);
+    tvin_port_id_t Tvin_GetHdmiPortIdBySourceInput(tv_source_input_t source_input);
 
 private:
     //VDIN
