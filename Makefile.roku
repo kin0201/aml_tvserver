@@ -6,7 +6,7 @@
 ################################################################################
 OUT_ROOT ?= dist
 
-DEPENDS := audio_client
+DEPENDS := audio_client libbinder
 DEPENDS := $(addsuffix /build, $(addprefix $(OUT_ROOT)/../../, $(DEPENDS)))
 override LDFLAGS += $(addprefix -L, $(DEPENDS))
 
@@ -14,6 +14,7 @@ LOCAL_PATH = .
 AUDIO_HAL_DIR = $(AML_COMMON_DIR)/audio_hal
 CUTILS_DIR = $(AML_COMMON_DIR)/cutils
 TVSERVER_DIR = $(AML_COMMON_DIR)/tvserver
+BINDER_DIR = $(AML_COMMON_DIR)/aml_commonlib/libbinder
 
 CFLAGS += -Wall -D_GNU_SOURCE -DHAVE_AUDIO
 
@@ -88,6 +89,7 @@ INCLUDES += \
 	-I$(AUDIO_HAL_DIR) \
 	-I$(AUDIO_HAL_DIR)/include \
 	-I$(CUTILS_DIR)/include \
+	-I$(BINDER_DIR)/include \
 	$(NULL)
 
 ALL_SRCS = $(pq_SRCS) $(tv_SRCS) $(tvclient_SRCS) $(tvservice_SRCS) $(tvtest_SRCS)
@@ -97,10 +99,10 @@ include $(ROKU_PORT_COMMON_DIR)/build/define_target.mk
 
 comma = ,
 $(eval $(call DEFINE_TARGET,libpq.so,$(pq_SRCS),,$(LDFLAGS) -lstdc++ -lpthread -lz -ldl -lrt -lm -lsqlite3 -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
-$(eval $(call DEFINE_TARGET,libtvclient.so,$(tvclient_SRCS),,$(LDFLAGS) -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
+$(eval $(call DEFINE_TARGET,libtvclient.so,$(tvclient_SRCS),,$(LDFLAGS) -lstdc++ -lpthread -lz -ldl -lrt -lbinder -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
 $(eval $(call DEFINE_TARGET,libtv.so,$(tv_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -lpq -laudio_client -lexpat -lboost_system -lboost_filesystem -lstdc++ -lpthread -lz -ldl -lrt -fPIC -shared -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,lib))
-$(eval $(call DEFINE_TARGET,tvservice,$(tvservice_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -lpq -ltv -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -lsqlite3 -laudio_client -lexpat -lboost_system -lboost_filesystem -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
-$(eval $(call DEFINE_TARGET,tvtest,$(tvtest_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -ltvclient -lstdc++ -lpthread -lz -ldl -lrt -ldbus-1 -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
+$(eval $(call DEFINE_TARGET,tvservice,$(tvservice_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -lpq -ltv -lstdc++ -lpthread -lz -ldl -lrt -lbinder -lsqlite3 -laudio_client -lexpat -lboost_system -lboost_filesystem -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
+$(eval $(call DEFINE_TARGET,tvtest,$(tvtest_SRCS),,$(LDFLAGS) -L$(OUT_ROOT) -ltvclient -lstdc++ -lpthread -lz -ldl -lrt -lbinder -Wl$(comma)-z$(comma)defs -Wl$(comma)--build-id,bin))
 
 # ---------------------------------------------------------------------
 #  Build rules

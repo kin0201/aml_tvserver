@@ -95,7 +95,7 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
         send.writeInt32(signalDetectEvent->mDviFlag);
         evtCallBack->transact(EVT_SIG_DT_CB, send, &reply);
     } else {
-        LOGW("Event callback is null.\n");
+        LOGD("Event callback is null.\n");
     }
     return 0;
 }

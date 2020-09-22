@@ -1,6 +1,6 @@
 TVSERVER_PROJDIR  := $(AML_COMMON_DIR)/tvserver
 TVSERVER_OSS_LIC  := CLOSED
-TVSERVER_DEPENDS  := audio_client
+TVSERVER_DEPENDS  := audio_client libbinder
 TVSERVER_BINARIES := usr/lib/libtvclient.so usr/lib/libpq.so  usr/lib/libtv.so usr/bin/tvservice usr/bin/tvtest
 TVSERVER_ADD_SRC  := $(ROKU_OS_INCLUDE_DIRS)
 

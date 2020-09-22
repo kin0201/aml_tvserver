@@ -40,7 +40,7 @@ TvClient::TvClient() {
     do {
         tvServicebinder = sm->getService(String16("tvservice"));
         if (tvServicebinder != 0) break;
-        LOGW("TvClient: Waiting tvservice published.\n");
+        LOGD("TvClient: Waiting tvservice published.\n");
         usleep(500000);
     } while(true);
     LOGD("Connected to tvservice.\n");
