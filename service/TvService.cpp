@@ -103,6 +103,7 @@ int TvService::ParserTvCommand(const char *commandData)
 {
     int ret = 0;
     char cmdbuff[1024];
+    memset(cmdbuff, 0x0, sizeof(cmdbuff));
     memcpy(cmdbuff, commandData, strlen(commandData));
     const char *delimitation = ".";
     char *temp = strtok(cmdbuff, delimitation);

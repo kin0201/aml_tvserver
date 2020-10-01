@@ -26,7 +26,16 @@ static tv_hdmi_edid_version_t Hdmi4CurrentEdidVer = HDMI_EDID_VER_14;
 CTv::CTv()
 {
     mpObserver = NULL;
-    LoadConfigFile(CONFIG_FILE_PATH_DEF);
+
+    const char* tvConfigFilePath = getenv(CFG_TV_CONFIG_FILE_PATH_STR);
+    if (!tvConfigFilePath) {
+        LOGD("%s: read tvconfig file path failed!\n", __FUNCTION__);
+        tvConfigFilePath = CONFIG_FILE_PATH_DEF;
+    } else {
+        LOGD("%s: tvconfig file path is %s!\n", __FUNCTION__, tvConfigFilePath);
+    }
+    LoadConfigFile(tvConfigFilePath);
+
     mpTvin = CTvin::getInstance();
     mpTvin->Tvin_AddVideoPath(TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
     mpTvin->Tvin_LoadSourceInputToPortMap();

@@ -13,6 +13,7 @@
 #define CC_CFG_KEY_STR_MAX_LEN                  (128)
 #define CC_CFG_VALUE_STR_MAX_LEN                (512)
 
+#define CFG_TV_CONFIG_FILE_PATH_STR             "TV_CONFIG_FILE_PATH"
 //for tv config
 #define CFG_SECTION_TV                          "TV"
 #define CFG_SECTION_ATV                         "ATV"
