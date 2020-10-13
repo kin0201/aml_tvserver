@@ -22,21 +22,25 @@ extern int __tv_log_print(const char *moudle_tag, const char *level_tag ,const c
 
 #ifdef LOG_MOUDLE_TAG
 
+#undef LOGD
 #ifndef LOGD
 #define LOGD(...) \
     __tv_log_print(LOG_MOUDLE_TAG, "D", LOG_CLASS_TAG, __VA_ARGS__)
 #endif
 
+#undef LOGE
 #ifndef LOGE
 #define LOGE(...) \
     __tv_log_print(LOG_MOUDLE_TAG, "E", LOG_CLASS_TAG, __VA_ARGS__)
 #endif
 
+#undef LOGV
 #ifndef LOGV
 #define LOGV(...) \
     __tv_log_print(LOG_MOUDLE_TAG, "W", LOG_CLASS_TAG, __VA_ARGS__)
 #endif
 
+#undef LOGI
 #ifndef LOGI
 #define LOGI(...) \
     __tv_log_print(LOG_MOUDLE_TAG, "I", LOG_CLASS_TAG, __VA_ARGS__)

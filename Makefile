@@ -35,6 +35,7 @@ tv_SRCS  = \
 tvclient_SRCS  = \
 	$(LOCAL_PATH)/client/TvClient.cpp \
 	$(LOCAL_PATH)/client/CTvClientLog.cpp \
+	$(LOCAL_PATH)/client/TvClientWrapper.cpp \
 	$(NULL)
 
 tvclient_HEADERS = \
@@ -52,7 +53,7 @@ tvservice_SRCS  = \
 # tvtest - src files
 ################################################################################
 tvtest_SRCS  = \
-	$(LOCAL_PATH)/test/main_tvtest.cpp \
+	$(LOCAL_PATH)/test/main_tvtest.c \
 	$(NULL)
 
 # ---------------------------------------------------------------------
@@ -82,12 +83,28 @@ all: $(BUILD_TARGETS)
 
 clean:
 	rm -f *.o $(BUILD_TARGETS)
+	rm -rf $(STAGING_DIR)/usr/include/tvclient
+	rm -rf $(STAGING_DIR)/usr/lib/libtvclient.so
+	rm -rf $(STAGING_DIR)/usr/lib/libtv.so
+	rm -rf $(STAGING_DIR)/usr/bin/tvtest
+	rm -rf $(STAGING_DIR)/usr/bin/tvservice
+	rm -rf $(TARGET_DIR)/usr/include/tvclient
+	rm -rf $(TARGET_DIR)/usr/lib/libtvclient.so
+	rm -rf $(TARGET_DIR)/usr/lib/libtv.so
+	rm -rf $(TARGET_DIR)/usr/bin/tvtest
+	rm -rf $(TARGET_DIR)/usr/bin/tvservice
 
 install:
 	install -m 0644 libtvclient.so $(TARGET_DIR)/usr/lib
 	install -m 0644 libtv.so $(TARGET_DIR)/usr/lib/
-	install -m 755 tvservice $(TARGET_DIR)/usr/bin/
-	install -m 755 tvtest $(TARGET_DIR)/usr/bin/
+	install -m 0755 tvservice $(TARGET_DIR)/usr/bin/
+	install -m 0755 tvtest $(TARGET_DIR)/usr/bin/
+	install -m 0644 libtvclient.so $(STAGING_DIR)/usr/lib
+	install -m 0644 libtv.so $(STAGING_DIR)/usr/lib
+	mkdir -p $(STAGING_DIR)/usr/include/tvclient
+	install -m 0644 $(LOCAL_PATH)/client/include/*  $(STAGING_DIR)/usr/include/tvclient
+	install -m 0755 tvservice $(STAGING_DIR)/usr/bin/
+	install -m 0755 tvtest $(STAGING_DIR)/usr/bin/
 
 uninstall:
 	rm -f $(TARGET_DIR)/usr/lib/libtvclient.so

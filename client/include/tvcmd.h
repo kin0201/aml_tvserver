@@ -16,6 +16,7 @@ enum tvcmd_e {
     TV_CONTROL_CLOSE_TV           = 2,
     TV_CONTROL_START_TV           = 3,
     TV_CONTROL_STOP_TV            = 4,
+    TV_CONTROL_VDIN_WORK_MODE_SET = 98,
     TV_CONTROL_CMD_MAX            = 99,
 
     //hdmi CMD(101~199)

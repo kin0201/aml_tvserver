@@ -385,4 +385,18 @@ typedef enum tvin_sig_fmt_e {
     TVIN_SIG_FMT_MAX,
 } tvin_sig_fmt_t;
 
+//tvin signal status
+typedef enum tvin_sig_status_e {
+    TVIN_SIG_STATUS_NULL = 0, // processing status from init to the finding of the 1st confirmed status
+    TVIN_SIG_STATUS_NOSIG,    // no signal - physically no signal
+    TVIN_SIG_STATUS_UNSTABLE, // unstable - physically bad signal
+    TVIN_SIG_STATUS_NOTSUP,   // not supported - physically good signal & not supported
+    TVIN_SIG_STATUS_STABLE,   // stable - physically good signal & supported
+} tvin_sig_status_t;
+
+typedef enum vdin_work_mode_e {
+    VDIN_WORK_MODE_VFM = 0,
+    VDIN_WORK_MODE_V4L2,
+    VDIN_WORK_MODE_MAX,
+} vdin_work_mode_t;
 #endif

@@ -14,6 +14,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <binder/IPCThreadState.h>
+#include <binder/ProcessState.h>
 
 #include "TvClient.h"
 #include "CTvClientLog.h"
@@ -35,6 +37,8 @@ TvClient *TvClient::GetInstance() {
 }
 
 TvClient::TvClient() {
+    sp<ProcessState> proc(ProcessState::self());
+    proc->startThreadPool();
     Parcel send, reply;
     sp<IServiceManager> sm = defaultServiceManager();
     do {
@@ -77,10 +81,11 @@ int TvClient::SendTvClientEvent(CTvEvent &event)
     LOGD("%s\n", __FUNCTION__);
 
     int clientSize = mTvClientObserver.size();
+    LOGD("%s: now has %d tvclient.\n", __FUNCTION__, clientSize);
     int i = 0;
     for (i = 0; i < clientSize; i++) {
         if (mTvClientObserver[i] != NULL) {
-            LOGI("%s, client cookie:%d notifyCallback", __FUNCTION__, i);
+            LOGI("%s, client cookie:%d notifyCallback.\n", __FUNCTION__, i);
             mTvClientObserver[i]->onTvClientEvent(event);
         }
     }
@@ -134,6 +139,8 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
             cookie = clientSize;
             mTvClientObserver[clientSize] = observer;
         }
+    } else {
+        LOGD("%s: observer is NULL.\n", __FUNCTION__);
     }
 
     return 0;
@@ -142,14 +149,22 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
 int TvClient::StartTv(tv_source_input_t source) {
     LOGD("%s\n", __FUNCTION__);
     char buf[32] = {0};
-    sprintf(buf, "source.start.%d", source);
+    sprintf(buf, "control.%d.%d", TV_CONTROL_START_TV, source);
     return SendMethodCall(buf);
 }
 
 int TvClient::StopTv(tv_source_input_t source) {
     LOGD("%s\n", __FUNCTION__);
     char buf[32] = {0};
-    sprintf(buf, "source.stop.%d", source);
+    sprintf(buf, "control.%d.%d", TV_CONTROL_STOP_TV, source);
+    return SendMethodCall(buf);
+}
+
+int TvClient::SetVdinWorkMode(vdin_work_mode_t vdinWorkMode)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[512] = {0};
+    sprintf(buf, "control.%d.%d", TV_CONTROL_VDIN_WORK_MODE_SET, vdinWorkMode);
     return SendMethodCall(buf);
 }
 

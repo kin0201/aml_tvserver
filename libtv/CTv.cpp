@@ -98,6 +98,7 @@ int CTv::StopTv(tv_source_input_t source)
 {
     LOGD("%s: source = %d!\n", __FUNCTION__, source);
 
+    mVdinWorkMode = VDIN_WORK_MODE_VFM;
     mCurrentSource = SOURCE_MPEG;
     tvin_info_t tempSignalInfo;
     tempSignalInfo.trans_fmt = TVIN_TFMT_2D;
@@ -262,15 +263,6 @@ int CTv::SetCurrenSourceInfo(tvin_info_t sig_info)
     mCurrentSignalInfo.is_dvi = sig_info.is_dvi;
     mCurrentSignalInfo.aspect_ratio = sig_info.aspect_ratio;
 
-    /*if ((mCurrentSource == SOURCE_MPEG)
-        || (mCurrentSource != SOURCE_MPEG && mCurrentSignalInfo.status == TVIN_SIG_STATUS_STABLE)) {
-        source_input_param_t source_input_param;
-        source_input_param.source_input = mCurrentSource;
-        source_input_param.sig_fmt = mCurrentSignalInfo.fmt;
-        source_input_param.trans_fmt = mCurrentSignalInfo.trans_fmt;
-        CPQControl::GetInstance()->SetCurrentSourceInputInfo(source_input_param);
-    }*/
-
     return 0;
 }
 
@@ -281,14 +273,20 @@ tvin_info_t CTv::GetCurrentSourceInfo(void)
     } else {//Other source
         //todo
     }
-    LOGD("mCurrentSource = %d, trans_fmt is %d,fmt is %d, status is %d",
+    LOGD("mCurrentSource = %d, trans_fmt is %d,fmt is %d, status is %d.\n",
             mCurrentSource, mCurrentSignalInfo.trans_fmt, mCurrentSignalInfo.fmt, mCurrentSignalInfo.status);
     return mCurrentSignalInfo;
 }
 
 int CTv::setTvObserver ( TvIObserver *ob )
 {
-    mpObserver = ob;
+    LOGD("%s\n", __FUNCTION__);
+    if (ob != NULL) {
+        mpObserver = ob;
+    } else {
+        LOGD("%s: Observer is NULL.\n", __FUNCTION__);
+    }
+
     return 0;
 }
 
@@ -447,17 +445,27 @@ int CTv::GetEdidVersion(tv_source_input_t source)
     return retValue;
 }
 
+int CTv::SetVdinWorkMode(vdin_work_mode_t vdinWorkMode)
+{
+    mVdinWorkMode = vdinWorkMode;
+    return 0;
+}
+
 void CTv::onSigToStable()
 {
-    LOGD("%s\n", __FUNCTION__);
+    LOGD("%s: mVdinWorkMode is %d\n", __FUNCTION__, mVdinWorkMode);
     //start decoder
-    mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
+    if (mVdinWorkMode == VDIN_WORK_MODE_VFM) {
+        mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
+    } else {
+        LOGD("%s: not VFM mode.\n", __FUNCTION__);
+    }
 
     //send signal to apk
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
-    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
+    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mStatus = mCurrentSignalInfo.status;
     event.mDviFlag = mCurrentSignalInfo.is_dvi;
     sendTvEvent(event);
@@ -478,8 +486,8 @@ void CTv::onSigToUnSupport()
     mpTvin->Tvin_StopDecoder();
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
-    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
+    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mStatus = mCurrentSignalInfo.status;
     event.mDviFlag = mCurrentSignalInfo.is_dvi;
     sendTvEvent(event);
@@ -493,8 +501,8 @@ void CTv::onSigToNoSig()
     mpTvin->Tvin_StopDecoder();
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
-    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mFmt = mCurrentSignalInfo.fmt;
+    event.mTrans_fmt = mCurrentSignalInfo.trans_fmt;
     event.mStatus = mCurrentSignalInfo.status;
     event.mDviFlag = mCurrentSignalInfo.is_dvi;
     sendTvEvent (event);
@@ -507,6 +515,8 @@ int CTv::sendTvEvent(CTvEvent &event)
 
     if (mpObserver != NULL) {
         mpObserver->onTvEvent(event);
+    } else {
+        LOGD("%s: Observer is NULL.\n", __FUNCTION__);
     }
 
     return 0;

@@ -66,10 +66,10 @@ int CTvDevicesPollDetect::startDetect()
 
     ret = pthread_create(&thread_id, NULL, TvDevicesPollDetectThread, (void *)this);
     if (ret != 0) {
-        LOGD("CTvDevicesPollDetect create thread fail\n");
+        LOGE("CTvDevicesPollDetect create thread fail\n");
         ret = -1;
     } else {
-        LOGE("CTvDevicesPollDetect thread id (%lu) done\n", thread_id);
+        LOGD("CTvDevicesPollDetect thread id (%lu) done\n", thread_id);
         ret = 0;
     }
 
@@ -199,11 +199,11 @@ int CTvDevicesPollDetect::GetSourceConnectStatus(tv_source_input_t source_input)
         break;
     }
     default:
-        LOGD("%s; Not support source :%s", __FUNCTION__, inputToName(source_input));
+        LOGD("%s; Not support source :%s\n", __FUNCTION__, inputToName(source_input));
         break;
     }
 
-    LOGD("%: source :%s, status:%s", __FUNCTION__, inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
+    LOGD("%: source :%s, status:%s\n", __FUNCTION__, inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
     return PlugStatus;
 }
 

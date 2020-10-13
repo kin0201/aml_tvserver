@@ -6,6 +6,8 @@
  *
  * Description: c++ file
  */
+#define LOG_MOUDLE_TAG "TV"
+#define LOG_CLASS_TAG "CTvAudio"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -76,7 +78,7 @@ void CTvAudio::create_audio_patch(int device_type)
         sink.type = AUDIO_PORT_TYPE_DEVICE;
         sink.ext.device.type = AUDIO_DEVICE_OUT_SPEAKER;
 
-        LOGD("create mix --> speaker patch...");
+        LOGD("create mix --> speaker patch...\n");
         ret = device->create_audio_patch(device, 1, &source, 1, &sink, &patch_handle);
         if (ret) {
             LOGE("fail ret:%d\n",ret);
@@ -90,7 +92,7 @@ void CTvAudio::release_audio_patch()
 {
     if ((patch_handle) && (iSInit)) {
         int ret;
-        LOGD("destroy patch...");
+        LOGD("destroy patch...\n");
         ret = device->release_audio_patch(device, patch_handle);
         if (ret) {
             LOGE("fail ret:%d\n",ret);

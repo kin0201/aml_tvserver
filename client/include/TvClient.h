@@ -52,6 +52,7 @@ public:
     int GetEdidVersion(tv_source_input_t source);
     int SetEdidData(tv_source_input_t source, char *dataBuf);
     int GetEdidData(tv_source_input_t source,char *dataBuf);
+    int SetVdinWorkMode(vdin_work_mode_t vdinWorkMode);
 private:
     int SendMethodCall(char *CmdString);
     static int HandSourceConnectEvent(const void *param);

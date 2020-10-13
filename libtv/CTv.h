@@ -51,6 +51,7 @@ public:
     int LoadEdidData(int isNeedBlackScreen, int isDolbyVisionEnable);
     int SetEdidVersion(tv_source_input_t source, tv_hdmi_edid_version_t edidVer);
     int GetEdidVersion(tv_source_input_t source);
+    int SetVdinWorkMode(vdin_work_mode_t vdinWorkMode);
 
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();
@@ -73,4 +74,5 @@ private:
     tv_source_input_t mCurrentSource;
     CTvDevicesPollDetect mTvDevicesPollDetect;
     TvIObserver *mpObserver;
+    vdin_work_mode_t mVdinWorkMode = VDIN_WORK_MODE_VFM;
 };

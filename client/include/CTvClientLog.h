@@ -14,6 +14,9 @@
 #ifndef _C_TV_LOG_H_
 #define _C_TV_LOG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //1024 + 128
 #define DEFAULT_LOG_BUFFER_LEN 1152
@@ -49,4 +52,7 @@ extern int _log_print(const char *moudle_tag, const char *level_tag ,const char 
     _log_print("tvclient", "I", " ", __VA_ARGS__)
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 #endif//end #ifndef _C_TV_LOG_H_

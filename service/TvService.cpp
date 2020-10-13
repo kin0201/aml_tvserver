@@ -63,10 +63,8 @@ int TvService::SendSignalForSourceConnectEvent(CTvEvent &event)
     LOGD("%s\n", __FUNCTION__);
     Parcel send, reply;
 
-    int eventType = CTvEvent::TV_EVENT_SOURCE_CONNECT;
     TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
     if (evtCallBack != NULL) {
-        send.writeInt32(eventType);
         send.writeInt32(sourceConnectEvent->mSourceInput);
         send.writeInt32(sourceConnectEvent->connectionState);
         LOGD("send source evt(%d,%d) to client.\n",
@@ -83,10 +81,8 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
     LOGD("%s\n", __FUNCTION__);
     Parcel send, reply;
 
-    int eventType = CTvEvent::TV_EVENT_SIGLE_DETECT;
     TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
     if (evtCallBack != NULL) {
-        send.writeInt32(eventType);
         send.writeInt32(signalDetectEvent->mSourceInput);
         send.writeInt32(signalDetectEvent->mFmt);
         send.writeInt32(signalDetectEvent->mTrans_fmt);
@@ -108,17 +104,22 @@ int TvService::ParserTvCommand(const char *commandData)
     const char *delimitation = ".";
     char *temp = strtok(cmdbuff, delimitation);
     LOGD("%s: cmdType = %s\n", __FUNCTION__, temp);
-    if (strcmp(temp, "source") == 0) {
-        LOGD("%s: source cmd!\n", __FUNCTION__);
+    if (strcmp(temp, "control") == 0) {
+        LOGD("%s: control cmd!\n", __FUNCTION__);
         temp = strtok(NULL, delimitation);
-        if (strcmp(temp, "start") == 0) {
+        int moudleID = atoi(temp);
+        if (moudleID == TV_CONTROL_START_TV) {
             temp = strtok(NULL, delimitation);
             tv_source_input_t startSource = (tv_source_input_t)atoi(temp);
             ret = mpTv->StartTv(startSource);
-        } else if (strcmp(temp, "stop") == 0){
+        } else if (moudleID == TV_CONTROL_STOP_TV) {
             temp = strtok(NULL, delimitation);
             tv_source_input_t stopSource = (tv_source_input_t)atoi(temp);
             ret = mpTv->StopTv(stopSource);
+        } else if (moudleID == TV_CONTROL_VDIN_WORK_MODE_SET) {
+            temp = strtok(NULL, delimitation);
+            vdin_work_mode_t setVdinWorkMode = (vdin_work_mode_t)atoi(temp);
+            ret = mpTv->SetVdinWorkMode(setVdinWorkMode);
         } else {
             LOGD("%s: invalid sourec cmd!\n", __FUNCTION__);
         }
@@ -168,6 +169,7 @@ int TvService::ParserTvCommand(const char *commandData)
 status_t TvService::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {
+    LOGD("%s: cmd is %d.\n", __FUNCTION__, code);
     switch (code) {
         case CMD_TV_ACTION: {
             const char* command = data.readCString();
