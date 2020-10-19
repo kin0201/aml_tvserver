@@ -27,7 +27,7 @@ const int RET_FAILED  = -1;
 const int EVENT_SIGLE_DETECT = 4;
 const int EVENT_SOURCE_CONNECT = 10;
 
-TvClient *mInstance = NULL;
+TvClient *TvClient::mInstance;
 TvClient *TvClient::GetInstance() {
     if (mInstance == NULL) {
         mInstance = new TvClient();
@@ -37,6 +37,7 @@ TvClient *TvClient::GetInstance() {
 }
 
 TvClient::TvClient() {
+    LOGD("%s.\n", __FUNCTION__);
     sp<ProcessState> proc(ProcessState::self());
     proc->startThreadPool();
     Parcel send, reply;
@@ -53,6 +54,7 @@ TvClient::TvClient() {
 }
 
 TvClient::~TvClient() {
+    LOGD("%s.\n", __FUNCTION__);
     Parcel send, reply;
     tvServicebinder->transact(CMD_CLR_TV_CB, send, &reply);
     tvServicebinder = NULL;
@@ -85,13 +87,13 @@ int TvClient::SendTvClientEvent(CTvEvent &event)
     int i = 0;
     for (i = 0; i < clientSize; i++) {
         if (mTvClientObserver[i] != NULL) {
-            LOGI("%s, client cookie:%d notifyCallback.\n", __FUNCTION__, i);
             mTvClientObserver[i]->onTvClientEvent(event);
+        } else {
+            LOGD("%s: mTvClientObserver[%d] is NULL.\n", __FUNCTION__, i, mTvClientObserver[i]);
         }
     }
 
-    LOGD("send event for %d TvClientObserver!\n", i);
-
+    LOGD("send event for %d count TvClientObserver!\n", i);
     return 0;
 }
 
@@ -125,6 +127,7 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
 {
     LOGD("%s\n", __FUNCTION__);
     if (observer != nullptr) {
+        LOGD("%s: observer is %p.\n", __FUNCTION__, observer);
         int cookie = -1;
         int clientSize = mTvClientObserver.size();
         for (int i = 0; i < clientSize; i++) {
@@ -132,6 +135,8 @@ int TvClient::setTvClientObserver(TvClientIObserver *observer)
                 cookie = i;
                 mTvClientObserver[i] = observer;
                 break;
+            } else {
+                LOGD("%s: mTvClientObserver[%d] has been register.\n", __FUNCTION__, i);
             }
         }
 

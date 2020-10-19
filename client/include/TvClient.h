@@ -59,6 +59,7 @@ private:
     static int HandSignalDetectEvent(const void *param);
     int SendTvClientEvent(CTvEvent &event);
 
+    static TvClient *mInstance;
     std::map<int, TvClientIObserver *> mTvClientObserver;
 
     sp<IBinder> tvServicebinder;
