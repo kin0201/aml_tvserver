@@ -106,6 +106,8 @@
 #define UBOOTENV_EDID_VERSION                   "ubootenv.var.edid_select"
 #define UBOOTENV_PORT_MAP                       "ubootenv.var.port_map"
 #define CFG_HDMI_EDID_FILE_PATH                 "edid.file.path"
+#define CFG_HDMI_EDID_AUTO_LOAD_EN              "edid.data.auto.load.en"
+
 //for tv sysfs
 #define SYS_SPDIF_MODE_DEV_PATH                 "/sys/class/audiodsp/digital_raw"
 #define SYS_VECM_DNLP_ADJ_LEVEL                 "/sys/module/am_vecm/parameters/dnlp_adj_level"
