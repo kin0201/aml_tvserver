@@ -60,7 +60,7 @@ tvtest_SRCS  = \
 #  Build rules
 BUILD_TARGETS = libtvclient.so libtv.so tvservice tvtest
 
-.PHONY: all install uninstall clean
+.PHONY: all install clean
 
 libtvclient.so: $(tvclient_SRCS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared -fPIC -I$(tvclient_HEADERS) \
@@ -85,9 +85,6 @@ clean:
 	rm -f *.o $(BUILD_TARGETS)
 	rm -rf $(STAGING_DIR)/usr/include/tvclient
 	rm -rf $(STAGING_DIR)/usr/lib/libtvclient.so
-	rm -rf $(STAGING_DIR)/usr/lib/libtv.so
-	rm -rf $(STAGING_DIR)/usr/bin/tvtest
-	rm -rf $(STAGING_DIR)/usr/bin/tvservice
 	rm -rf $(TARGET_DIR)/usr/include/tvclient
 	rm -rf $(TARGET_DIR)/usr/lib/libtvclient.so
 	rm -rf $(TARGET_DIR)/usr/lib/libtv.so
@@ -99,15 +96,3 @@ install:
 	install -m 0644 libtv.so $(TARGET_DIR)/usr/lib/
 	install -m 0755 tvservice $(TARGET_DIR)/usr/bin/
 	install -m 0755 tvtest $(TARGET_DIR)/usr/bin/
-	install -m 0644 libtvclient.so $(STAGING_DIR)/usr/lib
-	install -m 0644 libtv.so $(STAGING_DIR)/usr/lib
-	mkdir -p $(STAGING_DIR)/usr/include/tvclient
-	install -m 0644 $(LOCAL_PATH)/client/include/*  $(STAGING_DIR)/usr/include/tvclient
-	install -m 0755 tvservice $(STAGING_DIR)/usr/bin/
-	install -m 0755 tvtest $(STAGING_DIR)/usr/bin/
-
-uninstall:
-	rm -f $(TARGET_DIR)/usr/lib/libtvclient.so
-	rm -f $(TARGET_DIR)/usr/lib/libtv.so
-	rm -f $(TARGET_DIR)/usr/bin/tvtest
-	rm -f $(TARGET_DIR)/usr/bin/tvservice
