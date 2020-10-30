@@ -50,15 +50,23 @@ CTv::CTv()
     signalInfo.is_dvi = 0;
     signalInfo.aspect_ratio = TVIN_ASPECT_NULL;
     SetCurrenSourceInfo(signalInfo);
-    int dolbyVisionEnableState = 0;
-    char buf[32] = {0};
-    tvReadSysfs(DOLBY_VISION_ENABLE_PATH, buf);
-    if (strcmp("Y", buf) == 0) {
-        dolbyVisionEnableState = true;
+
+    //EDID load
+    int edidAutoLoadEnable = ConfigGetInt(CFG_SECTION_HDMI, CFG_HDMI_EDID_AUTO_LOAD_EN, 1);
+    if (edidAutoLoadEnable == 1) {
+        LOGD("%s: EDID data load by tvserver!\n", __FUNCTION__);
+        int dolbyVisionEnableState = 0;
+        char buf[32] = {0};
+        tvReadSysfs(DOLBY_VISION_ENABLE_PATH, buf);
+        if (strcmp("Y", buf) == 0) {
+            dolbyVisionEnableState = true;
+        } else {
+            dolbyVisionEnableState = false;
+        }
+        LoadEdidData(0, dolbyVisionEnableState);
     } else {
-        dolbyVisionEnableState = false;
+        LOGD("%s: EDID data load by customer!\n", __FUNCTION__);
     }
-    LoadEdidData(0, dolbyVisionEnableState);
     mTvDevicesPollDetect.setObserver(this);
     mTvDevicesPollDetect.startDetect();
 }
@@ -318,7 +326,7 @@ int CTv::LoadEdidData(int isNeedBlackScreen, int isDolbyVisionEnable)
     char edidReadBuf[REAL_EDID_DATA_SIZE] = {0};
     char edidFileName[100] = {0};
     int loadNum = 1;
-    const char *edidFilePath = ConfigGetStr(CFG_SECTION_HDMI, CFG_HDMI_EDID_FILE_PATH, "/vendor/etc/tvconfig");
+    const char *edidFilePath = ConfigGetStr(CFG_SECTION_HDMI, CFG_HDMI_EDID_FILE_PATH, "/vendor/etc/tvconfig/hdmi");
     if (isDolbyVisionKoExist && (isDolbyVisionEnable == 1)) {
         for (loadNum=1;loadNum<7;loadNum++) {
             LOGD("%s: load dolby vision EDID!\n", __FUNCTION__);
