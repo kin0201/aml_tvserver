@@ -10,7 +10,7 @@
 #ifndef _TVCLIENT_WRAPPER_H__
 #define _TVCLIENT_WRAPPER_H_
 
-#include "common.h"
+#include "TvCommon.h"
 
 #ifdef __cplusplus
 extern "C" {

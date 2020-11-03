@@ -15,7 +15,7 @@
 #include <pthread.h>
 
 #include "TvService.h"
-#include "common.h"
+#include "TvCommon.h"
 #include "CTvLog.h"
 #include "tvcmd.h"
 

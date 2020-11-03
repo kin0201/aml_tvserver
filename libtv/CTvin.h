@@ -10,7 +10,7 @@
 #ifndef _CTVIN_H
 #define _CTVIN_H
 
-#include "common.h"
+#include "TvCommon.h"
 
 // ***************************************************************************
 // *** TVIN general definition/enum/struct ***********************************
