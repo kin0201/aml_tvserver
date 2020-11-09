@@ -131,6 +131,8 @@ int main(int argc, char **argv) {
     LOGD("#### select 4 to edid 1.4 (this is default) ####\n");
     LOGD("#### select 5 to edid 2.0 ####\n");
     LOGD("#### select 6 to edid auto ####\n");
+    LOGD("#### select 7 to AV1 ####\n");
+    LOGD("#### select 8 to AV2 ####\n");
     LOGD("#### select q to stop####\n");
     LOGD("##########################\n");
     while (run) {
@@ -176,6 +178,19 @@ int main(int argc, char **argv) {
           case '6': {
               test->EdidVer = 2;
               test->SendCmd("EDID_set");
+              break;
+          case '7': {
+              test->SendCmd("stop");
+              SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
+              test->CurrentSource=SOURCE_AV1;
+              test->SendCmd("start");
+              break;
+          }
+          case '8': {
+              test->SendCmd("stop");
+              SetOsdBlankStatus("/sys/class/graphics/fb0/blank", 0);
+              test->CurrentSource=SOURCE_AV2;
+              test->SendCmd("start");
               break;
           }
           default: {
