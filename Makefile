@@ -4,7 +4,7 @@
 #
 ################################################################################
 LOCAL_PATH = $(shell pwd)
-LDFLAGS += -lstdc++ -lpthread -lz -ldl -lrt -L$(STAGING_DIR)/usr/lib
+LDFLAGS += -Wl,--no-as-needed -lstdc++ -lpthread -lz -ldl -lrt -L$(STAGING_DIR)/usr/lib
 CFLAGS += -Wall -Wno-unknown-pragmas -Wno-format \
           -O3 -fexceptions -fnon-call-exceptions -D_GNU_SOURCE \
           -I$(STAGING_DIR)/usr/include -DHAVE_AUDIO
@@ -72,7 +72,7 @@ libtv.so: $(tv_SRCS)
 	-I$(LOCAL_PATH)/libtv/tvutils -laudio_client -o $@ $^ $(LDLIBS)
 
 tvservice: $(tvservice_SRCS) libtv.so
-	$(CC) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) \
+	$(CXX) $(CXXFLAGS) $(CFLAGS) $(LDFLAGS) -I$(tvclient_HEADERS) \
 	-I$(LOCAL_PATH)/libtv -I$(LOCAL_PATH)/libtv/tvutils \
 	-L$(LOCAL_PATH) -ltv -laudio_client -o $@ $^ $(LDLIBS)
 
