@@ -69,7 +69,7 @@ int TvClient::SendMethodCall(char *CmdString)
     if (tvServicebinder != NULL) {
         send.writeCString(CmdString);
         if (tvServicebinder->transact(CMD_TV_ACTION, send, &reply) != 0) {
-            LOGE("TvClient: call %s failed.\n", CmdString);
+            LOGE("%s: tvServicebinder failed.\n", __FUNCTION__);
             ReturnVal = -1;
         } else {
             ReturnVal = reply.readInt32();
@@ -176,7 +176,7 @@ int TvClient::SetVdinWorkMode(vdin_work_mode_t vdinWorkMode)
 int TvClient::SetEdidVersion(tv_source_input_t source, int edidVer)
 {
     LOGD("%s\n", __FUNCTION__);
-    char buf[512] = {0};
+    char buf[32] = {0};
     sprintf(buf, "edid.set.%d.%d.%d", HDMI_EDID_VER_SET, source, edidVer);
     return SendMethodCall(buf);
 }
@@ -184,7 +184,7 @@ int TvClient::SetEdidVersion(tv_source_input_t source, int edidVer)
 int TvClient::GetEdidVersion(tv_source_input_t source)
 {
     LOGD("%s\n", __FUNCTION__);
-    char buf[512] = {0};
+    char buf[32] = {0};
     sprintf(buf, "edid.get.%d.%d", HDMI_EDID_VER_GET, source);
     return SendMethodCall(buf);
 }
@@ -192,9 +192,28 @@ int TvClient::GetEdidVersion(tv_source_input_t source)
 int TvClient::SetEdidData(tv_source_input_t source, char *dataBuf)
 {
     LOGD("%s\n", __FUNCTION__);
-    char buf[512] = {0};
-    sprintf(buf, "edid.set.%d.%s", HDMI_EDID_DATA_SET, source, dataBuf);
-    return SendMethodCall(buf);
+    char CmdString[32] = {0};
+    sprintf(CmdString, "%d.%d.", HDMI_EDID_DATA_SET, source);
+
+    int ret = -1;
+    Parcel send, reply;
+    if (tvServicebinder != NULL) {
+        send.writeCString(CmdString);
+        send.writeInt32(256);
+        for (int i=0;i<256;i++) {
+            send.writeInt32(dataBuf[i]);
+        }
+        if (tvServicebinder->transact(DATA_SET_ACTION, send, &reply) != 0) {
+            LOGE("%s: tvServicebinder failed.\n", __FUNCTION__);
+        } else {
+            ret = reply.readInt32();
+        }
+    } else {
+        LOGE("%s: tvServicebinder is NULL.\n", __FUNCTION__);
+    }
+
+    return ret;
+
 }
 
 int TvClient::GetEdidData(tv_source_input_t source, char *dataBuf)

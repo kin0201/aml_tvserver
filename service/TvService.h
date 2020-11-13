@@ -29,6 +29,8 @@ public:
         CMD_CLR_TV_CB = IBinder::FIRST_CALL_TRANSACTION + 3,
         EVT_SRC_CT_CB = IBinder::FIRST_CALL_TRANSACTION + 4,
         EVT_SIG_DT_CB = IBinder::FIRST_CALL_TRANSACTION + 5,
+        DATA_SET_ACTION = IBinder::FIRST_CALL_TRANSACTION + 6,
+        DATA_GET_ACTION = IBinder::FIRST_CALL_TRANSACTION + 7,
     };
 
 private:
@@ -36,6 +38,7 @@ private:
     int SendSignalForSignalDetectEvent(CTvEvent &event);
     int SendSignalForSourceConnectEvent(CTvEvent &event);
     int ParserTvCommand(const char *commandData);
+    int ParserTvDataCommand(const char *commandBuf, unsigned char *dataBuf);
 
     CTv *mpTv;
     sp<IBinder> evtCallBack;

@@ -27,6 +27,8 @@
 #define HDMI_CEC_PORT_MAP                 "/sys/module/tvin_hdmirx/parameters/port_map"
 #define HDMI_EDID_DEV_PATH                "/sys/class/hdmirx/hdmirx0/edid"
 #define HDMI_EDID_VERSION_DEV_PATH        "/sys/class/hdmirx/hdmirx0/edid_select"
+#define HDMI_EDID_DATA_DEV_PATH           "/sys/class/hdmirx/hdmirx0/edid_with_port"
+
 
 #define REAL_EDID_DATA_SIZE        (256)
 
@@ -66,6 +68,7 @@ public:
     int GetHdmiHdcpKeyKsvInfo(struct _hdcp_ksv *msg);
     int CalHdmiPortCecPhysicAddr(void);
     int SetHdmiPortCecPhysicAddr(void);
+    int UpdataEdidDataWithPort(int port, unsigned char *dataBuf);
 private:
     int mHdmiRxDeviceId;
 };

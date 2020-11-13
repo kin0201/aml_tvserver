@@ -300,9 +300,18 @@ int CTv::setTvObserver ( TvIObserver *ob )
 
 int CTv::SetEDIDData(tv_source_input_t source, char *data)
 {
-    char edidData[REAL_EDID_DATA_SIZE];
-    memcpy(edidData, data, REAL_EDID_DATA_SIZE);
-    return mpHDMIRxManager->HdmiRxEdidDataSwitch(1, edidData);
+    LOGD("%s\n", __FUNCTION__);
+    int ret = -1;
+    if (data == NULL) {
+        LOGD("%s: data is NULL.\n", __FUNCTION__);
+    } else {
+        unsigned char edidData[REAL_EDID_DATA_SIZE];
+        memcpy(edidData, data, REAL_EDID_DATA_SIZE);
+        tvin_port_id_t portId = mpTvin->Tvin_GetHdmiPortIdBySourceInput(source);
+        ret = mpHDMIRxManager->UpdataEdidDataWithPort(portId, edidData);
+    }
+
+    return ret;
 }
 
 int CTv::GetEDIDData(tv_source_input_t source, char *data)

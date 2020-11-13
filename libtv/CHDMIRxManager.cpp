@@ -203,3 +203,40 @@ int CHDMIRxManager::SetHdmiPortCecPhysicAddr()
     tvWriteSysfs(HDMI_CEC_PORT_MAP,buf);
     return 0;
 }
+
+int CHDMIRxManager::UpdataEdidDataWithPort(int port, unsigned char *dataBuf)
+{
+    int ret = -1;
+    int size = REAL_EDID_DATA_SIZE + 1;
+    unsigned char LoadBuf[size];
+    memset(LoadBuf, 0, sizeof(char) * size);
+    LoadBuf[0] = (unsigned char)port;
+    memcpy(LoadBuf+1, dataBuf, REAL_EDID_DATA_SIZE);
+    /*LOGD("%s: edid data print start.\n", __FUNCTION__);
+    for (int i=0;i<257;i++) {
+        printf("0x%x ",LoadBuf[i]);
+    }
+    LOGD("%s: edid data print end.\n", __FUNCTION__);*/
+    int devFd = open(HDMI_EDID_DATA_DEV_PATH, O_RDWR);
+    if (devFd < 0) {
+        LOGE("%s: open ERROR(%s)!\n", __FUNCTION__, strerror(errno));
+        ret = -1;
+    } else {
+        if (write(devFd, LoadBuf, size) < 0) {
+            LOGE("%s: write ERROR(%s)!\n", __FUNCTION__, strerror(errno));
+            ret = -1;
+        } else {
+            ret = 0;
+        }
+
+        close(devFd);
+        devFd = -1;
+    }
+    if (ret >= 0) {
+        LOGD("%s: would update edid.\n", __FUNCTION__);
+        HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+    }
+
+    return ret;
+}
+

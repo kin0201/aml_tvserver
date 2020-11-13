@@ -135,9 +135,6 @@ int TvService::ParserTvCommand(const char *commandData)
                 temp = strtok(NULL, delimitation);
                 tv_hdmi_edid_version_t setVersion = (tv_hdmi_edid_version_t)atoi(temp);
                 ret = mpTv->SetEdidVersion(setSource, setVersion);
-            } else if (moudleID == HDMI_EDID_DATA_SET) {
-                temp = strtok(NULL, delimitation);
-                ret = mpTv->SetEDIDData(setSource, temp);
             } else {
                 LOGD("%s: invalid EDID set cmd!\n", __FUNCTION__);
                 ret = 0;
@@ -149,8 +146,6 @@ int TvService::ParserTvCommand(const char *commandData)
             tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
             if (moudleID == HDMI_EDID_VER_GET) {
                 ret = mpTv->GetEdidVersion(getSource);
-            } else if (moudleID == HDMI_EDID_DATA_GET) {
-                ret = mpTv->GetEDIDData(getSource, temp);
             } else {
                 LOGD("%s: invalid EDID get cmd!\n", __FUNCTION__);
                 ret = 0;
@@ -166,14 +161,70 @@ int TvService::ParserTvCommand(const char *commandData)
     return ret;
 }
 
+int TvService::ParserTvDataCommand(const char *commandBuf, unsigned char *dataBuf)
+{
+    int ret = 0;
+    char cmdbuff[1024], tempData[1024];
+    memset(cmdbuff, 0x0, 1024);
+    memcpy(cmdbuff, commandBuf, 1024);
+    const char *delimitation = ".";
+    char *temp = strtok(cmdbuff, delimitation);
+    int cmdID = atoi(temp);
+    LOGD("%s: cmdID = %d\n", __FUNCTION__, cmdID);
+    if (cmdID == HDMI_EDID_DATA_SET) {
+        temp = strtok(NULL, delimitation);
+        tv_source_input_t setSource = (tv_source_input_t)atoi(temp);
+        memcpy(tempData, dataBuf, 256);
+        /*LOGD("%s: edid data print start.\n", __FUNCTION__);
+        for (int i=0;i<256;i++) {
+            printf("0x%x",tempData[i]);
+        }
+        LOGD("%s: edid data print end.\n", __FUNCTION__);*/
+        ret = mpTv->SetEDIDData(setSource, tempData);
+    } else if (cmdID == HDMI_EDID_DATA_GET) {
+        temp = strtok(NULL, delimitation);
+        tv_source_input_t getSource = (tv_source_input_t)atoi(temp);
+        ret = mpTv->GetEDIDData(getSource, tempData);
+        memcpy(dataBuf, tempData, 256);
+    } else {
+        LOGD("%s: invalid data cmd.\n", __FUNCTION__);
+    }
+
+    return ret;
+}
+
 status_t TvService::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {
     LOGD("%s: cmd is %d.\n", __FUNCTION__, code);
+    unsigned char dataBuf[1024] = {0};
+    int count = 0;
     switch (code) {
         case CMD_TV_ACTION: {
             const char* command = data.readCString();
             int ret = ParserTvCommand(command);
+            reply->writeInt32(ret);
+            break;
+        }
+        case DATA_SET_ACTION: {
+            const char* command = data.readCString();
+            int setDataSize = data.readInt32();
+            LOGD("%s: data size is %d.\n", __FUNCTION__, setDataSize);
+            for (count=0;count<setDataSize;count++) {
+                dataBuf[count] = (char)data.readInt32();
+            }
+            int ret = ParserTvDataCommand(command, dataBuf);
+            reply->writeInt32(ret);
+            break;
+        }
+        case DATA_GET_ACTION: {
+            const char* command = data.readCString();
+            int ret = ParserTvDataCommand(command, dataBuf);
+            int getDataSize = sizeof(dataBuf);
+            reply->writeInt32(getDataSize);
+            for (count=0;count<getDataSize;count++) {
+                reply->writeInt32(dataBuf[count]);
+            }
             reply->writeInt32(ret);
             break;
         }
