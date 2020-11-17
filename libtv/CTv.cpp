@@ -463,12 +463,12 @@ void CTv::onSigToStable()
 {
     LOGD("%s: mVdinWorkMode is %d\n", __FUNCTION__, mVdinWorkMode);
     //start decoder
-    if (mVdinWorkMode == VDIN_WORK_MODE_VFM) {
+    /*if (mVdinWorkMode == VDIN_WORK_MODE_VFM) {
         mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
     } else {
         LOGD("%s: not VFM mode.\n", __FUNCTION__);
-    }
-
+    }*/
+    mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
     //send signal to apk
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
