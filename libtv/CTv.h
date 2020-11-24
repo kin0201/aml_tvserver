@@ -11,24 +11,17 @@
 #include "CTvDevicesPollDetect.h"
 #include "CTvEvent.h"
 #include "CHDMIRxManager.h"
+#include "CAmVideo.h"
+
 #ifdef HAVE_AUDIO
 #include "CTvAudio.h"
 #endif
 
-
 #define CONFIG_FILE_PATH_DEF               "/vendor/etc/tvconfig/tvconfig.conf"
 
-#define VIDEO_DISABLE_VIDEO                "/sys/class/video/disable_video"
 #define DOLBY_VISION_TV_KO_PATH            "/vendor/lib/modules/dovi_tv.ko"
 #define DOLBY_VISION_STB_KO_PATH           "/vendor/lib/modules/dovi.ko"
 #define DOLBY_VISION_ENABLE_PATH           "/sys/module/amdolby_vision/parameters/dolby_vision_enable"
-
-typedef enum video_layer_status_e {
-    VIDEO_LAYER_STATUS_ENABLE,
-    VIDEO_LAYER_STATUS_DISABLE,
-    VIDEO_LAYER_STATUS_ENABLE_AND_CLEAN,
-    VIDEO_LAYER_STATUS_MAX,
-} videolayer_status_t;
 
 class CTv : public CTvDevicesPollDetect::ISourceConnectObserver {
 public:
@@ -63,12 +56,12 @@ private:
     void onSigToUnSupport();
     void onSigToNoSig();
     int sendTvEvent(CTvEvent &event);
-    int setVideoLayerStatus(videolayer_status_t status);
 #ifdef HAVE_AUDIO
     int mapSourcetoAudiotupe(tv_source_input_t dest_source);
 #endif
 
     CTvin *mpTvin;
+    CAmVideo *mpAmVideo;
     CHDMIRxManager *mpHDMIRxManager;
     tvin_info_t mCurrentSignalInfo;
     tv_source_input_t mCurrentSource;

@@ -36,6 +36,7 @@ CTv::CTv()
     }
     LoadConfigFile(tvConfigFilePath);
 
+    mpAmVideo = new CAmVideo();
     mpTvin = CTvin::getInstance();
     mpTvin->Tvin_AddVideoPath(TV_PATH_VDIN_AMLVIDEO2_PPMGR_DEINTERLACE_AMVIDEO);
     mpTvin->Tvin_LoadSourceInputToPortMap();
@@ -84,6 +85,11 @@ CTv::~CTv()
         mpHDMIRxManager = NULL;
     }
 
+    if (mpAmVideo != NULL) {
+        delete mpAmVideo;
+        mpAmVideo = NULL;
+    }
+
     mpObserver = NULL;
     UnloadConfigFile();
 }
@@ -92,7 +98,6 @@ int CTv::StartTv(tv_source_input_t source)
 {
     LOGD("%s: source = %d!\n", __FUNCTION__, source);
     int ret = -1;
-    setVideoLayerStatus(VIDEO_LAYER_STATUS_ENABLE_AND_CLEAN);
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     ret = mpTvin->Tvin_OpenPort(source_port);
     mCurrentSource = source;
@@ -122,6 +127,8 @@ int CTv::StopTv(tv_source_input_t source)
     CTvAudio::getInstance()->release_audio_patch();
 #endif
     mpTvin->Tvin_StopDecoder();
+    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
+    mpAmVideo->SetVideoGlobalOutputMode(VIDEO_GLOBAL_OUTPUT_MODE_DISABLE);
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     return mpTvin->Tvin_ClosePort(source_port);
 }
@@ -478,6 +485,8 @@ void CTv::onSigToStable()
         LOGD("%s: not VFM mode.\n", __FUNCTION__);
     }*/
     mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
+    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_ENABLE);
+    mpAmVideo->SetVideoGlobalOutputMode(VIDEO_GLOBAL_OUTPUT_MODE_ENABLE);
     //send signal to apk
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
@@ -537,15 +546,6 @@ int CTv::sendTvEvent(CTvEvent &event)
     }
 
     return 0;
-}
-
-int CTv::setVideoLayerStatus(videolayer_status_t status)
-{
-    LOGD("%s: status = %d\n", __FUNCTION__, status);
-
-    char temp[8] = {0};
-    sprintf(temp, "%d", status);
-    return tvWriteSysfs(VIDEO_DISABLE_VIDEO, temp);
 }
 
 #ifdef HAVE_AUDIO
