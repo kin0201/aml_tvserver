@@ -15,37 +15,6 @@
 // ***************************************************************************
 // *** TVIN general definition/enum/struct ***********************************
 // ***************************************************************************
-
-typedef enum tvin_color_fmt_e {
-    TVIN_RGB444 = 0,
-    TVIN_YUV422, // 1
-    TVIN_YUV444, // 2
-    TVIN_YUYV422,// 3
-    TVIN_YVYU422,// 4
-    TVIN_UYVY422,// 5
-    TVIN_VYUY422,// 6
-    TVIN_NV12,   // 7
-    TVIN_NV21,   // 8
-    TVIN_BGGR,   // 9  raw data
-    TVIN_RGGB,   // 10 raw data
-    TVIN_GBRG,   // 11 raw data
-    TVIN_GRBG,   // 12 raw data
-    TVIN_COLOR_FMT_MAX,
-} tvin_color_fmt_t;
-
-typedef enum tvin_aspect_ratio_e {
-    TVIN_ASPECT_NULL = 0,
-    TVIN_ASPECT_1x1,
-    TVIN_ASPECT_4x3_FULL,
-    TVIN_ASPECT_14x9_FULL,
-    TVIN_ASPECT_14x9_LB_CENTER,
-    TVIN_ASPECT_14x9_LB_TOP,
-    TVIN_ASPECT_16x9_FULL,
-    TVIN_ASPECT_16x9_LB_CENTER,
-    TVIN_ASPECT_16x9_LB_TOP,
-    TVIN_ASPECT_MAX,
-} tvin_aspect_ratio_t;
-
 typedef enum tvin_port_id_e {
     TVIN_PORT_ID_1 = 1,
     TVIN_PORT_ID_2,
@@ -114,12 +83,6 @@ typedef struct tvin_video_buf_s {
     unsigned int reserved;
 } tvin_video_buf_t;
 
-typedef enum tvin_color_range_e {
-    TVIN_COLOR_RANGE_AUTO = 0,
-    TVIN_COLOR_RANGE_FULL,
-    TVIN_COLOR_RANGE_LIMIT,
-} tvin_color_range_t;
-
 typedef enum tvin_cn_type_e {
     GRAPHICS,
     PHOTO,
@@ -132,6 +95,15 @@ typedef struct tvin_latency_s {
     bool it_content;
     tvin_cn_type_e cn_type;
 } tvin_latency_t;
+
+typedef struct tvin_frontend_info_s {
+	enum tvin_line_scan_mode_e scan_mode;
+	enum tvin_color_fmt_e cfmt;
+	unsigned int fps;
+	unsigned int width;
+	unsigned int height;
+	unsigned int colordepth;
+} tvin_frontend_info_t;
 
 // ***************************************************************************
 // *** AFE module definition/enum/struct *************************************
@@ -283,6 +255,7 @@ enum {
 #define TVIN_IOC_GAME_MODE          _IOW(TVIN_IOC_MAGIC, 0x4b, unsigned int)
 #define TVIN_IOC_SET_AUTO_RATIO_EN  _IOW(TVIN_IOC_MAGIC, 0x4c, unsigned int)
 #define TVIN_IOC_GET_LATENCY_MODE   _IOR(TVIN_IOC_MAGIC, 0X4d, struct tvin_latency_s)
+#define TVIN_IOC_G_FRONTEND_INFO    _IOR(TVIN_IOC_MAGIC, 0x4e, struct tvin_frontend_info_s)
 #define TVIN_IOC_G_EVENT_INFO       _IOW(TVIN_IOC_MAGIC, 0x0a, struct vdin_event_info_s)
 
 //TVAFE
@@ -334,7 +307,9 @@ public:
     unsigned int Tvin_TransPortStringToValue(const char *port_str);
     tv_source_input_t Tvin_PortToSourceInput(tvin_port_t port);
     tvin_port_id_t Tvin_GetHdmiPortIdBySourceInput(tv_source_input_t source_input);
-
+    int Tvin_GetFrontendInfo(tvin_frontend_info_t *frontendInfo);
+    int Tvin_SetColorRangeMode(tvin_color_range_t range_mode);
+    int Tvin_GetColorRangeMode(void);
 private:
     //VDIN
     int VDIN_OpenModule();

@@ -475,6 +475,52 @@ int CTv::SetVdinWorkMode(vdin_work_mode_t vdinWorkMode)
     return 0;
 }
 
+int CTv::GetFrontendInfo(tvin_frontend_info_t *frontendInfo)
+{
+    int ret = -1;
+    if (frontendInfo == NULL) {
+        LOGD("%s: param is NULL.\n", __FUNCTION__);
+    } else {
+        ret = mpTvin->Tvin_GetFrontendInfo(frontendInfo);
+        /*LOGD("%s: scan mode:%d, colorfmt:%d, fps:%d, width:%d, height:%d, colordepth:%d.\n", __FUNCTION__, frontendInfo->scan_mode, frontendInfo->cfmt,
+            frontendInfo->fps,frontendInfo->width,frontendInfo->height,frontendInfo->colordepth);*/
+    }
+
+    if (ret < 0) {
+        LOGE("%s failed.\n", __FUNCTION__);
+    } else {
+        LOGD("%s success.\n", __FUNCTION__);
+    }
+
+    return ret;
+}
+
+int CTv::SetColorRangeMode(tvin_color_range_t range_mode)
+{
+    int ret = -1;
+    if ((range_mode >= TVIN_COLOR_RANGE_MAX) || (range_mode <TVIN_COLOR_RANGE_AUTO)) {
+        LOGD("%s: invalid range mode.\n", __FUNCTION__);
+    } else {
+        ret = mpTvin->Tvin_SetColorRangeMode(range_mode);
+    }
+
+    if (ret < 0) {
+        LOGE("%s failed.\n", __FUNCTION__);
+    } else {
+        LOGD("%s success.\n", __FUNCTION__);
+    }
+
+    return ret;
+}
+
+int CTv::GetColorRangeMode()
+{
+    int ret = mpTvin->Tvin_GetColorRangeMode();
+    LOGD("%s: mode is %d.\n", __FUNCTION__, ret);
+
+    return ret;
+}
+
 void CTv::onSigToStable()
 {
     LOGD("%s: mVdinWorkMode is %d\n", __FUNCTION__, mVdinWorkMode);

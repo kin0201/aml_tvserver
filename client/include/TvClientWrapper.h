@@ -72,7 +72,15 @@ extern int GetEdidVersion(struct TvClientWrapper_t *pTvClientWrappere, tv_source
 extern int SetEdidData(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source, char *dataBuf);
 extern int GetEdidData(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source,char *dataBuf);
 extern int setTvEventCallback(EventCallback Callback);
-
+extern int SetVdinWorkMode(struct TvClientWrapper_t *pTvClientWrapper, vdin_work_mode_t vdinWorkMode);
+extern int GetCurrentSourceFrameHeight(struct TvClientWrapper_t *pTvClientWrapper);
+extern int GetCurrentSourceFrameWidth(struct TvClientWrapper_t *pTvClientWrapper);
+extern int GetCurrentSourceFrameFps(struct TvClientWrapper_t *pTvClientWrapper);
+extern int GetCurrentSourceColorDepth(struct TvClientWrapper_t *pTvClientWrapper);
+extern tvin_aspect_ratio_t GetCurrentSourceAspectRatio(struct TvClientWrapper_t *pTvClientWrapper);
+extern tvin_color_fmt_t GetCurrentSourceColorFormat(struct TvClientWrapper_t *pTvClientWrapper);
+extern tvin_color_range_t GetCurrentSourceColorRange(struct TvClientWrapper_t *pTvClientWrapper);
+extern tvin_line_scan_mode_t GetCurrentSourceLineScanMode(struct TvClientWrapper_t *pTvClientWrapper);
 #ifdef __cplusplus
 };
 #endif

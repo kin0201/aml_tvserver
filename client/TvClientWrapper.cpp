@@ -78,8 +78,49 @@ public:
         return ret;
     }
 
-    int SetVdinWorkMode(vdin_work_mode_t vdinWorkMode) {
+    int SetVdinWorkMode(vdin_work_mode_t vdinWorkMode)
+    {
         return mpTvClient->SetVdinWorkMode(vdinWorkMode);
+    }
+
+    int GetCurrentSourceFrameHeight()
+    {
+        return mpTvClient->GetCurrentSourceFrameHeight();
+    }
+
+    int GetCurrentSourceFrameWidth()
+    {
+        return mpTvClient->GetCurrentSourceFrameWidth();
+    }
+
+    int GetCurrentSourceFrameFps()
+    {
+        return mpTvClient->GetCurrentSourceFrameFps();
+    }
+
+    int GetCurrentSourceColorDepth()
+    {
+        return mpTvClient->GetCurrentSourceColorDepth();
+    }
+
+    tvin_aspect_ratio_t GetCurrentSourceAspectRatio()
+    {
+        return mpTvClient->GetCurrentSourceAspectRatio();
+    }
+
+    tvin_color_fmt_t GetCurrentSourceColorFormat()
+    {
+        return mpTvClient->GetCurrentSourceColorFormat();
+    }
+
+    tvin_color_range_t GetCurrentSourceColorRange()
+    {
+        return mpTvClient->GetCurrentSourceColorRange();
+    }
+
+    tvin_line_scan_mode_t GetCurrentSourceLineScanMode()
+    {
+        return mpTvClient->GetCurrentSourceLineScanMode();
     }
 
     void onTvClientEvent(CTvEvent &event) {
@@ -183,7 +224,7 @@ int SetEdidData(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t so
     return pTvClientWrapper->tvClientWrapper.SetEdidData(source, dataBuf);
 }
 
-int GetEdidData(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source,char *dataBuf)
+int GetEdidData(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source, char *dataBuf)
 {
     return pTvClientWrapper->tvClientWrapper.GetEdidData(source, dataBuf);
 }
@@ -197,6 +238,51 @@ int setTvEventCallback(EventCallback Callback)
     }
 
     return 0;
+}
+
+int SetVdinWorkMode(struct TvClientWrapper_t *pTvClientWrapper, vdin_work_mode_t vdinWorkMode)
+{
+    return pTvClientWrapper->tvClientWrapper.SetVdinWorkMode(vdinWorkMode);
+}
+
+int GetCurrentSourceFrameHeight(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceFrameHeight();
+}
+
+int GetCurrentSourceFrameWidth(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceFrameWidth();
+}
+
+int GetCurrentSourceFrameFps(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceFrameFps();
+}
+
+int GetCurrentSourceColorDepth(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceColorDepth();
+}
+
+tvin_aspect_ratio_t GetCurrentSourceAspectRatio(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceAspectRatio();
+}
+
+tvin_color_fmt_t GetCurrentSourceColorFormat(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceColorFormat();
+}
+
+tvin_color_range_t GetCurrentSourceColorRange(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceColorRange();
+}
+
+tvin_line_scan_mode_t GetCurrentSourceLineScanMode(struct TvClientWrapper_t *pTvClientWrapper)
+{
+    return pTvClientWrapper->tvClientWrapper.GetCurrentSourceLineScanMode();
 }
 
 #ifdef __cplusplus

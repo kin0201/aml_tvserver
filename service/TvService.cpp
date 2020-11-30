@@ -98,6 +98,10 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
 int TvService::ParserTvCommand(const char *commandData)
 {
     int ret = 0;
+    tvin_frontend_info_t frontendInfo;
+    memset(&frontendInfo, 0x0, sizeof(tvin_frontend_info_t));
+    tvin_info_t tvinSignalInfo;
+    memset(&tvinSignalInfo, 0x0, sizeof(tvin_info_t));
     char cmdbuff[1024];
     memset(cmdbuff, 0x0, sizeof(cmdbuff));
     memcpy(cmdbuff, commandData, strlen(commandData));
@@ -120,6 +124,21 @@ int TvService::ParserTvCommand(const char *commandData)
             temp = strtok(NULL, delimitation);
             vdin_work_mode_t setVdinWorkMode = (vdin_work_mode_t)atoi(temp);
             ret = mpTv->SetVdinWorkMode(setVdinWorkMode);
+        } else if (moudleID == TV_CONTROL_GET_FRAME_HEIGHT) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = frontendInfo.height;
+        } else if (moudleID == TV_CONTROL_GET_FRAME_WIDTH) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = frontendInfo.width;
+        } else if (moudleID == TV_CONTROL_GET_FRAME_RATE) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = frontendInfo.fps;
+        } else if (moudleID == TV_CONTROL_GET_COLOR_DEPTH) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = frontendInfo.colordepth;
+        } else if (moudleID == TV_CONTROL_GET_LINE_SCAN_MODE) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = frontendInfo.scan_mode;
         } else {
             LOGD("%s: invalid sourec cmd!\n", __FUNCTION__);
         }
@@ -152,6 +171,26 @@ int TvService::ParserTvCommand(const char *commandData)
             }
         } else {
             LOGD("%s: invalid cmd!\n", __FUNCTION__);
+            ret = 0;
+        }
+    } else if (strcmp(temp, "hdmi") == 0) {
+        LOGD("%s: hdmi cmd!\n", __FUNCTION__);
+        temp = strtok(NULL, delimitation);
+        int moudleID = atoi(temp);
+        if (moudleID == HDMI_GET_COLOR_FORMAT) {
+            tvinSignalInfo = mpTv->GetCurrentSourceInfo();
+            ret = tvinSignalInfo.cfmt;
+        } else if (moudleID == HDMI_GET_COLOR_RANGE) {
+            mpTv->GetFrontendInfo(&frontendInfo);
+            ret = mpTv->GetColorRangeMode();
+        } else if (moudleID == HDMI_GET_COLOR_DEPTH) {
+            tvinSignalInfo = mpTv->GetCurrentSourceInfo();
+            ret = frontendInfo.colordepth;
+        } else if (moudleID == HDMI_GET_ASPECT_RATIO) {
+            tvinSignalInfo = mpTv->GetCurrentSourceInfo();
+            ret = tvinSignalInfo.aspect_ratio;
+        } else {
+            LOGD("%s: invalid hdmi cmd!\n", __FUNCTION__);
             ret = 0;
         }
     } else {

@@ -224,6 +224,70 @@ int TvClient::GetEdidData(tv_source_input_t source, char *dataBuf)
     return SendMethodCall(buf);
 }
 
+int TvClient::GetCurrentSourceFrameHeight()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d", TV_CONTROL_GET_FRAME_HEIGHT);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetCurrentSourceFrameWidth()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d", TV_CONTROL_GET_FRAME_WIDTH);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetCurrentSourceFrameFps()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d", TV_CONTROL_GET_FRAME_RATE);
+    return SendMethodCall(buf);
+}
+
+int TvClient::GetCurrentSourceColorDepth()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d", TV_CONTROL_GET_COLOR_DEPTH);
+    return SendMethodCall(buf);
+}
+
+tvin_aspect_ratio_t TvClient::GetCurrentSourceAspectRatio()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "hdmi.%d", HDMI_GET_ASPECT_RATIO);
+    return (tvin_aspect_ratio_t)SendMethodCall(buf);
+}
+
+tvin_color_fmt_t TvClient::GetCurrentSourceColorFormat()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "hdmi.%d", HDMI_GET_COLOR_FORMAT);
+    return (tvin_color_fmt_t)SendMethodCall(buf);
+}
+
+tvin_color_range_t TvClient::GetCurrentSourceColorRange()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "hdmi.%d", HDMI_GET_COLOR_RANGE);
+    return (tvin_color_range_t)SendMethodCall(buf);
+}
+
+tvin_line_scan_mode_t TvClient::GetCurrentSourceLineScanMode()
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d", TV_CONTROL_GET_LINE_SCAN_MODE);
+    return (tvin_line_scan_mode_t)SendMethodCall(buf);
+}
+
 status_t TvClient::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {

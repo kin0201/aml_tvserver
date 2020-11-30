@@ -45,7 +45,9 @@ public:
     int SetEdidVersion(tv_source_input_t source, tv_hdmi_edid_version_t edidVer);
     int GetEdidVersion(tv_source_input_t source);
     int SetVdinWorkMode(vdin_work_mode_t vdinWorkMode);
-
+    int GetFrontendInfo(tvin_frontend_info_t *frontendInfo);
+    int SetColorRangeMode(tvin_color_range_t range_mode);
+    int GetColorRangeMode();
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();
 

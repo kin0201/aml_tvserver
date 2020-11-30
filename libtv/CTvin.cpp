@@ -410,6 +410,31 @@ tvin_port_id_t CTvin::Tvin_GetHdmiPortIdBySourceInput(tv_source_input_t source_i
     return portId;
 }
 
+int CTvin::Tvin_GetFrontendInfo(tvin_frontend_info_t *frontendInfo)
+{
+    int ret = -1;
+    if (frontendInfo == NULL) {
+        LOGE("%s: frontendInfo is NULL!\n", __FUNCTION__);
+    } else {
+        ret = VDIN_DeviceIOCtl(TVIN_IOC_G_FRONTEND_INFO, frontendInfo);
+        if (ret < 0) {
+            LOGE("%s error(%s)!\n", __FUNCTION__, strerror(errno));
+        }
+    }
+
+    return ret;
+}
+
+int CTvin::Tvin_SetColorRangeMode(tvin_color_range_t range_mode)
+{
+    return VDIN_SetColorRangeMode(range_mode);
+}
+
+int CTvin::Tvin_GetColorRangeMode()
+{
+    return VDIN_GetColorRangeMode();
+}
+
 unsigned int CTvin::Tvin_TransPortStringToValue(const char *port_str)
 {
     if (strcasecmp(port_str, "TVIN_PORT_CVBS0") == 0) {
