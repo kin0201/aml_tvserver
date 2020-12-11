@@ -81,6 +81,7 @@ extern tvin_aspect_ratio_t GetCurrentSourceAspectRatio(struct TvClientWrapper_t 
 extern tvin_color_fmt_t GetCurrentSourceColorFormat(struct TvClientWrapper_t *pTvClientWrapper);
 extern tvin_color_range_t GetCurrentSourceColorRange(struct TvClientWrapper_t *pTvClientWrapper);
 extern tvin_line_scan_mode_t GetCurrentSourceLineScanMode(struct TvClientWrapper_t *pTvClientWrapper);
+extern int GetSourceConnectStatus(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source);
 #ifdef __cplusplus
 };
 #endif

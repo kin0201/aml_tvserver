@@ -123,6 +123,11 @@ public:
         return mpTvClient->GetCurrentSourceLineScanMode();
     }
 
+    int GetSourceConnectStatus(tv_source_input_t source)
+    {
+        return mpTvClient->GetSourceConnectStatus(source);
+    }
+
     void onTvClientEvent(CTvEvent &event) {
         int eventType = event.getEventType();
         LOGD("%s: eventType: %d.\n", __FUNCTION__, eventType);
@@ -283,6 +288,11 @@ tvin_color_range_t GetCurrentSourceColorRange(struct TvClientWrapper_t *pTvClien
 tvin_line_scan_mode_t GetCurrentSourceLineScanMode(struct TvClientWrapper_t *pTvClientWrapper)
 {
     return pTvClientWrapper->tvClientWrapper.GetCurrentSourceLineScanMode();
+}
+
+int GetSourceConnectStatus(struct TvClientWrapper_t *pTvClientWrapper, tv_source_input_t source)
+{
+    return pTvClientWrapper->tvClientWrapper.GetSourceConnectStatus(source);
 }
 
 #ifdef __cplusplus

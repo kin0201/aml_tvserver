@@ -48,6 +48,7 @@ public:
     int GetFrontendInfo(tvin_frontend_info_t *frontendInfo);
     int SetColorRangeMode(tvin_color_range_t range_mode);
     int GetColorRangeMode();
+    int GetSourceConnectStatus(tv_source_input_t source);
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();
 

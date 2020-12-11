@@ -521,6 +521,11 @@ int CTv::GetColorRangeMode()
     return ret;
 }
 
+int CTv::GetSourceConnectStatus(tv_source_input_t source)
+{
+    return mTvDevicesPollDetect.GetSourceConnectStatus(source);
+}
+
 void CTv::onSigToStable()
 {
     LOGD("%s: mVdinWorkMode is %d\n", __FUNCTION__, mVdinWorkMode);

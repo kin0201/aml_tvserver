@@ -288,6 +288,14 @@ tvin_line_scan_mode_t TvClient::GetCurrentSourceLineScanMode()
     return (tvin_line_scan_mode_t)SendMethodCall(buf);
 }
 
+int TvClient::GetSourceConnectStatus(tv_source_input_t source)
+{
+    LOGD("%s\n", __FUNCTION__);
+    char buf[32] = {0};
+    sprintf(buf, "control.%d.%d", TV_CONTROL_GET_CONNECT_STATUS, source);
+    return SendMethodCall(buf);
+}
+
 status_t TvClient::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {

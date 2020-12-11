@@ -139,6 +139,10 @@ int TvService::ParserTvCommand(const char *commandData)
         } else if (moudleID == TV_CONTROL_GET_LINE_SCAN_MODE) {
             mpTv->GetFrontendInfo(&frontendInfo);
             ret = frontendInfo.scan_mode;
+        } else if (moudleID == TV_CONTROL_GET_CONNECT_STATUS) {
+            temp = strtok(NULL, delimitation);
+            tv_source_input_t source = (tv_source_input_t)atoi(temp);
+            ret = mpTv->GetSourceConnectStatus(source);
         } else {
             LOGD("%s: invalid sourec cmd!\n", __FUNCTION__);
         }
