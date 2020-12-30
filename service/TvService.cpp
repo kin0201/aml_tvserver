@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+pthread_mutex_t tvservice_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 TvService *mInstance = NULL;
 TvService *TvService::GetInstance() {
     if (mInstance == NULL) {
@@ -97,6 +99,8 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
 
 int TvService::ParserTvCommand(const char *commandData)
 {
+    pthread_mutex_lock(&tvservice_mutex);
+
     int ret = 0;
     tvin_frontend_info_t frontendInfo;
     memset(&frontendInfo, 0x0, sizeof(tvin_frontend_info_t));
@@ -201,11 +205,14 @@ int TvService::ParserTvCommand(const char *commandData)
         LOGD("%s: invalie cmdType!\n", __FUNCTION__);
     }
 
+    pthread_mutex_unlock(&tvservice_mutex);
     return ret;
 }
 
 int TvService::ParserTvDataCommand(const char *commandBuf, unsigned char *dataBuf)
 {
+    pthread_mutex_lock(&tvservice_mutex);
+
     int ret = 0;
     char cmdbuff[1024], tempData[1024];
     memset(cmdbuff, 0x0, 1024);
@@ -233,6 +240,7 @@ int TvService::ParserTvDataCommand(const char *commandBuf, unsigned char *dataBu
         LOGD("%s: invalid data cmd.\n", __FUNCTION__);
     }
 
+    pthread_mutex_unlock(&tvservice_mutex);
     return ret;
 }
 

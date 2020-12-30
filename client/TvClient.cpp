@@ -27,6 +27,8 @@ const int RET_FAILED  = -1;
 const int EVENT_SIGLE_DETECT = 4;
 const int EVENT_SOURCE_CONNECT = 10;
 
+pthread_mutex_t tvclient_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 TvClient *TvClient::mInstance;
 TvClient *TvClient::GetInstance() {
     if (mInstance == NULL) {
@@ -299,6 +301,7 @@ int TvClient::GetSourceConnectStatus(tv_source_input_t source)
 status_t TvClient::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {
+    pthread_mutex_lock(&tvclient_mutex);
     LOGD("TvClient get tanscode: %u\n", code);
     switch (code) {
         case EVT_SRC_CT_CB: {
@@ -311,8 +314,9 @@ status_t TvClient::onTransact(uint32_t code,
         }
         case CMD_START:
         default:
+            pthread_mutex_unlock(&tvclient_mutex);
             return BBinder::onTransact(code, data, reply, flags);
     }
-
+    pthread_mutex_unlock(&tvclient_mutex);
     return (0);
 }
