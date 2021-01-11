@@ -110,9 +110,16 @@ int CTv::StartTv(tv_source_input_t source)
 int CTv::StopTv(tv_source_input_t source)
 {
     LOGD("%s: source = %d!\n", __FUNCTION__, source);
+#ifdef HAVE_AUDIO
+    CTvAudio::getInstance()->release_audio_patch();
+#endif
+    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
+    mpAmVideo->SetVideoGlobalOutputMode(VIDEO_GLOBAL_OUTPUT_MODE_DISABLE);
+    tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
+    mpTvin->Tvin_ClosePort(source_port);
 
     mVdinWorkMode = VDIN_WORK_MODE_VFM;
-    mCurrentSource = SOURCE_MPEG;
+    mCurrentSource = SOURCE_INVALID;
     tvin_info_t tempSignalInfo;
     tempSignalInfo.trans_fmt = TVIN_TFMT_2D;
     tempSignalInfo.fmt = TVIN_SIG_FMT_NULL;
@@ -123,14 +130,8 @@ int CTv::StopTv(tv_source_input_t source)
     tempSignalInfo.is_dvi = 0;
     tempSignalInfo.aspect_ratio = TVIN_ASPECT_NULL;
     SetCurrenSourceInfo(tempSignalInfo);
-#ifdef HAVE_AUDIO
-    CTvAudio::getInstance()->release_audio_patch();
-#endif
-    mpTvin->Tvin_StopDecoder();
-    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
-    mpAmVideo->SetVideoGlobalOutputMode(VIDEO_GLOBAL_OUTPUT_MODE_DISABLE);
-    tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
-    return mpTvin->Tvin_ClosePort(source_port);
+
+    return 0;
 }
 
 int CTv::SwitchSource(tv_source_input_t dest_source)
