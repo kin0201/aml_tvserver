@@ -203,7 +203,7 @@ int CTvDevicesPollDetect::GetSourceConnectStatus(tv_source_input_t source_input)
         break;
     }
 
-    LOGD("%: source :%s, status:%s\n", __FUNCTION__, inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
+    LOGD("%s: source :%s, status:%s\n", __FUNCTION__, inputToName(source_input), (SOURCE_PLUG_IN == PlugStatus)?"plug in":"plug out");
     return PlugStatus;
 }
 
