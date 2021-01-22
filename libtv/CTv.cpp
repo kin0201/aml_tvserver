@@ -337,13 +337,14 @@ int CTv::LoadEdidData(int isNeedBlackScreen, int isDolbyVisionEnable)
         mpTvin->Tvin_StopDecoder();
     }
 
-    bool isDolbyVisionKoExist = isFileExist(DOLBY_VISION_TV_KO_PATH) || isFileExist(DOLBY_VISION_STB_KO_PATH);
-    LOGD("%s: isDolbyVisionKoExist = %d, isDolbyVisionEnable = %d.\n", __FUNCTION__, isDolbyVisionKoExist, isDolbyVisionEnable);
     char edidLoadBuf[6 * REAL_EDID_DATA_SIZE] = {0};
     char edidReadBuf[REAL_EDID_DATA_SIZE] = {0};
     char edidFileName[100] = {0};
     int loadNum = 1;
     const char *edidFilePath = ConfigGetStr(CFG_SECTION_HDMI, CFG_HDMI_EDID_FILE_PATH, "/vendor/etc/tvconfig/hdmi");
+    const char *dolbyModulePath = ConfigGetStr(CFG_SECTION_SETTING, CFG_DOLBY_MODULE, DOLBY_VISION_TV_KO_PATH);
+    bool isDolbyVisionKoExist = isFileExist(dolbyModulePath) || isFileExist(DOLBY_VISION_STB_KO_PATH);
+    LOGD("%s: isDolbyVisionKoExist = %d, isDolbyVisionEnable = %d.\n", __FUNCTION__, isDolbyVisionKoExist, isDolbyVisionEnable);
     if (isDolbyVisionKoExist && (isDolbyVisionEnable == 1)) {
         for (loadNum=1;loadNum<7;loadNum++) {
             LOGD("%s: load dolby vision EDID!\n", __FUNCTION__);
