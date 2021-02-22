@@ -65,6 +65,8 @@ int main(int argc, char **argv) {
     printf("#### select 4 to edid 1.4 (this is default) ####\n");
     printf("#### select 5 to edid 2.0 ####\n");
     printf("#### select 6 to edid auto ####\n");
+    printf("#### select 7 to AV1 ####\n");
+    printf("#### select 8 to AV2 ####\n");
     printf("#### select q to stop####\n");
     printf("##########################\n");
     while (run) {
@@ -108,6 +110,20 @@ int main(int argc, char **argv) {
           }
           case '6': {
               SetEdidVersion(pTvClientWrapper, CurrentSource, 2);
+              break;
+          }
+          case '7': {
+              StopTv(pTvClientWrapper, CurrentSource);
+              CurrentSource = SOURCE_AV1;
+              WriteSysfs("/sys/class/graphics/fb0/blank", "0");
+              StartTv(pTvClientWrapper, CurrentSource);
+              break;
+          }
+         case '8': {
+              StopTv(pTvClientWrapper, CurrentSource);
+              CurrentSource = SOURCE_AV2;
+              WriteSysfs("/sys/class/graphics/fb0/blank", "0");
+              StartTv(pTvClientWrapper, CurrentSource);
               break;
           }
           default: {
