@@ -136,7 +136,7 @@ int CHDMIRxManager::HdmiRxEdidVerSwitch(int verValue)
         devFd = -1;
     }
 
-    HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+    //HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
     return ret;
 }
 

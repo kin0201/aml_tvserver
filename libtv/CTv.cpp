@@ -16,6 +16,7 @@
 #include "tvutils.h"
 #include "TvConfigManager.h"
 #include "CTvLog.h"
+#include <sys/ioctl.h>
 
 static tv_hdmi_edid_version_t Hdmi1CurrentEdidVer = HDMI_EDID_VER_14;
 static tv_hdmi_edid_version_t Hdmi2CurrentEdidVer = HDMI_EDID_VER_14;
@@ -394,52 +395,50 @@ int CTv::SetEdidVersion(tv_source_input_t source, tv_hdmi_edid_version_t edidVer
 {
     LOGD("%s: setSource: %d, setVersion: %d\n", __FUNCTION__, source, edidVer);
     int ret = -1;
-    if (mCurrentSource == source) {
-        tv_hdmi_edid_version_t currentVersion = (tv_hdmi_edid_version_t)GetEdidVersion(source);
-        if (currentVersion != edidVer) {
-            mpTvin->Tvin_StopDecoder();
-            tvin_port_id_t portId = TVIN_PORT_ID_MAX;
-            int edidSetValue = 0;
-            int portEdidVersion = 0;
-            for (int i=SOURCE_HDMI1;i<SOURCE_VGA;i++) {
-                portId = mpTvin->Tvin_GetHdmiPortIdBySourceInput((tv_source_input_t)i);
-                if (i == source) {
-                    portEdidVersion = edidVer;
-                } else {
-                    portEdidVersion = GetEdidVersion((tv_source_input_t)i);
-                }
-                edidSetValue |=  (portEdidVersion << (4*portId - 4));
-            }
-            ret = mpHDMIRxManager->HdmiRxEdidVerSwitch(edidSetValue);
-            if (ret < 0) {
-                LOGE("%s failed.\n", __FUNCTION__);
-                ret = -1;
+    tv_hdmi_edid_version_t currentVersion = (tv_hdmi_edid_version_t)GetEdidVersion(source);
+    if (currentVersion != edidVer) {
+        mpTvin->Tvin_StopDecoder();
+        tvin_port_id_t portId = TVIN_PORT_ID_MAX;
+        int edidSetValue = 0;
+        int portEdidVersion = 0;
+        for (int i=SOURCE_HDMI1;i<SOURCE_VGA;i++) {
+            portId = mpTvin->Tvin_GetHdmiPortIdBySourceInput((tv_source_input_t)i);
+            if (i == source) {
+                portEdidVersion = edidVer;
             } else {
-                //TODO:add user setting read/write flow
-                switch (source) {
-                case SOURCE_HDMI1:
-                    Hdmi1CurrentEdidVer = edidVer;
-                    break;
-                case SOURCE_HDMI2:
-                    Hdmi2CurrentEdidVer = edidVer;
-                    break;
-                case SOURCE_HDMI3:
-                    Hdmi3CurrentEdidVer = edidVer;
-                    break;
-                case SOURCE_HDMI4:
-                    Hdmi4CurrentEdidVer = edidVer;
-                    break;
-                default:
-                    LOGD("%s: not hdmi source.\n", __FUNCTION__);
-                    break;
-                }
+                portEdidVersion = GetEdidVersion((tv_source_input_t)i);
             }
+            edidSetValue |=  (portEdidVersion << (4*portId - 4));
+        }
+        ret = mpHDMIRxManager->HdmiRxEdidVerSwitch(edidSetValue);
+        if (mCurrentSource == source) {
+            mpHDMIRxManager->HDMIRxDeviceIOCtl(HDMI_IOC_EDID_UPDATE);
+        }
+        if (ret < 0) {
+            LOGE("%s failed.\n", __FUNCTION__);
+            ret = -1;
         } else {
-            LOGD("%s: same EDID version, no need set.\n", __FUNCTION__);
-            ret = 0;
+            //TODO:add user setting read/write flow
+            switch (source) {
+            case SOURCE_HDMI1:
+                Hdmi1CurrentEdidVer = edidVer;
+                break;
+            case SOURCE_HDMI2:
+                Hdmi2CurrentEdidVer = edidVer;
+                break;
+            case SOURCE_HDMI3:
+                Hdmi3CurrentEdidVer = edidVer;
+                break;
+            case SOURCE_HDMI4:
+                Hdmi4CurrentEdidVer = edidVer;
+                break;
+            default:
+                LOGD("%s: not hdmi source.\n", __FUNCTION__);
+                break;
+            }
         }
     } else {
-        LOGD("%s: not current sorce, don't set.\n", __FUNCTION__);
+        LOGD("%s: same EDID version, no need set.\n", __FUNCTION__);
         ret = 0;
     }
 
