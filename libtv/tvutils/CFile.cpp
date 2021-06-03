@@ -167,17 +167,21 @@ int CFile::delFile()
 
 int  CFile::getFileAttrValue(const char *path)
 {
-    int value;
-
     int fd = open(path, O_RDONLY);
     if (fd <= 0) {
         LOGE("open (%s)ERROR!! error = -%s.\n", path, strerror(errno));
     }
     char tmp[8];
-    read(fd, tmp, sizeof(tmp));
-    close(fd);
-    value = atoi(tmp);
-    return value;
+    size_t sizeRead = read(fd, tmp, sizeof(tmp));
+    if (sizeRead < 0) {
+        LOGE("%s: read (%s)ERROR!! error = -%s.\n", __FUNCTION__, path, strerror(errno));
+        close(fd);
+        return -1;
+    } else {
+        int value = atoi(tmp);
+        close(fd);
+        return value;
+    }
 }
 
 int  CFile::setFileAttrValue(const char *path, int value)
@@ -200,10 +204,16 @@ int CFile::getFileAttrStr(const char *path, char *str)
         LOGE("open (%s)ERROR!! error = -%s.\n", path, strerror(errno));
     }
     char tmp[BUFFER_SIZE] = {0};
-    read(fd, tmp, sizeof(tmp));
-    close(fd);
-    str = tmp;
-    return 0;
+    size_t sizeRead = read(fd, tmp, sizeof(tmp));
+    if (sizeRead < 0) {
+        LOGE("%s: read (%s)ERROR!! error = -%s.\n", __FUNCTION__, path, strerror(errno));
+        close(fd);
+        return -1;
+    } else {
+        close(fd);
+        str = tmp;
+        return 0;
+    }
 }
 
 int CFile::setFileAttrStr(const char *path, const char *str)
