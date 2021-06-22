@@ -66,14 +66,19 @@ int TvService::SendSignalForSourceConnectEvent(CTvEvent &event)
     Parcel send, reply;
 
     TvEvent::SourceConnectEvent *sourceConnectEvent = (TvEvent::SourceConnectEvent *)(&event);
-    if (evtCallBack != NULL) {
-        send.writeInt32(sourceConnectEvent->mSourceInput);
-        send.writeInt32(sourceConnectEvent->connectionState);
-        LOGD("send source evt(%d,%d) to client.\n",
-             sourceConnectEvent->mSourceInput, sourceConnectEvent->connectionState);
-        evtCallBack->transact(EVT_SRC_CT_CB, send, &reply);
-    } else {
-        LOGD("Event callback is null.\n");
+    int clientSize = mTvServiceCallBack.size();
+    LOGD("%s: now has %d tvclient.\n", __FUNCTION__, clientSize);
+    int i = 0;
+    for (i = 0; i < clientSize; i++) {
+        if (mTvServiceCallBack[i] != NULL) {
+            send.writeInt32(sourceConnectEvent->mSourceInput);
+            send.writeInt32(sourceConnectEvent->connectionState);
+            LOGD("send source evt(%d,%d) to client.\n",
+                 sourceConnectEvent->mSourceInput, sourceConnectEvent->connectionState);
+            mTvServiceCallBack[i]->transact(EVT_SRC_CT_CB, send, &reply);
+        } else {
+            LOGD("Event callback is null.\n");
+        }
     }
     return 0;
 }
@@ -84,15 +89,20 @@ int TvService::SendSignalForSignalDetectEvent(CTvEvent &event)
     Parcel send, reply;
 
     TvEvent::SignalDetectEvent *signalDetectEvent = (TvEvent::SignalDetectEvent *)(&event);
-    if (evtCallBack != NULL) {
-        send.writeInt32(signalDetectEvent->mSourceInput);
-        send.writeInt32(signalDetectEvent->mFmt);
-        send.writeInt32(signalDetectEvent->mTrans_fmt);
-        send.writeInt32(signalDetectEvent->mStatus);
-        send.writeInt32(signalDetectEvent->mDviFlag);
-        evtCallBack->transact(EVT_SIG_DT_CB, send, &reply);
-    } else {
-        LOGD("Event callback is null.\n");
+    int clientSize = mTvServiceCallBack.size();
+    LOGD("%s: now has %d tvclient.\n", __FUNCTION__, clientSize);
+    int i = 0;
+    for (i = 0; i < clientSize; i++) {
+        if (mTvServiceCallBack[i] != NULL) {
+            send.writeInt32(signalDetectEvent->mSourceInput);
+            send.writeInt32(signalDetectEvent->mFmt);
+            send.writeInt32(signalDetectEvent->mTrans_fmt);
+            send.writeInt32(signalDetectEvent->mStatus);
+            send.writeInt32(signalDetectEvent->mDviFlag);
+            mTvServiceCallBack[i]->transact(EVT_SIG_DT_CB, send, &reply);
+        } else {
+            LOGD("Event callback is null.\n");
+        }
     }
     return 0;
 }
@@ -244,6 +254,50 @@ int TvService::ParserTvDataCommand(const char *commandBuf, unsigned char *dataBu
     return ret;
 }
 
+int TvService::SetTvServiceCallBack(sp<IBinder> callBack)
+{
+    LOGD("%s\n", __FUNCTION__);
+    int ret = -1;
+    if (callBack != nullptr) {
+        LOGD("%s: callBack is %p.\n", __FUNCTION__, callBack);
+        int cookie = -1;
+        int clientSize = mTvServiceCallBack.size();
+        for (int i = 0; i < clientSize; i++) {
+            if (mTvServiceCallBack[i] == NULL) {
+                cookie = i;
+                mTvServiceCallBack[i] = callBack;
+                break;
+            } else {
+                LOGD("%s: mTvServiceCallBack[%d] has been register.\n", __FUNCTION__, i);
+            }
+        }
+
+        if (cookie < 0) {
+            cookie = clientSize;
+            mTvServiceCallBack[clientSize] = callBack;
+        }
+        ret = cookie;
+    } else {
+        LOGD("%s: callBack is NULL.\n", __FUNCTION__);
+    }
+    return ret;
+}
+
+int TvService::RemoveTvServiceCallBack(int callBackId)
+{
+    LOGD("%s\n", __FUNCTION__);
+
+    int clientSize = mTvServiceCallBack.size();
+    if (callBackId < 0) {
+        LOGD("%s: invalid callBackId.\n", __FUNCTION__);
+    } else {
+        mTvServiceCallBack.erase(callBackId);
+    }
+
+    clientSize = mTvServiceCallBack.size();
+    LOGD("%s: now has %d tvclient after remove.\n", __FUNCTION__, clientSize);
+    return 0;
+}
 status_t TvService::onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags) {
@@ -280,11 +334,12 @@ status_t TvService::onTransact(uint32_t code,
             break;
         }
         case CMD_SET_TV_CB: {
-            evtCallBack = data.readStrongBinder();
+            int tvServiceCallBackID = SetTvServiceCallBack(data.readStrongBinder());
+            reply->writeInt32(tvServiceCallBackID);
             break;
         }
         case CMD_CLR_TV_CB: {
-            evtCallBack = NULL;
+            RemoveTvServiceCallBack(data.readInt32());
             break;
         }
         default:

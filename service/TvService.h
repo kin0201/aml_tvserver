@@ -13,6 +13,7 @@
 #include <binder/Binder.h>
 #include <binder/Parcel.h>
 #include "CTv.h"
+#include <map>
 
 using namespace android;
 
@@ -40,8 +41,10 @@ private:
     int ParserTvCommand(const char *commandData);
     int ParserTvDataCommand(const char *commandBuf, unsigned char *dataBuf);
 
+    int SetTvServiceCallBack(sp<IBinder> callBack);
+    int RemoveTvServiceCallBack(int callBackId);
     CTv *mpTv;
-    sp<IBinder> evtCallBack;
+    std::map<int, sp<IBinder>> mTvServiceCallBack;
     virtual status_t onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags = 0);

@@ -40,6 +40,7 @@ TvClient *TvClient::GetInstance() {
 
 TvClient::TvClient() {
     LOGD("%s.\n", __FUNCTION__);
+    pthread_mutex_lock(&tvclient_mutex);
     sp<ProcessState> proc(ProcessState::self());
     proc->startThreadPool();
     Parcel send, reply;
@@ -53,13 +54,20 @@ TvClient::TvClient() {
     LOGD("Connected to tvservice.\n");
     send.writeStrongBinder(sp<IBinder>(this));
     tvServicebinder->transact(CMD_SET_TV_CB, send, &reply);
+    tvServicebinderId = reply.readInt32();
+    pthread_mutex_unlock(&tvclient_mutex);
 }
 
 TvClient::~TvClient() {
     LOGD("%s.\n", __FUNCTION__);
-    Parcel send, reply;
-    tvServicebinder->transact(CMD_CLR_TV_CB, send, &reply);
+    pthread_mutex_lock(&tvclient_mutex);
+    if (tvServicebinder != NULL) {
+        Parcel send, reply;
+        send.writeInt32(tvServicebinderId);
+        tvServicebinder->transact(CMD_CLR_TV_CB, send, &reply);
+    }
     tvServicebinder = NULL;
+    pthread_mutex_unlock(&tvclient_mutex);
 }
 
 int TvClient::SendMethodCall(char *CmdString)
@@ -76,6 +84,8 @@ int TvClient::SendMethodCall(char *CmdString)
         } else {
             ReturnVal = reply.readInt32();
         }
+    } else {
+        LOGE("%s: tvServicebinder is NULL.\n", __FUNCTION__);
     }
     return ReturnVal;
 }

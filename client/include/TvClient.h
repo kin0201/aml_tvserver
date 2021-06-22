@@ -74,6 +74,7 @@ private:
     std::map<int, TvClientIObserver *> mTvClientObserver;
 
     sp<IBinder> tvServicebinder;
+    int tvServicebinderId;
     virtual status_t onTransact(uint32_t code,
                                 const Parcel& data, Parcel* reply,
                                 uint32_t flags = 0);
