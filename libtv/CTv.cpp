@@ -575,7 +575,8 @@ void CTv::onSigToUnSupport()
 void CTv::onSigToNoSig()
 {
     LOGD("%s\n", __FUNCTION__);
-
+    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
+    LOGD("%s video layer has disabled \n", __FUNCTION__);
     mpTvin->Tvin_StopDecoder();
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
