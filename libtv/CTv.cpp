@@ -16,6 +16,7 @@
 #include "tvutils.h"
 #include "TvConfigManager.h"
 #include "CTvLog.h"
+#include "CVpp.h"
 #include <sys/ioctl.h>
 
 static tv_hdmi_edid_version_t Hdmi1CurrentEdidVer = HDMI_EDID_VER_14;
@@ -36,6 +37,15 @@ CTv::CTv()
         LOGD("%s: tvconfig file path is %s!\n", __FUNCTION__, tvConfigFilePath);
     }
     LoadConfigFile(tvConfigFilePath);
+
+    const char * value;
+    value = ConfigGetStr( CFG_SECTION_TV, CFG_TVIN_ATV_DISPLAY_SNOW, "null" );
+    if (strcmp(value, "enable") == 0 ) {
+        mATVDisplaySnow = true;
+    } else {
+        mATVDisplaySnow = false;
+    }
+    LOGD("%s: load mATVDisplaySnow status [%d]!\n", __FUNCTION__, mATVDisplaySnow);
 
     mpAmVideo = new CAmVideo();
     mpTvin = CTvin::getInstance();
@@ -71,6 +81,7 @@ CTv::CTv()
     }
     mTvDevicesPollDetect.setObserver(this);
     mTvDevicesPollDetect.startDetect();
+    mLastScreenMode = -1;
 }
 
 CTv::~CTv()
@@ -98,6 +109,11 @@ CTv::~CTv()
 int CTv::StartTv(tv_source_input_t source)
 {
     LOGD("%s: source = %d!\n", __FUNCTION__, source);
+
+    if (SOURCE_DTV == source) {//DTV source unsupport ,set blue screen
+        LOGD("%s: DTV: set blue layer!\n", __FUNCTION__);
+        CVpp::getInstance()->VPP_setVideoColor(true);
+    }
     int ret = -1;
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     ret = mpTvin->Tvin_OpenPort(source_port);
@@ -575,9 +591,19 @@ void CTv::onSigToUnSupport()
 void CTv::onSigToNoSig()
 {
     LOGD("%s\n", __FUNCTION__);
-    mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
-    LOGD("%s video layer has disabled \n", __FUNCTION__);
-    mpTvin->Tvin_StopDecoder();
+
+    if (needSnowEffect()) {
+        SetSnowShowEnable(true);
+        mpTvin->Tvin_StartDecoder(mCurrentSignalInfo);
+        mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_ENABLE);
+        CVpp::getInstance()->VPP_setVideoColor(false);
+
+    }  else {
+        LOGD("%s video layer has disabled \n", __FUNCTION__);
+        CVpp::getInstance()->VPP_setVideoColor(false);
+        mpTvin->Tvin_StopDecoder();
+    }
+
     TvEvent::SignalDetectEvent event;
     event.mSourceInput = mCurrentSource;
     event.mFmt = mCurrentSignalInfo.fmt;
@@ -586,6 +612,34 @@ void CTv::onSigToNoSig()
     event.mDviFlag = mCurrentSignalInfo.is_dvi;
     sendTvEvent (event);
     //To do
+}
+
+bool CTv::needSnowEffect()
+{
+    bool isEnable = false;
+    LOGD("%s: mCurrentSource = [%d].\n", __FUNCTION__,mCurrentSource);
+    if ((SOURCE_TV == mCurrentSource) && mATVDisplaySnow ) {
+        isEnable = true;
+        LOGD("%s: ATV:snow display is enabled.\n", __FUNCTION__);
+    } else {
+        LOGD("%s: ATV:snow display is disabled.\n", __FUNCTION__);
+    }
+
+    return isEnable;
+}
+
+int CTv::SetSnowShowEnable(bool enable)
+{
+    LOGD("%s: enable = [%d]\n", __FUNCTION__ , enable);
+    if (enable) {
+        mLastScreenMode = CVpp::getInstance()->getVideoScreenMode();
+        LOGD("%s: Get LastScreenMode = %d\n", __FUNCTION__, mLastScreenMode);
+        CVpp::getInstance()->setVideoScreenMode(1);//while show snow,need show full screen
+    } else {
+        LOGD("%s: Set LastScreenMode = %d\n", __FUNCTION__, mLastScreenMode);
+        CVpp::getInstance()->setVideoScreenMode(mLastScreenMode);
+    }
+    return mpTvin->Tvin_SwitchSnow(enable);
 }
 
 int CTv::sendTvEvent(CTvEvent &event)

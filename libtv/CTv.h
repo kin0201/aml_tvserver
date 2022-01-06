@@ -48,6 +48,8 @@ public:
     int GetFrontendInfo(tvin_frontend_info_t *frontendInfo);
     int SetColorRangeMode(tvin_color_range_t range_mode);
     int GetColorRangeMode();
+    bool needSnowEffect();
+    int SetSnowShowEnable(bool enable);
     int GetSourceConnectStatus(tv_source_input_t source);
     virtual void onSourceConnect(int source, int connect_status);
     virtual void onVdinSignalChange();
@@ -63,6 +65,8 @@ private:
     int mapSourcetoAudiotupe(tv_source_input_t dest_source);
 #endif
 
+    volatile int mLastScreenMode;
+
     CTvin *mpTvin;
     CAmVideo *mpAmVideo;
     CHDMIRxManager *mpHDMIRxManager;
@@ -71,4 +75,5 @@ private:
     CTvDevicesPollDetect mTvDevicesPollDetect;
     TvIObserver *mpObserver;
     vdin_work_mode_t mVdinWorkMode = VDIN_WORK_MODE_VFM;
+    bool mATVDisplaySnow;
 };

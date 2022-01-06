@@ -59,7 +59,7 @@ int CTvin::VDIN_OpenModule()
         LOGE("Open %s error(%s)!\n", VDIN_DEV_PATH, strerror(errno));
         return -1;
     }
-
+    LOGD ( "%s: Open %s module fd = [%d]\n",__FUNCTION__, VDIN_DEV_PATH, fd );
     return fd;
 }
 
@@ -89,6 +89,7 @@ int CTvin::VDIN_DeviceIOCtl ( int request, ... )
         va_end ( ap );
 
         tmp_ret = ioctl ( mVdin0DevFd, request, arg );
+        LOGD ( "%s: ret = %d\n",__FUNCTION__,tmp_ret);
         return tmp_ret;
     }
 
@@ -214,8 +215,7 @@ int CTvin::AFE_OpenModule ( void )
         LOGE ( "Open tvafe module, error(%s).\n", strerror ( errno ) );
         return -1;
     }
-
-    LOGD ( "Open %s module fd = [%d]\n", AFE_DEV_PATH, fd );
+    LOGD ( "%s: Open %s module fd = [%d]\n",__FUNCTION__, AFE_DEV_PATH, fd );
     return fd;
 }
 
@@ -245,7 +245,7 @@ int CTvin::AFE_DeviceIOCtl ( int request, ... )
         va_end ( ap );
 
         tmp_ret = ioctl ( mAfeDevFd, request, arg );
-
+        LOGD ( "%s: ret = %d\n",__FUNCTION__,tmp_ret);
         AFE_CloseModule();
 
         return tmp_ret;
@@ -535,9 +535,11 @@ int CTvin::Tvin_SwitchSnow(bool enable)
 {
     int ret = -1;
     if ( enable ) {
+        LOGD("%s: set snow enable\n", __FUNCTION__ );
         ret = AFE_DeviceIOCtl( TVIN_IOC_S_AFE_SONWON );
         ret = VDIN_DeviceIOCtl( TVIN_IOC_SNOWON );
     } else {
+        LOGD("%s: set snow disable\n", __FUNCTION__ );
         ret = AFE_DeviceIOCtl( TVIN_IOC_S_AFE_SONWOFF );
         ret = VDIN_DeviceIOCtl( TVIN_IOC_SNOWOFF );
     }

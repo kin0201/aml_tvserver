@@ -28,6 +28,7 @@ tv_SRCS  = \
 	$(LOCAL_PATH)/libtv/CTvDevicesPollDetect.cpp \
 	$(LOCAL_PATH)/libtv/CTvAudio.cpp \
 	$(LOCAL_PATH)/libtv/CAmVideo.cpp \
+	$(LOCAL_PATH)/libtv/CVpp.cpp \
 	$(NULL)
 
 ################################################################################
