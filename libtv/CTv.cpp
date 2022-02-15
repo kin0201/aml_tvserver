@@ -118,6 +118,10 @@ int CTv::StartTv(tv_source_input_t source)
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     ret = mpTvin->Tvin_OpenPort(source_port);
     mCurrentSource = source;
+    if (SOURCE_MPEG == source) {
+        LOGD("%s: NEW SOURCE is MPEG! RETURN\n", __FUNCTION__);
+        return ret;
+    }
 #ifdef HAVE_AUDIO
     CTvAudio::getInstance()->create_audio_patch(mapSourcetoAudiotupe(source));
 #endif
@@ -132,6 +136,7 @@ int CTv::StopTv(tv_source_input_t source)
 #endif
     mpAmVideo->SetVideoLayerStatus(VIDEO_LAYER_STATUS_DISABLE);
     mpAmVideo->SetVideoGlobalOutputMode(VIDEO_GLOBAL_OUTPUT_MODE_DISABLE);
+    mpTvin->Tvin_StopDecoder();
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     mpTvin->Tvin_ClosePort(source_port);
 
