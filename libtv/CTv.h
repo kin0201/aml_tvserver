@@ -23,6 +23,11 @@
 #define DOLBY_VISION_STB_KO_PATH           "/vendor/lib/modules/dovi.ko"
 #define DOLBY_VISION_ENABLE_PATH           "/sys/module/amdolby_vision/parameters/dolby_vision_enable"
 
+#define VIDEO_SYNC_ENABLE   "/sys/class/tsync/enable"
+#define VIDEO_SYNC_MODE     "/sys/class/tsync/mode"
+//0 means do AV sync, 1 means don't do AV sync,just free run.
+#define VIDEO_FREERUN_MODE    "/sys/class/video/freerun_mode"
+
 class CTv : public CTvDevicesPollDetect::ISourceConnectObserver {
 public:
     class TvIObserver {

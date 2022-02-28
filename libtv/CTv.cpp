@@ -114,6 +114,16 @@ int CTv::StartTv(tv_source_input_t source)
         LOGD("%s: DTV: set blue layer!\n", __FUNCTION__);
         CVpp::getInstance()->VPP_setVideoColor(true);
     }
+
+    //DTV need frame AV sync, other source don't need it
+    if (SOURCE_DTV != source) {
+        tvWriteSysfs(VIDEO_SYNC_ENABLE, "0");
+        // set sync mode to vmaster. 0: vmaster; 1:amaster
+        tvWriteSysfs(VIDEO_SYNC_MODE, "0");
+    } else {
+        tvWriteSysfs(VIDEO_FREERUN_MODE, "0");
+    }
+
     int ret = -1;
     tvin_port_t source_port = mpTvin->Tvin_GetSourcePortBySourceInput(source);
     ret = mpTvin->Tvin_OpenPort(source_port);
